@@ -1,0 +1,95 @@
+{% set modules_nav = modules %}
+{% set active_module = 0 %}
+{% extends "base.html" %}
+
+{% block title %}DSA Master — Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+
+  <header class="hero">
+    <div class="hero-text">
+      <h1>Master Data Structures & Algorithms</h1>
+      <p>An interactive Python course for beginners. Learn with hands-on labs and quizzes — no fluff, just code.</p>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-card">
+        <div class="stat-num">{{ completed_labs }}</div>
+        <div class="stat-label">Labs Done</div>
+        <div class="stat-sub">of {{ total_labs }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">{{ completed_quizzes }}</div>
+        <div class="stat-label">Quizzes Passed</div>
+        <div class="stat-sub">of {{ total_modules }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">{{ ((completed_labs / total_labs * 100) | int) if total_labs > 0 else 0 }}%</div>
+        <div class="stat-label">Complete</div>
+        <div class="stat-sub">overall progress</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="progress-bar-global">
+    <div class="progress-bar-fill" style="width: {{ ((completed_labs / total_labs * 100) | int) if total_labs > 0 else 0 }}%"></div>
+  </div>
+
+  <section class="modules-section">
+    <h2 class="section-title">Course Modules</h2>
+    <div class="module-grid">
+      {% for m in modules %}
+      <div class="module-card" style="--card-accent: {{ m.color }}">
+        <div class="module-card-header">
+          <div class="module-icon-big">{{ m.icon }}</div>
+          <div class="module-meta">
+            <span class="badge badge-difficulty">{{ m.difficulty }}</span>
+            <span class="badge badge-time">⏱ {{ m.estimated_time }}</span>
+          </div>
+        </div>
+        <h3 class="module-card-title">{{ m.title }}</h3>
+        <p class="module-card-desc">{{ m.description }}</p>
+
+        <div class="module-progress">
+          <div class="module-prog-row">
+            <span>Labs</span>
+            <span>{{ m.labs_done }}/{{ m.total_labs }}</span>
+          </div>
+          <div class="module-prog-bar">
+            <div class="module-prog-fill"
+                 style="width: {{ ((m.labs_done / m.total_labs * 100) | int) if m.total_labs > 0 else 0 }}%; background: {{ m.color }}">
+            </div>
+          </div>
+          {% if m.quiz_score is not none %}
+          <div class="quiz-score-badge" style="color: {{ m.color }}">
+            Quiz: {{ m.quiz_score }}%
+            {% if m.quiz_score >= 80 %}✅{% else %}🔄{% endif %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="module-card-actions">
+          <a href="/module/{{ m.id }}" class="btn btn-primary" style="background: {{ m.color }}">
+            {% if m.visited %}Continue{% else %}Start{% endif %}
+          </a>
+          <a href="/quiz/{{ m.id }}" class="btn btn-outline">Quiz</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <div class="reset-section">
+    <button class="btn btn-danger-outline" onclick="resetProgress()">Reset All Progress</button>
+  </div>
+
+</div>
+
+<script>
+function resetProgress() {
+  if (!confirm('Reset ALL progress? This cannot be undone.')) return;
+  fetch('/reset_progress', { method: 'POST' })
+    .then(() => location.reload());
+}
+</script>
+{% endblock %}

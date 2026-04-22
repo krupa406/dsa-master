@@ -1,0 +1,183 @@
+{% set modules_nav = [module] %}
+{% set active_module = module.id %}
+{% extends "base.html" %}
+
+{% block title %}Lab {{ lab_number }}: {{ lab.title }} — DSA Master{% endblock %}
+
+{% block content %}
+<div class="lab-page">
+
+  <div class="lab-page-header" style="--accent: {{ module.color }}">
+    <a href="/module/{{ module.id }}" class="back-link">← {{ module.icon }} {{ module.title }}</a>
+    <div class="lab-title-row">
+      <h1>🧪 Lab {{ lab_number }}: {{ lab.title }}</h1>
+      <span class="lab-progress-badge">Lab {{ lab_number }} of {{ total_labs }}</span>
+    </div>
+    {% if is_completed %}
+    <div class="completed-banner">✅ You've completed this lab!</div>
+    {% endif %}
+  </div>
+
+  <div class="lab-layout">
+
+    <!-- Left panel: instructions -->
+    <aside class="lab-instructions">
+      <div class="instructions-card">
+        <h3>📋 Instructions</h3>
+        <div class="instructions-body">{{ lab.description | safe }}</div>
+      </div>
+
+      <div class="hints-card">
+        <h3>💡 Hints</h3>
+        <div class="hints-list">
+          {% for hint in lab.hints %}
+          <details class="hint-item">
+            <summary>Hint {{ loop.index }}</summary>
+            <p>{{ hint }}</p>
+          </details>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="sidebar-section mt-2">
+        <div class="sidebar-label">Module Labs</div>
+        {% for l in module.labs %}
+        <a href="/lab/{{ module.id }}/{{ l.id }}"
+           class="sidebar-link {% if l.id == lab.id %}active{% endif %}">
+          🧪 Lab {{ loop.index }}: {{ l.title }}
+        </a>
+        {% endfor %}
+        <a href="/quiz/{{ module.id }}" class="sidebar-link">📝 Take Quiz</a>
+      </div>
+    </aside>
+
+    <!-- Right panel: editor + output -->
+    <main class="lab-editor-area">
+
+      <div class="editor-wrap">
+        <div class="editor-toolbar">
+          <span class="editor-label">Python — Write your solution</span>
+          <div class="editor-btns">
+            <button class="btn-secondary" onclick="resetCode()">↺ Reset</button>
+            <button class="btn-run" id="run-btn" onclick="runTests()">▶ Run &amp; Test</button>
+          </div>
+        </div>
+        <textarea class="code-editor" id="lab-editor" spellcheck="false">{{ lab.starter_code }}</textarea>
+      </div>
+
+      <div class="output-wrap" id="output-wrap" style="display:none">
+        <div class="output-header-row">
+          <span class="output-header">Test Output</span>
+          <span id="result-badge" class="result-badge"></span>
+        </div>
+        <pre class="output-pre" id="lab-output"></pre>
+      </div>
+
+      <div class="lab-actions">
+        <button class="btn btn-primary" id="run-btn-2"
+                onclick="runTests()" style="background: {{ module.color }}">
+          ▶ Run &amp; Test
+        </button>
+        {% if prev_lab %}
+        <a href="/lab/{{ module.id }}/{{ prev_lab.id }}" class="btn btn-outline">← Prev Lab</a>
+        {% endif %}
+        {% if next_lab %}
+        <a href="/lab/{{ module.id }}/{{ next_lab.id }}" class="btn btn-outline">Next Lab →</a>
+        {% else %}
+        <a href="/quiz/{{ module.id }}" class="btn btn-outline">Take Quiz →</a>
+        {% endif %}
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script>
+const STARTER_CODE = {{ lab.starter_code | tojson }};
+const TEST_CODE    = {{ lab.test_code    | tojson }};
+const MODULE_ID    = {{ module.id }};
+const LAB_ID       = {{ lab.id }};
+
+function resetCode() {
+  if (confirm('Reset to starter code? Your changes will be lost.')) {
+    document.getElementById('lab-editor').value = STARTER_CODE;
+    document.getElementById('output-wrap').style.display = 'none';
+  }
+}
+
+function setRunning(running) {
+  const btns = [document.getElementById('run-btn'), document.getElementById('run-btn-2')];
+  btns.forEach(b => {
+    b.textContent = running ? '⏳ Running...' : '▶ Run & Test';
+    b.disabled = running;
+  });
+}
+
+function runTests() {
+  const code = document.getElementById('lab-editor').value;
+  const outputWrap = document.getElementById('output-wrap');
+  const outputEl   = document.getElementById('lab-output');
+  const badge      = document.getElementById('result-badge');
+
+  setRunning(true);
+  outputWrap.style.display = 'block';
+  outputEl.textContent = 'Running...';
+  badge.textContent = '';
+  badge.className = 'result-badge';
+
+  fetch('/run_code', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code, test_code: TEST_CODE })
+  })
+  .then(r => r.json())
+  .then(data => {
+    const text = data.stdout + (data.stderr ? '\n' + data.stderr : '');
+    outputEl.textContent = text.trim() || '(no output)';
+
+    const passed = data.success && text.includes('All tests passed');
+    outputEl.className = 'output-pre ' + (passed ? 'out-success' : (data.success ? '' : 'out-error'));
+
+    if (passed) {
+      badge.textContent = '✅ All Tests Passed!';
+      badge.className = 'result-badge badge-pass';
+      markComplete();
+    } else if (!data.success) {
+      badge.textContent = '❌ Error';
+      badge.className = 'result-badge badge-fail';
+    } else {
+      badge.textContent = '⚠️ Some Tests Failed';
+      badge.className = 'result-badge badge-warn';
+    }
+    setRunning(false);
+  })
+  .catch(() => {
+    outputEl.textContent = 'Error: Could not connect to server.';
+    setRunning(false);
+  });
+}
+
+function markComplete() {
+  fetch('/complete_lab', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ module_id: MODULE_ID, lab_id: LAB_ID })
+  });
+}
+
+// Tab support & Ctrl+Enter to run
+document.getElementById('lab-editor').addEventListener('keydown', function(e) {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const s = this.selectionStart, end = this.selectionEnd;
+    this.value = this.value.substring(0, s) + '    ' + this.value.substring(end);
+    this.selectionStart = this.selectionEnd = s + 4;
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') runTests();
+});
+
+// Auto-size textarea
+const editor = document.getElementById('lab-editor');
+editor.style.height = Math.max(300, editor.scrollHeight) + 'px';
+</script>
+{% endblock %}

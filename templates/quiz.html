@@ -1,0 +1,174 @@
+{% set modules_nav = [module] %}
+{% set active_module = module.id %}
+{% extends "base.html" %}
+
+{% block title %}Quiz: {{ module.title }} — DSA Master{% endblock %}
+
+{% block content %}
+<div class="quiz-page">
+
+  <div class="quiz-page-header" style="--accent: {{ module.color }}">
+    <a href="/module/{{ module.id }}" class="back-link">← {{ module.icon }} {{ module.title }}</a>
+    <h1>📝 {{ module.title }} Quiz</h1>
+    <p>{{ module.quiz | length }} questions · Select one answer per question</p>
+    {% if quiz_score is not none %}
+    <div class="prev-score">
+      Previous best: <strong>{{ quiz_score }}%</strong>
+      {% if quiz_score >= 80 %}🏆{% elif quiz_score >= 60 %}👍{% else %}💪{% endif %}
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Quiz form -->
+  <div class="quiz-form" id="quiz-form">
+    {% for q in module.quiz %}
+    <div class="question-card" id="q{{ loop.index0 }}">
+      <div class="question-num">Question {{ loop.index }} of {{ module.quiz | length }}</div>
+      <div class="question-text">{{ q.question }}</div>
+      <div class="options-list">
+        {% for opt in q.options %}
+        <label class="option-label" id="opt-{{ loop.index0 }}-{{ loop.index0 }}">
+          <input type="radio" name="q{{ loop.index0 }}" value="{{ loop.index0 }}"
+                 onchange="selectOption({{ loop.index0 - 1 }}, {{ loop.index0 }})">
+          <span class="option-letter">{{ ['A','B','C','D'][loop.index0] }}</span>
+          <span class="option-text">{{ opt }}</span>
+        </label>
+        {% endfor %}
+      </div>
+      <div class="question-feedback" id="feedback-{{ loop.index0 }}" style="display:none"></div>
+    </div>
+    {% endfor %}
+
+    <div class="quiz-submit-row">
+      <div id="submit-hint" class="submit-hint">Answer all {{ module.quiz | length }} questions to submit</div>
+      <button class="btn btn-primary btn-large" id="submit-btn"
+              onclick="submitQuiz()" disabled
+              style="background: {{ module.color }}">
+        Submit Quiz
+      </button>
+    </div>
+  </div>
+
+  <!-- Results panel (hidden until submitted) -->
+  <div class="quiz-results" id="quiz-results" style="display:none">
+    <div class="results-score-circle" id="score-circle">
+      <div class="score-number" id="score-number">0%</div>
+      <div class="score-label" id="score-label">Score</div>
+    </div>
+    <div class="results-summary" id="results-summary"></div>
+    <div class="results-breakdown" id="results-breakdown"></div>
+    <div class="results-actions">
+      <button class="btn btn-outline" onclick="retakeQuiz()">↺ Retake Quiz</button>
+      {% if next_module %}
+      <a href="/module/{{ next_module.id }}" class="btn btn-primary" style="background: {{ module.color }}">
+        Next: {{ next_module.icon }} {{ next_module.title }} →
+      </a>
+      {% else %}
+      <a href="/" class="btn btn-primary" style="background: {{ module.color }}">🏠 Back to Dashboard</a>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = {{ module.quiz | tojson }};
+const MODULE_ID = {{ module.id }};
+const TOTAL     = QUESTIONS.length;
+const answers   = {};  // { questionIndex: selectedOptionIndex }
+
+function selectOption(qIdx, optIdx) {
+  answers[qIdx] = optIdx;
+  // Highlight selected
+  document.querySelectorAll(`#q${qIdx} .option-label`).forEach((el, i) => {
+    el.classList.toggle('selected', i === optIdx);
+  });
+  updateSubmitBtn();
+}
+
+function updateSubmitBtn() {
+  const answered = Object.keys(answers).length;
+  const btn  = document.getElementById('submit-btn');
+  const hint = document.getElementById('submit-hint');
+  btn.disabled = answered < TOTAL;
+  hint.textContent = answered < TOTAL
+    ? `Answer ${TOTAL - answered} more question${TOTAL - answered > 1 ? 's' : ''} to submit`
+    : 'All questions answered — ready to submit!';
+}
+
+function submitQuiz() {
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('submit-btn').textContent = 'Submitting...';
+
+  fetch('/submit_quiz', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ module_id: MODULE_ID, answers })
+  })
+  .then(r => r.json())
+  .then(data => showResults(data));
+}
+
+function showResults(data) {
+  document.getElementById('quiz-form').style.display = 'none';
+  const resultsEl = document.getElementById('quiz-results');
+  resultsEl.style.display = 'block';
+
+  // Score circle
+  const pct = data.score;
+  const circle = document.getElementById('score-circle');
+  document.getElementById('score-number').textContent = pct + '%';
+  document.getElementById('score-label').textContent =
+    `${data.correct} / ${data.total} correct`;
+
+  if (pct >= 80) {
+    circle.classList.add('score-great');
+    document.getElementById('results-summary').innerHTML =
+      `<h2>🏆 Excellent! You scored ${pct}%</h2><p>Outstanding work! You've mastered this module.</p>`;
+  } else if (pct >= 60) {
+    circle.classList.add('score-ok');
+    document.getElementById('results-summary').innerHTML =
+      `<h2>👍 Good job! You scored ${pct}%</h2><p>Solid understanding — review the missed questions and try again to hit 80%+.</p>`;
+  } else {
+    circle.classList.add('score-low');
+    document.getElementById('results-summary').innerHTML =
+      `<h2>💪 Keep going! You scored ${pct}%</h2><p>Review the theory and labs, then retake. You've got this!</p>`;
+  }
+
+  // Breakdown
+  let html = '<div class="breakdown-list">';
+  QUESTIONS.forEach((q, i) => {
+    const r = data.results[i];
+    const userAns = answers[i];
+    html += `
+      <div class="breakdown-item ${r.correct ? 'bd-correct' : 'bd-wrong'}">
+        <div class="bd-header">
+          <span class="bd-status">${r.correct ? '✅' : '❌'}</span>
+          <span class="bd-question">Q${i+1}: ${q.question}</span>
+        </div>
+        <div class="bd-details">
+          ${!r.correct ? `<div class="bd-your-ans">Your answer: <em>${q.options[userAns]}</em></div>` : ''}
+          <div class="bd-correct-ans">Correct: <em>${q.options[r.correct_answer]}</em></div>
+          <div class="bd-explanation">${r.explanation}</div>
+        </div>
+      </div>`;
+  });
+  html += '</div>';
+  document.getElementById('results-breakdown').innerHTML = html;
+
+  resultsEl.scrollIntoView({ behavior: 'smooth' });
+}
+
+function retakeQuiz() {
+  Object.keys(answers).forEach(k => delete answers[k]);
+  document.getElementById('quiz-form').style.display = 'block';
+  document.getElementById('quiz-results').style.display = 'none';
+  // Reset all radio buttons and styles
+  document.querySelectorAll('input[type=radio]').forEach(r => r.checked = false);
+  document.querySelectorAll('.option-label').forEach(l => l.classList.remove('selected','correct','wrong'));
+  document.getElementById('submit-btn').textContent = 'Submit Quiz';
+  updateSubmitBtn();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+{% endblock %}

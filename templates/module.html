@@ -1,0 +1,165 @@
+{% set modules_nav = [module] %}
+{% set active_module = module.id %}
+{% extends "base.html" %}
+
+{% block title %}{{ module.title }} — DSA Master{% endblock %}
+
+{% block content %}
+<div class="module-page">
+
+  <div class="module-page-header" style="--accent: {{ module.color }}">
+    <a href="/" class="back-link">← Dashboard</a>
+    <div class="module-page-title">
+      <span class="module-page-icon">{{ module.icon }}</span>
+      <div>
+        <h1>{{ module.title }}</h1>
+        <div class="module-page-meta">
+          <span class="badge badge-difficulty">{{ module.difficulty }}</span>
+          <span class="badge badge-time">⏱ {{ module.estimated_time }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="module-layout">
+
+    <!-- Sidebar -->
+    <aside class="module-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">This Module</div>
+        <a href="/module/{{ module.id }}" class="sidebar-link active">📖 Theory</a>
+        {% for lab in module.labs %}
+        <a href="/lab/{{ module.id }}/{{ lab.id }}" class="sidebar-link">
+          {% if labs_status[lab.id] %}✅{% else %}🧪{% endif %}
+          Lab {{ loop.index }}: {{ lab.title }}
+        </a>
+        {% endfor %}
+        <a href="/quiz/{{ module.id }}" class="sidebar-link">
+          {% if quiz_score is not none %}
+            {% if quiz_score >= 80 %}✅{% else %}🔄{% endif %}
+          {% else %}📝{% endif %}
+          Quiz
+          {% if quiz_score is not none %}<span class="quiz-badge">{{ quiz_score }}%</span>{% endif %}
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Navigation</div>
+        {% if prev_module %}
+        <a href="/module/{{ prev_module.id }}" class="sidebar-link">← {{ prev_module.icon }} {{ prev_module.title }}</a>
+        {% endif %}
+        {% if next_module %}
+        <a href="/module/{{ next_module.id }}" class="sidebar-link">{{ next_module.icon }} {{ next_module.title }} →</a>
+        {% endif %}
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="module-content">
+      <div class="theory-content">
+        {{ module.content | safe }}
+      </div>
+
+      <!-- Sandbox -->
+      <div class="sandbox-section">
+        <h3>🛠️ Python Sandbox</h3>
+        <p>Experiment with the concepts above. This code runs on your machine.</p>
+        <div class="editor-wrap" id="sandbox-wrap">
+          <div class="editor-toolbar">
+            <span class="editor-label">Python</span>
+            <button class="btn-run" onclick="runSandbox()">▶ Run Code</button>
+          </div>
+          <textarea class="code-editor" id="sandbox-editor" spellcheck="false" rows="8"># Try it yourself!
+# Type your Python code here and press Run Code
+
+numbers = [5, 2, 8, 1, 9, 3]
+print("Original:", numbers)
+numbers.sort()
+print("Sorted:  ", numbers)
+print("Length:  ", len(numbers))
+</textarea>
+          <div class="output-panel" id="sandbox-output" style="display:none">
+            <div class="output-header">Output</div>
+            <pre class="output-pre" id="sandbox-out"></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Labs summary -->
+      <div class="labs-summary">
+        <h3>🧪 Labs for this Module</h3>
+        <div class="labs-grid">
+          {% for lab in module.labs %}
+          <a href="/lab/{{ module.id }}/{{ lab.id }}" class="lab-card {% if labs_status[lab.id] %}lab-done{% endif %}">
+            <div class="lab-card-top">
+              <span class="lab-num">Lab {{ loop.index }}</span>
+              {% if labs_status[lab.id] %}<span class="lab-check">✅ Completed</span>{% endif %}
+            </div>
+            <h4>{{ lab.title }}</h4>
+            <p>{{ lab.description | striptags | truncate(100) }}</p>
+            <span class="lab-cta">{{ 'Review →' if labs_status[lab.id] else 'Start Lab →' }}</span>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Quiz CTA -->
+      <div class="quiz-cta-banner" style="border-color: {{ module.color }}">
+        <div class="quiz-cta-text">
+          <h3>📝 Test Your Knowledge</h3>
+          <p>Ready to check what you've learned? Take the {{ module.title }} quiz.</p>
+        </div>
+        <a href="/quiz/{{ module.id }}" class="btn btn-primary" style="background: {{ module.color }}">
+          {% if quiz_score is not none %}Retake Quiz (Best: {{ quiz_score }}%){% else %}Take Quiz{% endif %}
+        </a>
+      </div>
+
+      <!-- Nav -->
+      <div class="page-nav">
+        {% if prev_module %}
+        <a href="/module/{{ prev_module.id }}" class="btn btn-outline">← {{ prev_module.icon }} {{ prev_module.title }}</a>
+        {% else %}<span></span>{% endif %}
+        {% if next_module %}
+        <a href="/module/{{ next_module.id }}" class="btn btn-outline">{{ next_module.icon }} {{ next_module.title }} →</a>
+        {% endif %}
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+function runSandbox() {
+  const code = document.getElementById('sandbox-editor').value;
+  const outEl = document.getElementById('sandbox-out');
+  const panel = document.getElementById('sandbox-output');
+  const btn = document.querySelector('.btn-run');
+  btn.textContent = '⏳ Running...';
+  btn.disabled = true;
+  panel.style.display = 'block';
+  outEl.textContent = '';
+  fetch('/run_free', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ code })
+  })
+  .then(r => r.json())
+  .then(data => {
+    outEl.textContent = data.stdout || data.stderr || '(no output)';
+    outEl.className = 'output-pre ' + (data.success ? 'out-success' : 'out-error');
+    btn.textContent = '▶ Run Code';
+    btn.disabled = false;
+  });
+}
+
+document.getElementById('sandbox-editor').addEventListener('keydown', function(e) {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const start = this.selectionStart;
+    const end = this.selectionEnd;
+    this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
+    this.selectionStart = this.selectionEnd = start + 4;
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') runSandbox();
+});
+</script>
+{% endblock %}
