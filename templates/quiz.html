@@ -22,20 +22,21 @@
   <!-- Quiz form -->
   <div class="quiz-form" id="quiz-form">
     {% for q in module.quiz %}
-    <div class="question-card" id="q{{ loop.index0 }}">
+    {% set q_idx = loop.index0 %}
+    <div class="question-card" id="q{{ q_idx }}">
       <div class="question-num">Question {{ loop.index }} of {{ module.quiz | length }}</div>
       <div class="question-text">{{ q.question }}</div>
       <div class="options-list">
         {% for opt in q.options %}
-        <label class="option-label" id="opt-{{ loop.index0 }}-{{ loop.index0 }}">
-          <input type="radio" name="q{{ loop.index0 }}" value="{{ loop.index0 }}"
-                 onchange="selectOption({{ loop.index0 - 1 }}, {{ loop.index0 }})">
+        <label class="option-label" id="opt-{{ q_idx }}-{{ loop.index0 }}">
+          <input type="radio" name="q{{ q_idx }}" value="{{ loop.index0 }}"
+                 onchange="selectOption({{ q_idx }}, {{ loop.index0 }})">
           <span class="option-letter">{{ ['A','B','C','D'][loop.index0] }}</span>
           <span class="option-text">{{ opt }}</span>
         </label>
         {% endfor %}
       </div>
-      <div class="question-feedback" id="feedback-{{ loop.index0 }}" style="display:none"></div>
+      <div class="question-feedback" id="feedback-{{ q_idx }}" style="display:none"></div>
     </div>
     {% endfor %}
 
