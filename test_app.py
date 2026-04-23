@@ -4,7 +4,9 @@ Run with: python test_app.py
 """
 import unittest
 import json
-from app import app
+import os
+import tempfile
+from app import app, init_db
 from modules_data import MODULES
 
 
@@ -242,12 +244,24 @@ class TestCodeExecution(unittest.TestCase):
 
 
 class TestProgressTracking(unittest.TestCase):
-    """Test session-based progress persistence."""
+    """Test SQLite-backed progress persistence."""
 
     def setUp(self):
+        self.db_fd, self.db_path = tempfile.mkstemp(suffix='.db')
+        os.close(self.db_fd)  # Release fd; SQLite manages the file itself
         app.config['TESTING'] = True
         app.config['SECRET_KEY'] = 'test-secret'
+        app.config['DB_PATH'] = self.db_path
+        app._db_ready = False
         self.client = app.test_client()
+
+    def tearDown(self):
+        import gc
+        gc.collect()  # Release SQLite connections before deletion (needed on Windows)
+        try:
+            os.unlink(self.db_path)
+        except (PermissionError, FileNotFoundError):
+            pass
 
     def test_visiting_module_marks_it_visited(self):
         self.client.get('/module/1')

@@ -1,11 +1,17 @@
 import sys
 import subprocess
 import json
-from flask import Flask, render_template, request, jsonify, session
+import sqlite3
+import uuid
+from datetime import timedelta
+from flask import Flask, render_template, request, jsonify, session, current_app
 from modules_data import MODULES
 
 app = Flask(__name__)
 app.secret_key = 'dsa-platform-secret-2024'
+app.config['SESSION_PERMANENT'] = True
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=365)
+app.config['DB_PATH'] = 'progress.db'
 
 
 @app.context_processor
@@ -13,19 +19,63 @@ def inject_nav():
     return {'modules_nav': MODULES, 'active_module': 0}
 
 
+def get_db_path():
+    return current_app.config.get('DB_PATH', 'progress.db')
+
+
+def init_db():
+    with sqlite3.connect(get_db_path()) as conn:
+        conn.executescript('''
+            CREATE TABLE IF NOT EXISTS modules_visited (
+                user_id TEXT NOT NULL,
+                module_id INTEGER NOT NULL,
+                PRIMARY KEY (user_id, module_id)
+            );
+            CREATE TABLE IF NOT EXISTS labs_completed (
+                user_id TEXT NOT NULL,
+                lab_key TEXT NOT NULL,
+                PRIMARY KEY (user_id, lab_key)
+            );
+            CREATE TABLE IF NOT EXISTS quiz_scores (
+                user_id TEXT NOT NULL,
+                module_id TEXT NOT NULL,
+                score INTEGER NOT NULL,
+                PRIMARY KEY (user_id, module_id)
+            );
+        ''')
+
+
+@app.before_request
+def ensure_db():
+    if not getattr(app, '_db_ready', False):
+        init_db()
+        app._db_ready = True
+
+
+def get_user_id():
+    if 'user_id' not in session:
+        session['user_id'] = str(uuid.uuid4())
+    return session['user_id']
+
+
 def get_progress():
-    if 'progress' not in session:
-        session['progress'] = {
-            'modules_visited': [],
-            'labs_completed': {},
-            'quiz_scores': {},
-        }
-    return session['progress']
-
-
-def save_progress(progress):
-    session['progress'] = progress
-    session.modified = True
+    user_id = get_user_id()
+    db = get_db_path()
+    with sqlite3.connect(db) as conn:
+        visited = [row[0] for row in conn.execute(
+            'SELECT module_id FROM modules_visited WHERE user_id = ?', (user_id,)
+        )]
+        labs = {row[0]: True for row in conn.execute(
+            'SELECT lab_key FROM labs_completed WHERE user_id = ?', (user_id,)
+        )}
+        scores = {row[0]: row[1] for row in conn.execute(
+            'SELECT module_id, score FROM quiz_scores WHERE user_id = ?', (user_id,)
+        )}
+    return {
+        'modules_visited': visited,
+        'labs_completed': labs,
+        'quiz_scores': scores,
+    }
 
 
 def execute_code(code, timeout=10):
@@ -79,7 +129,7 @@ def index():
             'labs_done': labs_done,
             'total_labs': len(m['labs']),
             'quiz_score': quiz_score,
-            'content': None,  # Don't send full content to index
+            'content': None,
         })
     total_labs = sum(len(m['labs']) for m in MODULES)
     completed_labs = len(progress['labs_completed'])
@@ -101,8 +151,12 @@ def module_page(module_id):
         return 'Module not found', 404
     progress = get_progress()
     if module_id not in progress['modules_visited']:
-        progress['modules_visited'].append(module_id)
-        save_progress(progress)
+        user_id = get_user_id()
+        with sqlite3.connect(get_db_path()) as conn:
+            conn.execute(
+                'INSERT OR IGNORE INTO modules_visited (user_id, module_id) VALUES (?, ?)',
+                (user_id, module_id)
+            )
     mid = str(module_id)
     labs_status = {
         lab['id']: f"{mid}_{lab['id']}" in progress['labs_completed']
@@ -196,10 +250,13 @@ def complete_lab():
     lab_id = data.get('lab_id')
     if not module_id or not lab_id:
         return jsonify({'error': 'Missing module_id or lab_id'}), 400
-    progress = get_progress()
+    user_id = get_user_id()
     lab_key = f"{module_id}_{lab_id}"
-    progress['labs_completed'][lab_key] = True
-    save_progress(progress)
+    with sqlite3.connect(get_db_path()) as conn:
+        conn.execute(
+            'INSERT OR IGNORE INTO labs_completed (user_id, lab_key) VALUES (?, ?)',
+            (user_id, lab_key)
+        )
     return jsonify({'success': True})
 
 
@@ -225,11 +282,15 @@ def submit_quiz():
             'explanation': question['explanation'],
         })
     score = round((correct / len(quiz)) * 100)
-    progress = get_progress()
+    user_id = get_user_id()
     mid = str(module_id)
-    if mid not in progress['quiz_scores'] or score > progress['quiz_scores'][mid]:
-        progress['quiz_scores'][mid] = score
-        save_progress(progress)
+    with sqlite3.connect(get_db_path()) as conn:
+        conn.execute(
+            'INSERT INTO quiz_scores (user_id, module_id, score) VALUES (?, ?, ?) '
+            'ON CONFLICT(user_id, module_id) DO UPDATE SET score = excluded.score '
+            'WHERE excluded.score > quiz_scores.score',
+            (user_id, mid, score)
+        )
     return jsonify({
         'score': score,
         'correct': correct,
@@ -240,12 +301,11 @@ def submit_quiz():
 
 @app.route('/reset_progress', methods=['POST'])
 def reset_progress():
-    session['progress'] = {
-        'modules_visited': [],
-        'labs_completed': {},
-        'quiz_scores': {},
-    }
-    session.modified = True
+    user_id = get_user_id()
+    with sqlite3.connect(get_db_path()) as conn:
+        conn.execute('DELETE FROM modules_visited WHERE user_id = ?', (user_id,))
+        conn.execute('DELETE FROM labs_completed WHERE user_id = ?', (user_id,))
+        conn.execute('DELETE FROM quiz_scores WHERE user_id = ?', (user_id,))
     return jsonify({'success': True})
 
 

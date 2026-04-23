@@ -2213,4 +2213,1855 @@ if _fail == 0:
             },
         ]
     },
+    {
+        'id': 9,
+        'title': 'Graphs',
+        'icon': '🕸️',
+        'description': 'Explore graphs — the most versatile data structure for modeling connections and relationships.',
+        'difficulty': 'Intermediate',
+        'estimated_time': '60 min',
+        'color': '#059669',
+        'content': """
+<h2>What is a Graph?</h2>
+<p>A <strong>graph</strong> is a collection of <strong>nodes</strong> (vertices) connected by <strong>edges</strong>. Graphs model real-world relationships: roads, social networks, web pages, dependencies.</p>
+
+<div class="concept-box">
+  <h4>🔑 Key Idea</h4>
+  <p>Unlike trees (which are a special kind of graph), general graphs can have cycles and nodes with many connections in any direction.</p>
+</div>
+
+<h3>Graph Terminology</h3>
+<ul>
+  <li><strong>Vertex / Node</strong> — a point in the graph (e.g., a city)</li>
+  <li><strong>Edge</strong> — a connection between two nodes (e.g., a road)</li>
+  <li><strong>Directed graph</strong> — edges have direction (A → B but not B → A)</li>
+  <li><strong>Undirected graph</strong> — edges go both ways (A ↔ B)</li>
+  <li><strong>Weighted graph</strong> — edges have a cost or distance</li>
+  <li><strong>Adjacency</strong> — two nodes are adjacent if directly connected</li>
+</ul>
+
+<h3>Representing Graphs: Adjacency List</h3>
+<p>The most common representation in Python is an <strong>adjacency list</strong> — a dictionary mapping each node to its neighbors.</p>
+<pre><code class="language-python">
+# Undirected graph
+graph = {
+    'A': ['B', 'C'],
+    'B': ['A', 'D', 'E'],
+    'C': ['A', 'F'],
+    'D': ['B'],
+    'E': ['B', 'F'],
+    'F': ['C', 'E'],
+}
+
+# Directed graph (one-way edges)
+directed = {
+    'A': ['B', 'C'],
+    'B': ['D'],
+    'C': ['D', 'E'],
+    'D': [],
+    'E': [],
+}
+</code></pre>
+
+<h3>Breadth-First Search (BFS)</h3>
+<p>BFS explores the graph <strong>level by level</strong> — all neighbors before going deeper. Uses a <strong>queue</strong>.</p>
+<pre><code class="language-python">
+from collections import deque
+
+def bfs(graph, start):
+    visited = set()
+    queue = deque([start])
+    visited.add(start)
+    order = []
+
+    while queue:
+        node = queue.popleft()      # dequeue front
+        order.append(node)
+
+        for neighbor in graph[node]:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+
+    return order
+
+graph = {'A': ['B','C'], 'B': ['D','E'], 'C': ['F'], 'D': [], 'E': ['F'], 'F': []}
+print(bfs(graph, 'A'))  # ['A', 'B', 'C', 'D', 'E', 'F']
+</code></pre>
+
+<h3>Depth-First Search (DFS)</h3>
+<p>DFS explores as <strong>deep as possible</strong> before backtracking. Uses a <strong>stack</strong> (or recursion).</p>
+<pre><code class="language-python">
+def dfs(graph, start, visited=None):
+    if visited is None:
+        visited = set()
+    visited.add(start)
+    order = [start]
+
+    for neighbor in graph[start]:
+        if neighbor not in visited:
+            order += dfs(graph, neighbor, visited)
+
+    return order
+
+print(dfs(graph, 'A'))  # ['A', 'B', 'D', 'E', 'F', 'C']  (one possible order)
+</code></pre>
+
+<h3>BFS vs DFS</h3>
+<table class="complexity-table">
+  <tr><th>Property</th><th>BFS</th><th>DFS</th></tr>
+  <tr><td>Data structure</td><td>Queue</td><td>Stack / Recursion</td></tr>
+  <tr><td>Finds shortest path?</td><td>✅ Yes (unweighted)</td><td>❌ No</td></tr>
+  <tr><td>Memory</td><td>O(V) — stores a level</td><td>O(V) — stores a path</td></tr>
+  <tr><td>Time complexity</td><td>O(V + E)</td><td>O(V + E)</td></tr>
+  <tr><td>Good for</td><td>Shortest path, level order</td><td>Cycle detection, topological sort</td></tr>
+</table>
+
+<h3>Detecting a Cycle (Undirected Graph)</h3>
+<pre><code class="language-python">
+def has_cycle(graph):
+    visited = set()
+
+    def dfs(node, parent):
+        visited.add(node)
+        for neighbor in graph[node]:
+            if neighbor not in visited:
+                if dfs(neighbor, node):
+                    return True
+            elif neighbor != parent:
+                return True  # back edge = cycle
+        return False
+
+    for node in graph:
+        if node not in visited:
+            if dfs(node, None):
+                return True
+    return False
+</code></pre>
+""",
+        'sandbox_default': '''# Try BFS on a sample graph
+from collections import deque
+
+def bfs(graph, start):
+    visited = set([start])
+    queue = deque([start])
+    result = []
+    while queue:
+        node = queue.popleft()
+        result.append(node)
+        for n in graph[node]:
+            if n not in visited:
+                visited.add(n)
+                queue.append(n)
+    return result
+
+graph = {
+    'A': ['B', 'C'],
+    'B': ['D', 'E'],
+    'C': ['F'],
+    'D': [],
+    'E': ['F'],
+    'F': [],
+}
+print("BFS from A:", bfs(graph, 'A'))
+''',
+        'labs': [
+            {
+                'id': 1,
+                'title': 'BFS Shortest Path',
+                'description': 'Implement BFS to find the shortest path (in number of edges) between two nodes in an unweighted graph. Return the path as a list of nodes, or an empty list if no path exists.',
+                'starter_code': '''from collections import deque
+
+def shortest_path(graph, start, end):
+    """
+    Return the shortest path from start to end as a list of nodes.
+    Return [] if no path exists.
+    """
+    # YOUR CODE HERE
+    pass
+''',
+                'test_code': '''
+def _test(name, got, expected):
+    global _pass, _fail
+    if got == expected:
+        print(f"  PASS  {name}")
+        _pass += 1
+    else:
+        print(f"  FAIL  {name}  got={got!r}  expected={expected!r}")
+        _fail += 1
+
+_pass = _fail = 0
+
+g = {
+    'A': ['B', 'C'],
+    'B': ['D', 'E'],
+    'C': ['F'],
+    'D': [],
+    'E': ['F'],
+    'F': [],
+}
+
+print("Testing shortest_path:")
+_test("A to F (2 hops via C)", shortest_path(g, 'A', 'F'), ['A', 'C', 'F'])
+_test("A to D",                shortest_path(g, 'A', 'D'), ['A', 'B', 'D'])
+_test("A to A (same node)",    shortest_path(g, 'A', 'A'), ['A'])
+_test("D to F (no path)",      shortest_path(g, 'D', 'F'), [])
+_test("B to F",                shortest_path(g, 'B', 'F'), ['B', 'E', 'F'])
+
+print(f"\\n{'='*40}")
+print(f"Results: {_pass}/{_pass+_fail} tests passed")
+if _fail == 0:
+    print("🎉 All tests passed!")
+''',
+                'hints': [
+                    'Use a deque as your BFS queue. Start by adding (start, [start]) — the node AND the path so far.',
+                    'When you dequeue a node, check if it equals end — if so, return the path.',
+                    'For each unvisited neighbor, enqueue (neighbor, path + [neighbor]).',
+                    'Track visited nodes in a set to avoid revisiting. Return [] if the queue empties without finding end.',
+                    'Special case: if start == end, return [start] immediately.',
+                ]
+            },
+            {
+                'id': 2,
+                'title': 'Number of Islands',
+                'description': 'Given a 2D grid of "1"s (land) and "0"s (water), count the number of islands. An island is surrounded by water and formed by connecting adjacent land cells horizontally or vertically.',
+                'starter_code': '''def num_islands(grid):
+    """
+    Count the number of islands in the grid.
+    grid is a list of lists of "1" and "0" strings.
+    """
+    # YOUR CODE HERE
+    pass
+''',
+                'test_code': '''
+def _test(name, got, expected):
+    global _pass, _fail
+    if got == expected:
+        print(f"  PASS  {name}")
+        _pass += 1
+    else:
+        print(f"  FAIL  {name}  got={got!r}  expected={expected!r}")
+        _fail += 1
+
+_pass = _fail = 0
+
+print("Testing num_islands:")
+_test("1 big island", num_islands([
+    ["1","1","1"],
+    ["1","1","0"],
+    ["0","0","1"],
+]), 2)
+
+_test("3 separate islands", num_islands([
+    ["1","0","1"],
+    ["0","0","0"],
+    ["1","0","1"],
+]), 4)
+
+_test("all water", num_islands([
+    ["0","0"],
+    ["0","0"],
+]), 0)
+
+_test("all land = 1 island", num_islands([
+    ["1","1"],
+    ["1","1"],
+]), 1)
+
+_test("classic 3-island", num_islands([
+    ["1","1","0","0","0"],
+    ["1","1","0","0","0"],
+    ["0","0","1","0","0"],
+    ["0","0","0","1","1"],
+]), 3)
+
+print(f"\\n{'='*40}")
+print(f"Results: {_pass}/{_pass+_fail} tests passed")
+if _fail == 0:
+    print("🎉 All tests passed!")
+''',
+                'hints': [
+                    'Think of each "1" cell as a graph node. Two adjacent "1"s share an edge.',
+                    'Iterate through every cell. When you find a "1", increment your island count and do a DFS/BFS to mark the whole island as visited.',
+                    'Marking as visited: change "1" to "0" in-place (or use a visited set of (row, col) tuples).',
+                    'In DFS, check 4 directions: up, down, left, right. Make sure to check bounds (0 <= r < rows, 0 <= c < cols).',
+                    'The key insight: one DFS from a land cell visits the entire connected island.',
+                ]
+            },
+        ],
+        'quiz': [
+            {
+                'question': 'What data structure does BFS use internally?',
+                'options': ['Stack', 'Queue', 'Heap', 'Linked List'],
+                'answer': 1,
+                'explanation': 'BFS uses a Queue (FIFO). This ensures nodes are processed level-by-level — all neighbors of the current level are visited before going deeper. A deque from collections is the standard Python choice.'
+            },
+            {
+                'question': 'What is the time complexity of BFS/DFS on a graph with V vertices and E edges?',
+                'options': ['O(V)', 'O(E)', 'O(V + E)', 'O(V × E)'],
+                'answer': 2,
+                'explanation': 'Both BFS and DFS are O(V + E) — we visit each vertex once and traverse each edge once. This makes them extremely efficient for graph traversal problems.'
+            },
+            {
+                'question': 'Which traversal is guaranteed to find the shortest path in an unweighted graph?',
+                'options': ['DFS', 'BFS', 'Both', 'Neither'],
+                'answer': 1,
+                'explanation': 'BFS explores nodes level by level, so the first time it reaches a target node, it has found the shortest path (fewest edges). DFS can find A path, but not necessarily the shortest one.'
+            },
+            {
+                'question': 'In an adjacency list, what does graph["A"] = ["B", "C"] mean?',
+                'options': ['A is between B and C', 'Node A has edges to nodes B and C', 'B and C are the same as A', 'A, B, C form a cycle'],
+                'answer': 1,
+                'explanation': 'An adjacency list maps each node to a list of its direct neighbors. graph["A"] = ["B", "C"] means node A has edges connecting it to B and C.'
+            },
+            {
+                'question': 'Why must we track "visited" nodes in graph traversal?',
+                'options': ['To count the nodes', 'To avoid infinite loops in graphs with cycles', 'To sort the results', 'To save memory'],
+                'answer': 1,
+                'explanation': 'Without a visited set, traversal on a graph with cycles would loop forever (A→B→A→B...). Marking nodes as visited ensures each node is processed exactly once, giving O(V+E) time.'
+            },
+        ]
+    },
+    {
+        'id': 10,
+        'title': 'Dynamic Programming',
+        'icon': '⚡',
+        'description': 'Master dynamic programming — the technique that turns exponential problems into efficient polynomial solutions.',
+        'difficulty': 'Intermediate',
+        'estimated_time': '75 min',
+        'color': '#dc2626',
+        'content': """
+<h2>What is Dynamic Programming?</h2>
+<p><strong>Dynamic Programming (DP)</strong> solves complex problems by breaking them into simpler overlapping subproblems and storing results to avoid redundant computation.</p>
+
+<div class="concept-box">
+  <h4>🔑 Key Idea</h4>
+  <p>"If we've already solved a subproblem, don't solve it again — look up the answer." This transforms exponential-time recursion into polynomial-time solutions.</p>
+</div>
+
+<h3>Two Conditions for DP</h3>
+<ol>
+  <li><strong>Optimal Substructure</strong> — the optimal solution is built from optimal solutions to subproblems</li>
+  <li><strong>Overlapping Subproblems</strong> — the same subproblems recur many times</li>
+</ol>
+
+<h3>Approach 1: Memoization (Top-Down)</h3>
+<p>Write the recursive solution, then cache results in a dictionary.</p>
+<pre><code class="language-python">
+# Fibonacci — naive recursion: O(2^n)
+def fib_naive(n):
+    if n <= 1:
+        return n
+    return fib_naive(n-1) + fib_naive(n-2)
+
+# With memoization: O(n)
+def fib_memo(n, memo={}):
+    if n in memo:
+        return memo[n]
+    if n <= 1:
+        return n
+    memo[n] = fib_memo(n-1, memo) + fib_memo(n-2, memo)
+    return memo[n]
+
+# Using Python's built-in cache
+from functools import lru_cache
+
+@lru_cache(maxsize=None)
+def fib(n):
+    if n <= 1:
+        return n
+    return fib(n-1) + fib(n-2)
+
+print(fib(50))  # 12586269025  — instant!
+</code></pre>
+
+<h3>Approach 2: Tabulation (Bottom-Up)</h3>
+<p>Build the solution iteratively from the smallest subproblems up. No recursion needed.</p>
+<pre><code class="language-python">
+def fib_tab(n):
+    if n <= 1:
+        return n
+    dp = [0] * (n + 1)
+    dp[1] = 1
+    for i in range(2, n + 1):
+        dp[i] = dp[i-1] + dp[i-2]
+    return dp[n]
+
+print(fib_tab(10))  # 55
+
+# Space-optimized: only need last 2 values
+def fib_opt(n):
+    if n <= 1:
+        return n
+    a, b = 0, 1
+    for _ in range(2, n + 1):
+        a, b = b, a + b
+    return b
+</code></pre>
+
+<h3>Classic Problem: Coin Change</h3>
+<p>Given coins of certain denominations, find the minimum number of coins to make amount.</p>
+<pre><code class="language-python">
+def coin_change(coins, amount):
+    # dp[i] = min coins needed to make amount i
+    dp = [float('inf')] * (amount + 1)
+    dp[0] = 0  # base case: 0 coins to make amount 0
+
+    for i in range(1, amount + 1):
+        for coin in coins:
+            if coin <= i:
+                dp[i] = min(dp[i], dp[i - coin] + 1)
+
+    return dp[amount] if dp[amount] != float('inf') else -1
+
+print(coin_change([1, 5, 6, 9], 11))  # 2  (coins: 5+6)
+print(coin_change([2], 3))            # -1 (impossible)
+</code></pre>
+
+<h3>Classic Problem: 0/1 Knapsack</h3>
+<pre><code class="language-python">
+def knapsack(weights, values, capacity):
+    n = len(weights)
+    # dp[i][w] = max value using first i items, capacity w
+    dp = [[0] * (capacity + 1) for _ in range(n + 1)]
+
+    for i in range(1, n + 1):
+        for w in range(capacity + 1):
+            # Don't take item i
+            dp[i][w] = dp[i-1][w]
+            # Take item i (if it fits)
+            if weights[i-1] <= w:
+                dp[i][w] = max(dp[i][w], dp[i-1][w - weights[i-1]] + values[i-1])
+
+    return dp[n][capacity]
+
+weights = [2, 3, 4, 5]
+values  = [3, 4, 5, 6]
+print(knapsack(weights, values, 8))  # 10  (items 1+3: weight 2+4, value 3+5... actually 10 = items w=3+5, v=4+6)
+</code></pre>
+
+<h3>DP Complexity Summary</h3>
+<table class="complexity-table">
+  <tr><th>Problem</th><th>Time</th><th>Space</th></tr>
+  <tr><td>Fibonacci (naive)</td><td>O(2ⁿ)</td><td>O(n)</td></tr>
+  <tr><td>Fibonacci (DP)</td><td>O(n)</td><td>O(n) or O(1)</td></tr>
+  <tr><td>Coin Change</td><td>O(amount × coins)</td><td>O(amount)</td></tr>
+  <tr><td>0/1 Knapsack</td><td>O(n × capacity)</td><td>O(n × capacity)</td></tr>
+  <tr><td>Longest Common Subsequence</td><td>O(m × n)</td><td>O(m × n)</td></tr>
+</table>
+""",
+        'sandbox_default': '''# Dynamic Programming: Fibonacci
+from functools import lru_cache
+
+@lru_cache(maxsize=None)
+def fib(n):
+    if n <= 1:
+        return n
+    return fib(n-1) + fib(n-2)
+
+for i in range(10):
+    print(f"fib({i}) = {fib(i)}")
+
+# Coin change
+def coin_change(coins, amount):
+    dp = [float("inf")] * (amount + 1)
+    dp[0] = 0
+    for i in range(1, amount + 1):
+        for coin in coins:
+            if coin <= i:
+                dp[i] = min(dp[i], dp[i - coin] + 1)
+    return dp[amount] if dp[amount] != float("inf") else -1
+
+print("\\nCoin change [1,5,6,9] -> 11:", coin_change([1,5,6,9], 11))
+''',
+        'labs': [
+            {
+                'id': 1,
+                'title': 'Climbing Stairs',
+                'description': 'You are climbing a staircase with n steps. Each time you can climb 1 or 2 steps. Return the number of distinct ways to reach the top.',
+                'starter_code': '''def climb_stairs(n):
+    """
+    Return the number of distinct ways to climb n stairs
+    (each move is 1 or 2 steps).
+    """
+    # YOUR CODE HERE
+    pass
+''',
+                'test_code': '''
+def _test(name, got, expected):
+    global _pass, _fail
+    if got == expected:
+        print(f"  PASS  {name}")
+        _pass += 1
+    else:
+        print(f"  FAIL  {name}  got={got!r}  expected={expected!r}")
+        _fail += 1
+
+_pass = _fail = 0
+
+print("Testing climb_stairs:")
+_test("n=1  -> 1",  climb_stairs(1),  1)
+_test("n=2  -> 2",  climb_stairs(2),  2)
+_test("n=3  -> 3",  climb_stairs(3),  3)
+_test("n=4  -> 5",  climb_stairs(4),  5)
+_test("n=5  -> 8",  climb_stairs(5),  8)
+_test("n=10 -> 89", climb_stairs(10), 89)
+_test("n=20 -> 10946", climb_stairs(20), 10946)
+
+print(f"\\n{'='*40}")
+print(f"Results: {_pass}/{_pass+_fail} tests passed")
+if _fail == 0:
+    print("🎉 All tests passed!")
+''',
+                'hints': [
+                    'Notice the pattern: ways(n) = ways(n-1) + ways(n-2). To reach step n, you came from step n-1 (1 step) or step n-2 (2 steps).',
+                    'Base cases: ways(1) = 1, ways(2) = 2.',
+                    'This is identical to Fibonacci! Build a dp array of size n+1.',
+                    'Or use two variables (a, b) to save space — O(1) space solution.',
+                    'Start with dp[1]=1, dp[2]=2 and fill dp[i] = dp[i-1] + dp[i-2] for i in range(3, n+1).',
+                ]
+            },
+            {
+                'id': 2,
+                'title': 'Longest Common Subsequence',
+                'description': 'Given two strings, return the length of their Longest Common Subsequence (LCS). A subsequence is a sequence that appears in the same relative order but not necessarily contiguous.',
+                'starter_code': '''def lcs(text1, text2):
+    """
+    Return the length of the longest common subsequence of text1 and text2.
+    Example: lcs("abcde", "ace") == 3  (the LCS is "ace")
+    """
+    # YOUR CODE HERE
+    pass
+''',
+                'test_code': '''
+def _test(name, got, expected):
+    global _pass, _fail
+    if got == expected:
+        print(f"  PASS  {name}")
+        _pass += 1
+    else:
+        print(f"  FAIL  {name}  got={got!r}  expected={expected!r}")
+        _fail += 1
+
+_pass = _fail = 0
+
+print("Testing lcs:")
+_test('"abcde","ace" -> 3',   lcs("abcde", "ace"),     3)
+_test('"abc","abc" -> 3',     lcs("abc", "abc"),        3)
+_test('"abc","def" -> 0',     lcs("abc", "def"),        0)
+_test('"bl","yby" -> 1',      lcs("bl", "yby"),         1)
+_test('"oxcpqrsvwf","shmtulqrypy" -> 2', lcs("oxcpqrsvwf","shmtulqrypy"), 2)
+_test('"","abc" -> 0',        lcs("", "abc"),           0)
+_test('"abc","" -> 0',        lcs("abc", ""),           0)
+
+print(f"\\n{'='*40}")
+print(f"Results: {_pass}/{_pass+_fail} tests passed")
+if _fail == 0:
+    print("🎉 All tests passed!")
+''',
+                'hints': [
+                    'Create a 2D dp table: dp[i][j] = LCS length of text1[:i] and text2[:j].',
+                    'If text1[i-1] == text2[j-1]: dp[i][j] = dp[i-1][j-1] + 1  (extend the LCS by 1).',
+                    'Otherwise: dp[i][j] = max(dp[i-1][j], dp[i][j-1])  (best without one of the chars).',
+                    'Initialize a (len(text1)+1) × (len(text2)+1) table of zeros.',
+                    'Answer is dp[len(text1)][len(text2)].',
+                ]
+            },
+        ],
+        'quiz': [
+            {
+                'question': 'What are the two key properties a problem must have for Dynamic Programming to apply?',
+                'options': ['Sorted input and unique elements', 'Optimal substructure and overlapping subproblems', 'Linear time and constant space', 'Recursion and iteration'],
+                'answer': 1,
+                'explanation': 'DP requires: (1) Optimal Substructure — the optimal solution uses optimal solutions to subproblems; (2) Overlapping Subproblems — the same subproblems are solved multiple times. Both must hold for DP to be applicable.'
+            },
+            {
+                'question': 'What is the difference between memoization and tabulation?',
+                'options': ['They are the same thing', 'Memoization is top-down (recursive + cache); tabulation is bottom-up (iterative)', 'Memoization is faster; tabulation uses less memory', 'Tabulation is recursive; memoization is iterative'],
+                'answer': 1,
+                'explanation': 'Memoization (top-down): write the natural recursion, cache results. Tabulation (bottom-up): build a table iteratively from base cases up. Both achieve the same time complexity, but tabulation avoids recursion stack overhead.'
+            },
+            {
+                'question': 'What is the time complexity of computing Fibonacci(n) with memoization?',
+                'options': ['O(2ⁿ)', 'O(n²)', 'O(n)', 'O(log n)'],
+                'answer': 2,
+                'explanation': 'With memoization, each unique subproblem (fib(0) through fib(n)) is solved exactly once. There are n+1 subproblems each taking O(1), giving O(n) total. Without memoization, naive recursion is O(2ⁿ).'
+            },
+            {
+                'question': 'In the Coin Change problem with dp[i] = min coins for amount i, what is the recurrence?',
+                'options': ['dp[i] = dp[i-1] + 1', 'dp[i] = min(dp[i - coin] + 1) for each valid coin', 'dp[i] = dp[i//2] + 1', 'dp[i] = dp[i-1] + dp[i-2]'],
+                'answer': 1,
+                'explanation': 'For each amount i, we try every coin denomination. If we use a coin of value c, we need dp[i-c] coins for the remaining amount, plus 1. We take the minimum across all valid coins: dp[i] = min(dp[i-c]+1 for c in coins if c<=i).'
+            },
+            {
+                'question': 'Why is the climbing stairs problem equivalent to Fibonacci?',
+                'options': ['Both involve steps', 'To reach step n, you came from n-1 or n-2 — so ways(n) = ways(n-1) + ways(n-2)', 'Both have O(n) complexity', 'Both use recursion'],
+                'answer': 1,
+                'explanation': 'To stand on step n, your last move was either 1 step (from n-1) or 2 steps (from n-2). So the number of ways = ways(n-1) + ways(n-2) — exactly the Fibonacci recurrence. This is the classic DP insight: identify the recurrence relation.'
+            },
+        ]
+    },
+    # ── EXPERT MODULES ──────────────────────────────────────────────────────────
+    # Sources: NeetCode Roadmap (neetcode.io/roadmap), GeeksforGeeks DSA
+    # (geeksforgeeks.org/dsa), LeetCode Interview Crash Course
+    # (leetcode.com/explore/interview/card/leetcodes-interview-crash-course-data-structures-and-algorithms)
+    {
+        'id': 11,
+        'title': 'Heaps & Priority Queues',
+        'icon': '🏔️',
+        'description': 'Master heaps — the data structure that gives you the min or max element in O(1) and is the backbone of scheduling, Dijkstra, and Top-K problems.',
+        'difficulty': 'Expert',
+        'estimated_time': '60 min',
+        'color': '#7c3aed',
+        'content': """
+<h2>What is a Heap?</h2>
+<p>A <strong>heap</strong> is a complete binary tree that satisfies the <strong>heap property</strong>:</p>
+<ul>
+  <li><strong>Min-Heap:</strong> every parent ≤ its children → the root holds the <em>minimum</em> element.</li>
+  <li><strong>Max-Heap:</strong> every parent ≥ its children → the root holds the <em>maximum</em> element.</li>
+</ul>
+
+<div class="concept-box">
+  <h4>🔑 Key Idea</h4>
+  <p>A heap is NOT fully sorted — it only guarantees the root is the min/max. This relaxed property is what makes insert and extract each O(log n) while keeping peek O(1).</p>
+</div>
+
+<h3>Python's heapq Module</h3>
+<p>Python's <code>heapq</code> is a <strong>min-heap</strong> built on a plain list. Use negation for max-heap behavior.</p>
+<pre><code class="language-python">
+import heapq
+
+# Min-heap
+heap = []
+heapq.heappush(heap, 5)
+heapq.heappush(heap, 1)
+heapq.heappush(heap, 8)
+heapq.heappush(heap, 3)
+
+print(heap[0])              # 1  — peek min (O(1))
+print(heapq.heappop(heap))  # 1  — extract min (O(log n))
+print(heap[0])              # 3  — new min
+
+# Build heap from existing list (O(n) — more efficient than n pushes)
+nums = [5, 1, 8, 3, 2]
+heapq.heapify(nums)
+print(nums[0])              # 1
+
+# Max-heap: negate values
+max_heap = []
+heapq.heappush(max_heap, -5)
+heapq.heappush(max_heap, -1)
+heapq.heappush(max_heap, -8)
+print(-max_heap[0])         # 8  — peek max
+print(-heapq.heappop(max_heap))  # 8  — extract max
+</code></pre>
+
+<h3>Heap Complexity</h3>
+<table class="complexity-table">
+  <tr><th>Operation</th><th>Time</th><th>Notes</th></tr>
+  <tr><td>Peek min/max</td><td>O(1)</td><td>Just read root</td></tr>
+  <tr><td>Push (insert)</td><td>O(log n)</td><td>Sift up</td></tr>
+  <tr><td>Pop (extract min/max)</td><td>O(log n)</td><td>Sift down</td></tr>
+  <tr><td>Heapify (build from list)</td><td>O(n)</td><td>Better than n pushes</td></tr>
+  <tr><td>Search</td><td>O(n)</td><td>No ordering guarantee</td></tr>
+</table>
+
+<h3>Classic Pattern: Top-K Elements</h3>
+<p>Find the K largest elements in O(n log K) — much faster than sorting O(n log n) when K is small.</p>
+<pre><code class="language-python">
+import heapq
+
+def top_k_largest(nums, k):
+    # Keep a min-heap of size k
+    # The root of this heap is the k-th largest
+    heap = []
+    for num in nums:
+        heapq.heappush(heap, num)
+        if len(heap) > k:
+            heapq.heappop(heap)  # Remove smallest
+    return sorted(heap, reverse=True)
+
+print(top_k_largest([3, 1, 5, 12, 2, 11], 3))  # [12, 11, 5]
+
+# Python shortcut:
+print(heapq.nlargest(3, [3, 1, 5, 12, 2, 11]))  # [12, 11, 5]
+</code></pre>
+
+<h3>Classic Pattern: Merge K Sorted Lists</h3>
+<pre><code class="language-python">
+import heapq
+
+def merge_k_sorted(lists):
+    result = []
+    # Push (value, list_index, element_index) for each list's first element
+    heap = []
+    for i, lst in enumerate(lists):
+        if lst:
+            heapq.heappush(heap, (lst[0], i, 0))
+
+    while heap:
+        val, list_i, elem_i = heapq.heappop(heap)
+        result.append(val)
+        if elem_i + 1 < len(lists[list_i]):
+            next_val = lists[list_i][elem_i + 1]
+            heapq.heappush(heap, (next_val, list_i, elem_i + 1))
+
+    return result
+
+lists = [[1, 4, 7], [2, 5, 8], [3, 6, 9]]
+print(merge_k_sorted(lists))  # [1, 2, 3, 4, 5, 6, 7, 8, 9]
+</code></pre>
+
+<h3>When to Use a Heap</h3>
+<ul>
+  <li>Repeatedly need the min or max of a changing dataset</li>
+  <li>Top-K / K-th largest or smallest problems</li>
+  <li>Merge K sorted arrays/lists</li>
+  <li>Scheduling and task prioritization</li>
+  <li>Dijkstra's shortest path (internally uses a min-heap)</li>
+  <li>Median of a data stream (two heaps trick)</li>
+</ul>
+""",
+        'sandbox_default': '''import heapq
+
+# Min-heap demo
+heap = [5, 1, 8, 3, 2, 7]
+heapq.heapify(heap)
+print("Min-heap:", heap)
+print("Pop in order:", [heapq.heappop(heap) for _ in range(len(heap))])
+
+# Top-3 largest
+nums = [10, 4, 7, 2, 15, 9, 3]
+print("\\nTop 3 largest:", heapq.nlargest(3, nums))
+print("Top 3 smallest:", heapq.nsmallest(3, nums))
+''',
+        'labs': [
+            {
+                'id': 1,
+                'title': 'K-th Largest Element',
+                'description': 'Find the k-th largest element in an unsorted array. You must solve it in O(n log k) time using a heap — do not sort the entire array.',
+                'starter_code': '''import heapq
+
+def find_kth_largest(nums, k):
+    """
+    Return the k-th largest element in nums.
+    Example: find_kth_largest([3,2,1,5,6,4], 2) == 5
+    Constraint: O(n log k) time using a heap.
+    """
+    # YOUR CODE HERE
+    pass
+''',
+                'test_code': '''
+def _test(name, got, expected):
+    global _pass, _fail
+    if got == expected:
+        print(f"  PASS  {name}")
+        _pass += 1
+    else:
+        print(f"  FAIL  {name}  got={got!r}  expected={expected!r}")
+        _fail += 1
+
+_pass = _fail = 0
+
+print("Testing find_kth_largest:")
+_test("[3,2,1,5,6,4] k=2 -> 5",   find_kth_largest([3,2,1,5,6,4], 2),   5)
+_test("[3,2,3,1,2,4,5,5,6] k=4 -> 4", find_kth_largest([3,2,3,1,2,4,5,5,6], 4), 4)
+_test("[1] k=1 -> 1",              find_kth_largest([1], 1),             1)
+_test("[7,6,5,4,3] k=1 -> 7",     find_kth_largest([7,6,5,4,3], 1),     7)
+_test("[7,6,5,4,3] k=5 -> 3",     find_kth_largest([7,6,5,4,3], 5),     3)
+_test("[1,2] k=2 -> 1",           find_kth_largest([1,2], 2),           1)
+
+print(f"\\n{'='*40}")
+print(f"Results: {_pass}/{_pass+_fail} tests passed")
+if _fail == 0:
+    print("🎉 All tests passed!")
+''',
+                'hints': [
+                    'Maintain a min-heap of size exactly k. The root will be the k-th largest.',
+                    'For each number in nums: push it onto the heap. If heap size > k, pop the minimum.',
+                    'After processing all numbers, heap[0] is the k-th largest.',
+                    'Why does this work? The heap keeps the k largest elements seen so far, and the smallest of those k is at the root.',
+                ]
+            },
+            {
+                'id': 2,
+                'title': 'Median of Data Stream',
+                'description': 'Design a class that supports adding numbers one at a time and finding the median at any point. Use the two-heaps technique to achieve O(log n) add and O(1) find_median.',
+                'starter_code': '''import heapq
+
+class MedianFinder:
+    """
+    Use two heaps:
+    - max_heap (lower half) — store negated values for Python's min-heap
+    - min_heap (upper half)
+    Invariant: max_heap size == min_heap size OR max_heap size == min_heap size + 1
+    """
+
+    def __init__(self):
+        # YOUR CODE HERE
+        pass
+
+    def add_num(self, num):
+        """Add num to the data structure."""
+        # YOUR CODE HERE
+        pass
+
+    def find_median(self):
+        """Return the median of all numbers added so far."""
+        # YOUR CODE HERE
+        pass
+''',
+                'test_code': '''
+def _test(name, got, expected):
+    global _pass, _fail
+    if abs(got - expected) < 1e-9:
+        print(f"  PASS  {name}")
+        _pass += 1
+    else:
+        print(f"  FAIL  {name}  got={got!r}  expected={expected!r}")
+        _fail += 1
+
+_pass = _fail = 0
+
+print("Testing MedianFinder:")
+mf = MedianFinder()
+mf.add_num(1)
+_test("after [1]",        mf.find_median(), 1.0)
+mf.add_num(2)
+_test("after [1,2]",      mf.find_median(), 1.5)
+mf.add_num(3)
+_test("after [1,2,3]",    mf.find_median(), 2.0)
+mf.add_num(4)
+_test("after [1,2,3,4]",  mf.find_median(), 2.5)
+mf.add_num(5)
+_test("after [1,2,3,4,5]",mf.find_median(), 3.0)
+
+mf2 = MedianFinder()
+mf2.add_num(6)
+mf2.add_num(2)
+mf2.add_num(9)
+_test("after [6,2,9]",    mf2.find_median(), 6.0)
+mf2.add_num(1)
+_test("after [6,2,9,1]",  mf2.find_median(), 4.0)
+
+print(f"\\n{'='*40}")
+print(f"Results: {_pass}/{_pass+_fail} tests passed")
+if _fail == 0:
+    print("🎉 All tests passed!")
+''',
+                'hints': [
+                    'Use two heaps: a max-heap for the lower half and a min-heap for the upper half.',
+                    'Python has only min-heap, so simulate max-heap by storing negated values.',
+                    'Invariant: keep the heaps balanced so max_heap has at most 1 extra element.',
+                    'add_num: push to max_heap first. Then if max_heap top > min_heap top, rebalance. Then balance sizes.',
+                    'find_median: if sizes are equal, average the two tops. Otherwise return max_heap top (it has the extra element).',
+                ]
+            },
+        ],
+        'quiz': [
+            {
+                'question': 'What is the time complexity of extracting the minimum from a min-heap?',
+                'options': ['O(1)', 'O(log n)', 'O(n)', 'O(n log n)'],
+                'answer': 1,
+                'explanation': 'Extracting the min (heappop) is O(log n). The minimum is at the root (O(1) to find), but after removal we must restore the heap property by "sifting down" the replacement element, which takes O(log n) — one swap per level of the tree.'
+            },
+            {
+                'question': 'How do you simulate a max-heap using Python\'s heapq module?',
+                'options': ['Use heapq.max()', 'Call heapq.heapify in reverse', 'Store negated values (-x instead of x)', 'Sort the list first'],
+                'answer': 2,
+                'explanation': 'Python\'s heapq only provides a min-heap. To simulate a max-heap, store -x instead of x. The smallest negative value corresponds to the largest original value. When you pop, negate the result: -heapq.heappop(heap).'
+            },
+            {
+                'question': 'What is the time complexity of building a heap from an existing list of n elements using heapify?',
+                'options': ['O(n log n)', 'O(n)', 'O(log n)', 'O(n²)'],
+                'answer': 1,
+                'explanation': 'heapify is O(n) — counter-intuitively faster than pushing n elements one by one (which is O(n log n)). Most elements are near the bottom of the tree and require very few swaps, so the total work sums to O(n).'
+            },
+            {
+                'question': 'You need the 5 largest elements from a list of 1,000,000 numbers. Which approach is most efficient?',
+                'options': ['Sort the list and take the last 5: O(n log n)', 'Use a min-heap of size 5: O(n log 5) ≈ O(n)', 'Linear scan keeping 5 maximums: O(n)', 'Both B and C are equally optimal'],
+                'answer': 3,
+                'explanation': 'Both a size-k min-heap and a linear scan tracking k maximums are O(n) for fixed k. The heap approach (heapq.nlargest) is generally preferred in practice as it is clean and handles ties well. Sorting is O(n log n) — wasteful when you only need the top few.'
+            },
+            {
+                'question': 'In the "median of a data stream" problem, why are TWO heaps used instead of one?',
+                'options': ['For redundancy', 'A max-heap holds the lower half and a min-heap holds the upper half — their tops give the median in O(1)', 'To reduce memory usage', 'Heaps cannot store duplicate values'],
+                'answer': 1,
+                'explanation': 'One heap can give you the min or max in O(1), but not the median. By keeping a max-heap of the lower half and a min-heap of the upper half (sizes balanced), the median is always at one or both tops — O(1) access with O(log n) insertions.'
+            },
+        ]
+    },
+    {
+        'id': 12,
+        'title': 'Tries',
+        'icon': '🌳',
+        'description': 'Explore Tries (prefix trees) — the data structure powering autocomplete, spell-checkers, and IP routing with blazing-fast prefix lookups.',
+        'difficulty': 'Expert',
+        'estimated_time': '55 min',
+        'color': '#b45309',
+        'content': """
+<h2>What is a Trie?</h2>
+<p>A <strong>Trie</strong> (pronounced "try", from re<em>trie</em>val) is a tree where each node represents a single character. Paths from the root to marked nodes spell out complete words.</p>
+
+<div class="concept-box">
+  <h4>🔑 Key Idea</h4>
+  <p>Words with a common prefix share nodes in the tree. "cat", "car", and "card" all share the path c → a. This makes prefix searching O(L) where L is the word length — independent of how many words are stored.</p>
+</div>
+
+<h3>Trie Structure</h3>
+<pre><code class="language-python">
+class TrieNode:
+    def __init__(self):
+        self.children = {}   # char -> TrieNode
+        self.is_end = False  # True if this node ends a word
+</code></pre>
+
+<h3>Building a Trie</h3>
+<pre><code class="language-python">
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, word):
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+        node.is_end = True
+
+    def search(self, word):
+        # Returns True if word exists in the trie.
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                return False
+            node = node.children[char]
+        return node.is_end
+
+    def starts_with(self, prefix):
+        # Returns True if any word starts with prefix.
+        node = self.root
+        for char in prefix:
+            if char not in node.children:
+                return False
+            node = node.children[char]
+        return True
+
+trie = Trie()
+for word in ["apple", "app", "apt", "bat"]:
+    trie.insert(word)
+
+print(trie.search("app"))        # True
+print(trie.search("ap"))         # False (no end marker)
+print(trie.starts_with("ap"))    # True
+print(trie.starts_with("ba"))    # True
+print(trie.starts_with("cat"))   # False
+</code></pre>
+
+<h3>Trie Complexity</h3>
+<table class="complexity-table">
+  <tr><th>Operation</th><th>Time</th><th>Space</th></tr>
+  <tr><td>Insert word of length L</td><td>O(L)</td><td>O(L) worst case</td></tr>
+  <tr><td>Search word of length L</td><td>O(L)</td><td>O(1)</td></tr>
+  <tr><td>Prefix check (starts_with)</td><td>O(L)</td><td>O(1)</td></tr>
+  <tr><td>Total space (n words, avg L)</td><td>—</td><td>O(n × L)</td></tr>
+</table>
+
+<h3>Autocomplete with Trie</h3>
+<pre><code class="language-python">
+def autocomplete(trie, prefix):
+    # Return all words in trie that start with prefix.
+    node = trie.root
+    for char in prefix:
+        if char not in node.children:
+            return []
+        node = node.children[char]
+
+    # DFS from the prefix node to collect all complete words
+    results = []
+    def dfs(node, current):
+        if node.is_end:
+            results.append(current)
+        for char, child in node.children.items():
+            dfs(child, current + char)
+
+    dfs(node, prefix)
+    return results
+</code></pre>
+
+<h3>When to Use a Trie</h3>
+<ul>
+  <li>Autocomplete / type-ahead search</li>
+  <li>Spell-checking</li>
+  <li>IP routing (longest prefix match)</li>
+  <li>Word games (Boggle, Scrabble)</li>
+  <li>Count words with a given prefix</li>
+  <li>Word search in a grid (faster than brute-force)</li>
+</ul>
+
+<h3>Trie vs Hash Map</h3>
+<table class="complexity-table">
+  <tr><th>Feature</th><th>Trie</th><th>Hash Map</th></tr>
+  <tr><td>Exact word lookup</td><td>O(L)</td><td>O(L) average</td></tr>
+  <tr><td>Prefix search</td><td>O(L)</td><td>O(n×L) — must scan all</td></tr>
+  <tr><td>Autocomplete</td><td>O(L + results)</td><td>O(n×L)</td></tr>
+  <tr><td>Sorted iteration</td><td>Natural (DFS)</td><td>Requires sorting</td></tr>
+</table>
+""",
+        'sandbox_default': '''class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_end = False
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, word):
+        node = self.root
+        for ch in word:
+            if ch not in node.children:
+                node.children[ch] = TrieNode()
+            node = node.children[ch]
+        node.is_end = True
+
+    def search(self, word):
+        node = self.root
+        for ch in word:
+            if ch not in node.children:
+                return False
+            node = node.children[ch]
+        return node.is_end
+
+    def starts_with(self, prefix):
+        node = self.root
+        for ch in prefix:
+            if ch not in node.children:
+                return False
+            node = node.children[ch]
+        return True
+
+trie = Trie()
+words = ["apple", "app", "apt", "bat", "ball", "ban"]
+for w in words: trie.insert(w)
+
+print("search(\'app\'):", trie.search("app"))
+print("search(\'ap\'):", trie.search("ap"))
+print("starts_with(\'ba\'):", trie.starts_with("ba"))
+print("starts_with(\'cat\'):", trie.starts_with("cat"))
+''',
+        'labs': [
+            {
+                'id': 1,
+                'title': 'Build a Trie',
+                'description': 'Implement a Trie with insert, search, and starts_with operations.',
+                'starter_code': '''class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_end = False
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, word):
+        """Insert word into the trie."""
+        # YOUR CODE HERE
+        pass
+
+    def search(self, word):
+        """Return True if word is in the trie (exact match)."""
+        # YOUR CODE HERE
+        pass
+
+    def starts_with(self, prefix):
+        """Return True if any inserted word starts with prefix."""
+        # YOUR CODE HERE
+        pass
+''',
+                'test_code': '''
+def _test(name, got, expected):
+    global _pass, _fail
+    if got == expected:
+        print(f"  PASS  {name}")
+        _pass += 1
+    else:
+        print(f"  FAIL  {name}  got={got!r}  expected={expected!r}")
+        _fail += 1
+
+_pass = _fail = 0
+
+t = Trie()
+for w in ["apple", "app", "apt", "bat", "ball"]:
+    t.insert(w)
+
+print("Testing search:")
+_test("search apple -> True",   t.search("apple"), True)
+_test("search app   -> True",   t.search("app"),   True)
+_test("search ap    -> False",  t.search("ap"),    False)
+_test("search bat   -> True",   t.search("bat"),   True)
+_test("search ba    -> False",  t.search("ba"),    False)
+_test("search cat   -> False",  t.search("cat"),   False)
+
+print("\\nTesting starts_with:")
+_test("starts_with ap  -> True",  t.starts_with("ap"),  True)
+_test("starts_with ba  -> True",  t.starts_with("ba"),  True)
+_test("starts_with bal -> True",  t.starts_with("bal"), True)
+_test("starts_with cat -> False", t.starts_with("cat"), False)
+_test("starts_with b   -> True",  t.starts_with("b"),   True)
+
+print(f"\\n{'='*40}")
+print(f"Results: {_pass}/{_pass+_fail} tests passed")
+if _fail == 0:
+    print("🎉 All tests passed!")
+''',
+                'hints': [
+                    'For insert: traverse from root, creating TrieNode children as needed, then mark node.is_end = True at the last character.',
+                    'For search: traverse from root following each character. If any character is missing, return False. At the end check node.is_end.',
+                    'For starts_with: same as search but do NOT check is_end — just return True if you reach the end of the prefix without missing a character.',
+                    'The difference between search and starts_with is only the final check: search needs is_end=True, starts_with just needs to survive the traversal.',
+                ]
+            },
+            {
+                'id': 2,
+                'title': 'Word Search in a Grid',
+                'description': 'Given a 2D board of characters and a list of words, return all words that exist in the board. A word can be constructed from sequentially adjacent cells (horizontal or vertical). The same cell may not be used more than once per word.',
+                'starter_code': '''class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.word = None  # Store complete word at end node
+
+def find_words(board, words):
+    """
+    Return a list of all words from `words` that exist in the board.
+    Use a Trie + DFS for efficiency.
+    """
+    # Build trie from word list
+    root = TrieNode()
+    for w in words:
+        node = root
+        for ch in w:
+            if ch not in node.children:
+                node.children[ch] = TrieNode()
+            node = node.children[ch]
+        node.word = w  # Mark end of word
+
+    rows, cols = len(board), len(board[0])
+    found = []
+
+    def dfs(node, r, c):
+        # YOUR CODE HERE
+        pass
+
+    for r in range(rows):
+        for c in range(cols):
+            if board[r][c] in root.children:
+                dfs(root.children[board[r][c]], r, c)
+
+    return found
+''',
+                'test_code': '''
+def _test(name, got, expected):
+    global _pass, _fail
+    got_s = sorted(got)
+    exp_s = sorted(expected)
+    if got_s == exp_s:
+        print(f"  PASS  {name}")
+        _pass += 1
+    else:
+        print(f"  FAIL  {name}  got={got_s!r}  expected={exp_s!r}")
+        _fail += 1
+
+_pass = _fail = 0
+
+board1 = [["o","a","a","n"],["e","t","a","e"],["i","h","k","r"],["i","f","l","v"]]
+words1 = ["oath","pea","eat","rain"]
+_test("board1 classic", find_words(board1, words1), ["oath", "eat"])
+
+board2 = [["a","b"],["c","d"]]
+_test("board2 no match", find_words(board2, ["abdc"]), ["abdc"])
+_test("board2 no match2", find_words(board2, ["abcd"]), [])
+
+board3 = [["a"]]
+_test("1x1 board found",    find_words(board3, ["a"]), ["a"])
+_test("1x1 board not found", find_words(board3, ["b"]), [])
+
+print(f"\\n{'='*40}")
+print(f"Results: {_pass}/{_pass+_fail} tests passed")
+if _fail == 0:
+    print("🎉 All tests passed!")
+''',
+                'hints': [
+                    'Build a trie from all the target words first. Then DFS from every board cell.',
+                    'In the DFS: check if the current board character exists in the current trie node\'s children. If not, stop.',
+                    'Mark the current cell as visited by temporarily replacing board[r][c] with "#". Restore it after DFS.',
+                    'When node.word is not None, you\'ve found a complete word — add to found and set node.word = None to avoid duplicates.',
+                    'Explore 4 directions: (r-1,c), (r+1,c), (r,c-1), (r,c+1). Check bounds before recursing.',
+                ]
+            },
+        ],
+        'quiz': [
+            {
+                'question': 'What is the time complexity of searching for a word of length L in a Trie?',
+                'options': ['O(n) where n is number of words', 'O(L)', 'O(L × n)', 'O(log n)'],
+                'answer': 1,
+                'explanation': 'Trie search is O(L) where L is the length of the word — completely independent of how many words are stored. You follow exactly L edges from root to the target node. This is what makes Tries superior to hash maps for prefix-based operations.'
+            },
+            {
+                'question': 'In a Trie, what is the difference between search("app") and starts_with("app")?',
+                'options': ['No difference', 'search checks is_end at the last node; starts_with only checks the path exists', 'starts_with is faster', 'search only works for single characters'],
+                'answer': 1,
+                'explanation': 'Both traverse the same path. The difference is at the end: search requires the last node to have is_end=True (the exact word "app" was inserted). starts_with just requires the path to exist — any word starting with "app" would satisfy it.'
+            },
+            {
+                'question': 'Why is a Trie better than a Hash Map for autocomplete?',
+                'options': ['Tries use less memory', 'Tries can find all words with a given prefix in O(L + results) vs O(n×L) for hash maps', 'Hash maps cannot store strings', 'Tries have O(1) lookups'],
+                'answer': 1,
+                'explanation': 'With a hash map, finding all words matching a prefix requires checking every stored word — O(n×L). A trie lets you navigate to the prefix node in O(L), then DFS to collect all matching words. This is why autocomplete systems (search engines, IDEs) use tries.'
+            },
+            {
+                'question': 'What does node.children store in a typical Trie implementation?',
+                'options': ['A list of all possible characters', 'A mapping from character to child TrieNode', 'The full words stored in the trie', 'An integer count of children'],
+                'answer': 1,
+                'explanation': 'Each TrieNode has a dictionary (or array of size 26 for lowercase letters) mapping each character to its child TrieNode. This allows O(1) lookup of the next node for a given character.'
+            },
+            {
+                'question': 'In the Word Search in a Grid problem, why is a Trie used instead of checking each word separately?',
+                'options': ['Tries are always faster', 'Multiple words share prefixes in the Trie — one DFS path can match many words simultaneously', 'The grid must be sorted first', 'Tries reduce memory usage'],
+                'answer': 1,
+                'explanation': 'Without a trie, you\'d DFS from every cell for every word: O(words × cells × 4^L). With a trie, one DFS from a cell explores all words simultaneously by following the trie. When a branch doesn\'t match any word\'s prefix, the DFS prunes immediately.'
+            },
+        ]
+    },
+    {
+        'id': 13,
+        'title': 'Backtracking',
+        'icon': '🔙',
+        'description': 'Master backtracking — the systematic technique for exploring all possibilities by building candidates incrementally and abandoning paths that cannot lead to a solution.',
+        'difficulty': 'Expert',
+        'estimated_time': '65 min',
+        'color': '#be123c',
+        'content': """
+<h2>What is Backtracking?</h2>
+<p><strong>Backtracking</strong> is a refined brute-force technique. It builds solutions incrementally and <strong>abandons ("backtracks")</strong> a path as soon as it determines the path cannot possibly lead to a valid solution.</p>
+
+<div class="concept-box">
+  <h4>🔑 Key Idea</h4>
+  <p>Think of it as exploring a decision tree: at each step you make a choice, recurse deeper, then <em>undo</em> that choice ("backtrack") before trying the next option. This "try → recurse → undo" pattern is the backbone of backtracking.</p>
+</div>
+
+<h3>The Backtracking Template</h3>
+<pre><code class="language-python">
+def backtrack(current_state, choices):
+    # Base case: solution is complete
+    if is_solution(current_state):
+        record_solution(current_state)
+        return
+
+    for choice in choices:
+        if is_valid(choice, current_state):   # pruning
+            make_choice(current_state, choice)
+            backtrack(current_state, next_choices)
+            undo_choice(current_state, choice)  # ← the "backtrack" step
+</code></pre>
+
+<h3>Example: Generate All Permutations</h3>
+<pre><code class="language-python">
+def permutations(nums):
+    result = []
+
+    def backtrack(current, remaining):
+        if not remaining:           # base case: used all numbers
+            result.append(current[:])
+            return
+        for i, num in enumerate(remaining):
+            current.append(num)                          # choose
+            backtrack(current, remaining[:i] + remaining[i+1:])  # explore
+            current.pop()                                # undo
+
+    backtrack([], nums)
+    return result
+
+print(permutations([1, 2, 3]))
+# [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+</code></pre>
+
+<h3>Example: Subsets (Power Set)</h3>
+<pre><code class="language-python">
+def subsets(nums):
+    result = []
+
+    def backtrack(start, current):
+        result.append(current[:])   # every partial state is a valid subset
+        for i in range(start, len(nums)):
+            current.append(nums[i])     # choose
+            backtrack(i + 1, current)   # explore (only forward → no duplicates)
+            current.pop()               # undo
+
+    backtrack(0, [])
+    return result
+
+print(subsets([1, 2, 3]))
+# [[], [1], [1,2], [1,2,3], [1,3], [2], [2,3], [3]]
+</code></pre>
+
+<h3>Example: N-Queens Problem</h3>
+<pre><code class="language-python">
+def solve_n_queens(n):
+    result = []
+    queens = []   # queens[row] = col of queen in that row
+
+    def is_safe(row, col):
+        for r, c in enumerate(queens):
+            if c == col or abs(r - row) == abs(c - col):
+                return False
+        return True
+
+    def backtrack(row):
+        if row == n:
+            # Build board representation
+            board = [['.' * c + 'Q' + '.' * (n - c - 1)] for c in queens]
+            result.append([''.join(row) for row in board])
+            return
+        for col in range(n):
+            if is_safe(row, col):
+                queens.append(col)    # choose
+                backtrack(row + 1)    # explore
+                queens.pop()          # undo
+
+    backtrack(0)
+    return result
+</code></pre>
+
+<h3>Backtracking Complexity</h3>
+<table class="complexity-table">
+  <tr><th>Problem</th><th>Time Complexity</th><th>Notes</th></tr>
+  <tr><td>Permutations (n items)</td><td>O(n × n!)</td><td>n! permutations, each length n</td></tr>
+  <tr><td>Subsets (n items)</td><td>O(n × 2ⁿ)</td><td>2ⁿ subsets, each up to length n</td></tr>
+  <tr><td>N-Queens (n×n board)</td><td>O(n!)</td><td>With pruning, much less in practice</td></tr>
+  <tr><td>Sudoku (9×9)</td><td>O(9^81) worst</td><td>Pruning makes it fast in practice</td></tr>
+</table>
+
+<h3>Pruning — The Key to Efficiency</h3>
+<p>Backtracking is only efficient when paired with strong <strong>pruning</strong> (early termination). Always ask: "Can this partial solution possibly become valid?" If not, stop immediately.</p>
+<pre><code class="language-python">
+# Combination Sum — prune when remaining goes below 0
+def combination_sum(candidates, target):
+    result = []
+    candidates.sort()  # Sort to enable early termination
+
+    def backtrack(start, current, remaining):
+        if remaining == 0:
+            result.append(current[:])
+            return
+        for i in range(start, len(candidates)):
+            if candidates[i] > remaining:  # ← pruning: no point going further
+                break
+            current.append(candidates[i])
+            backtrack(i, current, remaining - candidates[i])
+            current.pop()
+
+    backtrack(0, [], target)
+    return result
+</code></pre>
+""",
+        'sandbox_default': '''def permutations(nums):
+    result = []
+    def backtrack(current, remaining):
+        if not remaining:
+            result.append(current[:])
+            return
+        for i, num in enumerate(remaining):
+            current.append(num)
+            backtrack(current, remaining[:i] + remaining[i+1:])
+            current.pop()
+    backtrack([], nums)
+    return result
+
+def subsets(nums):
+    result = []
+    def backtrack(start, current):
+        result.append(current[:])
+        for i in range(start, len(nums)):
+            current.append(nums[i])
+            backtrack(i + 1, current)
+            current.pop()
+    backtrack(0, [])
+    return result
+
+print("Permutations of [1,2,3]:")
+for p in permutations([1, 2, 3]):
+    print(" ", p)
+
+print("\\nSubsets of [1,2,3]:")
+for s in subsets([1, 2, 3]):
+    print(" ", s)
+''',
+        'labs': [
+            {
+                'id': 1,
+                'title': 'Combination Sum',
+                'description': 'Given a list of distinct integers (candidates) and a target integer, return all unique combinations where the chosen numbers sum to target. The same number may be used unlimited times. Return combinations in any order.',
+                'starter_code': '''def combination_sum(candidates, target):
+    """
+    Return all unique combinations of candidates that sum to target.
+    Each candidate may be used any number of times.
+    Example: combination_sum([2,3,6,7], 7) -> [[2,2,3],[7]]
+    """
+    # YOUR CODE HERE
+    pass
+''',
+                'test_code': '''
+def _test(name, got, expected):
+    global _pass, _fail
+    got_s  = sorted(tuple(sorted(x)) for x in got)
+    exp_s  = sorted(tuple(sorted(x)) for x in expected)
+    if got_s == exp_s:
+        print(f"  PASS  {name}")
+        _pass += 1
+    else:
+        print(f"  FAIL  {name}")
+        print(f"    got:      {got_s}")
+        print(f"    expected: {exp_s}")
+        _fail += 1
+
+_pass = _fail = 0
+
+print("Testing combination_sum:")
+_test("[2,3,6,7] target=7",  combination_sum([2,3,6,7], 7),   [[2,2,3],[7]])
+_test("[2,3,5] target=8",    combination_sum([2,3,5], 8),      [[2,2,2,2],[2,3,3],[3,5]])
+_test("[2] target=1",        combination_sum([2], 1),           [])
+_test("[1] target=1",        combination_sum([1], 1),           [[1]])
+_test("[1] target=2",        combination_sum([1], 2),           [[1,1]])
+
+print(f"\\n{'='*40}")
+print(f"Results: {_pass}/{_pass+_fail} tests passed")
+if _fail == 0:
+    print("🎉 All tests passed!")
+''',
+                'hints': [
+                    'Sort candidates first — this lets you prune early when candidates[i] > remaining.',
+                    'Define backtrack(start, current, remaining). start prevents re-using earlier elements, current builds the combination, remaining tracks what\'s left to sum.',
+                    'Base case: remaining == 0 → add current[:] to results.',
+                    'For each candidate from start onward: if candidate > remaining, break (no point continuing). Otherwise append, recurse with same start index (reuse allowed), then pop.',
+                    'The key difference from permutations: use i (not i+1) in the recursive call to allow reuse of the same element.',
+                ]
+            },
+            {
+                'id': 2,
+                'title': 'Sudoku Solver',
+                'description': 'Write a backtracking solver for a 9×9 Sudoku puzzle. The board is given as a list of lists where "." represents empty cells. Fill in the empty cells so every row, column, and 3×3 box contains 1-9 with no repeats. Modify the board in-place.',
+                'starter_code': '''def solve_sudoku(board):
+    """
+    Solve the Sudoku puzzle by modifying board in-place.
+    "." represents an empty cell. Returns True if solved, False otherwise.
+    """
+    def is_valid(row, col, num):
+        # Check row, column, and 3x3 box
+        # YOUR CODE HERE
+        pass
+
+    def backtrack():
+        # Find next empty cell, try digits 1-9
+        # YOUR CODE HERE
+        pass
+
+    backtrack()
+    return board
+''',
+                'test_code': '''
+def _test(name, got, expected):
+    global _pass, _fail
+    if got == expected:
+        print(f"  PASS  {name}")
+        _pass += 1
+    else:
+        print(f"  FAIL  {name}")
+        for i, (gr, er) in enumerate(zip(got, expected)):
+            if gr != er:
+                print(f"    row {i}: got {gr}")
+                print(f"           exp {er}")
+        _fail += 1
+
+_pass = _fail = 0
+
+board1 = [
+    ["5","3",".",".","7",".",".",".","."],
+    ["6",".",".","1","9","5",".",".","."],
+    [".","9","8",".",".",".",".","6","."],
+    ["8",".",".",".","6",".",".",".","3"],
+    ["4",".",".","8",".","3",".",".","1"],
+    ["7",".",".",".","2",".",".",".","6"],
+    [".","6",".",".",".",".","2","8","."],
+    [".",".",".","4","1","9",".",".","5"],
+    [".",".",".",".","8",".",".","7","9"]
+]
+expected1 = [
+    ["5","3","4","6","7","8","9","1","2"],
+    ["6","7","2","1","9","5","3","4","8"],
+    ["1","9","8","3","4","2","5","6","7"],
+    ["8","5","9","7","6","1","4","2","3"],
+    ["4","2","6","8","5","3","7","9","1"],
+    ["7","1","3","9","2","4","8","5","6"],
+    ["9","6","1","5","3","7","2","8","4"],
+    ["2","8","7","4","1","9","6","3","5"],
+    ["3","4","5","2","8","6","1","7","9"]
+]
+result1 = solve_sudoku(board1)
+_test("Classic Sudoku puzzle", result1, expected1)
+
+print(f"\\n{'='*40}")
+print(f"Results: {_pass}/{_pass+_fail} tests passed")
+if _fail == 0:
+    print("🎉 All tests passed!")
+''',
+                'hints': [
+                    'is_valid(row, col, num): check that num doesn\'t appear in the same row, same column, or same 3×3 box. Box top-left: (row//3*3, col//3*3).',
+                    'backtrack(): iterate over all cells. When you find board[r][c] == ".", try digits "1" through "9".',
+                    'For each valid digit: set board[r][c] = digit, recurse. If recursion succeeds (returns True), return True.',
+                    'If no digit works for this cell, set board[r][c] = "." again (backtrack) and return False.',
+                    'Base case: if no empty cell is found, the puzzle is solved — return True.',
+                ]
+            },
+        ],
+        'quiz': [
+            {
+                'question': 'What is the essential "backtrack" step in a backtracking algorithm?',
+                'options': ['Return False when no solution exists', 'Undo the last choice before trying the next option', 'Sort the input before processing', 'Use a queue instead of recursion'],
+                'answer': 1,
+                'explanation': 'Backtracking follows a "try → recurse → undo" pattern. After exploring a path and returning from recursion, you must undo the last choice (e.g., pop the last element) to restore the state before trying the next option. Without this step, state leaks between branches.'
+            },
+            {
+                'question': 'What is "pruning" in the context of backtracking?',
+                'options': ['Sorting the input', 'Removing elements from the result', 'Stopping exploration of a branch early when it cannot lead to a valid solution', 'Using dynamic programming to cache results'],
+                'answer': 2,
+                'explanation': 'Pruning is the key optimization in backtracking. If you can determine early that the current partial solution cannot possibly lead to a valid answer, you abandon (prune) that branch immediately. Example: in Combination Sum, if candidates[i] > remaining, no larger candidate can help, so you break early.'
+            },
+            {
+                'question': 'How many total permutations are there for a list of 4 distinct elements?',
+                'options': ['4', '8', '16', '24'],
+                'answer': 3,
+                'explanation': 'The number of permutations of n distinct elements is n! (n factorial). For n=4: 4! = 4×3×2×1 = 24. This is also the worst-case number of leaf nodes in the backtracking decision tree for permutations.'
+            },
+            {
+                'question': 'In the subsets problem, how many subsets does a set of n elements have?',
+                'options': ['n', 'n²', '2ⁿ', 'n!'],
+                'answer': 2,
+                'explanation': 'A set of n elements has 2ⁿ subsets (the power set). For each element, you independently decide to include it or not — 2 choices, n times, giving 2ⁿ combinations. For n=3: 2³=8 subsets: [], [1], [2], [3], [1,2], [1,3], [2,3], [1,2,3].'
+            },
+            {
+                'question': 'Backtracking is most appropriate when:',
+                'options': ['The problem has optimal substructure (use DP instead)', 'You need to explore all possible combinations/arrangements with constraints', 'The input is sorted', 'You need O(n) time complexity'],
+                'answer': 1,
+                'explanation': 'Backtracking shines when you must explore all possible candidates (permutations, subsets, combinations) or find any valid configuration (N-Queens, Sudoku). If subproblems overlap and you only need the optimal value (not all solutions), Dynamic Programming is usually better.'
+            },
+        ]
+    },
+    {
+        'id': 14,
+        'title': 'Advanced Graph Algorithms',
+        'icon': '🗺️',
+        'description': 'Level up with Dijkstra\'s shortest path, topological sort, and Union-Find — the algorithms behind GPS navigation, build systems, and network connectivity.',
+        'difficulty': 'Expert',
+        'estimated_time': '75 min',
+        'color': '#0f766e',
+        'content': """
+<h2>Going Beyond BFS/DFS</h2>
+<p>Basic BFS/DFS find paths and connected components. Advanced graph algorithms solve harder questions: <em>What is the shortest weighted path? In what order should tasks execute? Are these two nodes in the same network?</em></p>
+
+<h3>1. Dijkstra's Algorithm — Shortest Weighted Path</h3>
+<p>Finds the shortest path from a source to all other nodes in a graph with <strong>non-negative edge weights</strong>. Uses a min-heap for efficiency.</p>
+
+<div class="concept-box">
+  <h4>🔑 Key Idea</h4>
+  <p>Always process the node with the smallest known distance next (greedy). Once a node is popped from the heap, its shortest distance is finalized.</p>
+</div>
+
+<pre><code class="language-python">
+import heapq
+
+def dijkstra(graph, start):
+    # graph: dict of {node: [(neighbor, weight), ...]}
+    # Returns: dict of shortest distances from start to every node
+    dist = {node: float('inf') for node in graph}
+    dist[start] = 0
+    heap = [(0, start)]  # (distance, node)
+
+    while heap:
+        d, node = heapq.heappop(heap)
+        if d > dist[node]:   # stale entry — skip
+            continue
+        for neighbor, weight in graph[node]:
+            new_dist = d + weight
+            if new_dist < dist[neighbor]:
+                dist[neighbor] = new_dist
+                heapq.heappush(heap, (new_dist, neighbor))
+
+    return dist
+
+graph = {
+    'A': [('B', 1), ('C', 4)],
+    'B': [('C', 2), ('D', 5)],
+    'C': [('D', 1)],
+    'D': [],
+}
+print(dijkstra(graph, 'A'))
+# {'A': 0, 'B': 1, 'C': 3, 'D': 4}
+</code></pre>
+
+<p><strong>Complexity:</strong> O((V + E) log V) with a binary heap.</p>
+
+<h3>2. Topological Sort — Ordering Dependencies</h3>
+<p>For a <strong>Directed Acyclic Graph (DAG)</strong>, topological sort produces a linear ordering of nodes such that every directed edge u → v has u before v. Used in build systems, course prerequisites, task scheduling.</p>
+
+<pre><code class="language-python">
+from collections import deque
+
+def topological_sort(graph):
+    # Kahn's Algorithm: BFS + in-degree counting.
+    # Returns sorted order, or [] if graph has a cycle.
+    in_degree = {node: 0 for node in graph}
+    for node in graph:
+        for neighbor in graph[node]:
+            in_degree[neighbor] += 1
+
+    queue = deque(n for n in graph if in_degree[n] == 0)
+    order = []
+
+    while queue:
+        node = queue.popleft()
+        order.append(node)
+        for neighbor in graph[node]:
+            in_degree[neighbor] -= 1
+            if in_degree[neighbor] == 0:
+                queue.append(neighbor)
+
+    return order if len(order) == len(graph) else []  # [] = cycle detected
+
+graph = {0: [1, 2], 1: [3], 2: [3], 3: []}
+print(topological_sort(graph))  # [0, 1, 2, 3]  or  [0, 2, 1, 3]
+</code></pre>
+
+<h3>3. Union-Find (Disjoint Set Union)</h3>
+<p>Efficiently tracks which <em>component</em> each node belongs to and merges components. With <strong>path compression</strong> and <strong>union by rank</strong>, nearly O(1) per operation.</p>
+
+<pre><code class="language-python">
+class UnionFind:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.rank = [0] * n
+        self.components = n
+
+    def find(self, x):
+        if self.parent[x] != x:
+            self.parent[x] = self.find(self.parent[x])  # path compression
+        return self.parent[x]
+
+    def union(self, x, y):
+        px, py = self.find(x), self.find(y)
+        if px == py:
+            return False  # already in same component
+        # Union by rank
+        if self.rank[px] < self.rank[py]:
+            px, py = py, px
+        self.parent[py] = px
+        if self.rank[px] == self.rank[py]:
+            self.rank[px] += 1
+        self.components -= 1
+        return True
+
+    def connected(self, x, y):
+        return self.find(x) == self.find(y)
+
+uf = UnionFind(5)
+uf.union(0, 1)
+uf.union(1, 2)
+print(uf.connected(0, 2))   # True
+print(uf.connected(0, 3))   # False
+print(uf.components)        # 3  (groups: {0,1,2}, {3}, {4})
+</code></pre>
+
+<h3>Complexity Comparison</h3>
+<table class="complexity-table">
+  <tr><th>Algorithm</th><th>Time</th><th>Use When</th></tr>
+  <tr><td>BFS shortest path</td><td>O(V + E)</td><td>Unweighted graph</td></tr>
+  <tr><td>Dijkstra</td><td>O((V+E) log V)</td><td>Weighted, non-negative edges</td></tr>
+  <tr><td>Bellman-Ford</td><td>O(V × E)</td><td>Negative edge weights</td></tr>
+  <tr><td>Topological Sort (Kahn)</td><td>O(V + E)</td><td>DAG — ordering dependencies</td></tr>
+  <tr><td>Union-Find (find/union)</td><td>O(α(n)) ≈ O(1)</td><td>Dynamic connectivity</td></tr>
+</table>
+""",
+        'sandbox_default': '''import heapq
+
+def dijkstra(graph, start):
+    dist = {node: float("inf") for node in graph}
+    dist[start] = 0
+    heap = [(0, start)]
+    while heap:
+        d, node = heapq.heappop(heap)
+        if d > dist[node]:
+            continue
+        for neighbor, weight in graph[node]:
+            nd = d + weight
+            if nd < dist[neighbor]:
+                dist[neighbor] = nd
+                heapq.heappush(heap, (nd, neighbor))
+    return dist
+
+# Road network example
+roads = {
+    "A": [("B", 1), ("C", 4)],
+    "B": [("C", 2), ("D", 5)],
+    "C": [("D", 1)],
+    "D": [],
+}
+print("Shortest from A:", dijkstra(roads, "A"))
+# Expected: {A:0, B:1, C:3, D:4}
+''',
+        'labs': [
+            {
+                'id': 1,
+                'title': 'Network Delay Time (Dijkstra)',
+                'description': 'There are n nodes in a network (labeled 1 to n). Given a list of travel times as directed edges (u, v, w) — from u to v with weight w — and a starting node k, return the time it takes for all nodes to receive a signal. If it is impossible for all nodes to receive the signal, return -1.',
+                'starter_code': '''import heapq
+
+def network_delay_time(times, n, k):
+    """
+    times: list of (source, target, weight)
+    n: number of nodes (labeled 1..n)
+    k: starting node
+    Returns: max shortest path to any node, or -1 if unreachable
+    """
+    # YOUR CODE HERE
+    pass
+''',
+                'test_code': '''
+def _test(name, got, expected):
+    global _pass, _fail
+    if got == expected:
+        print(f"  PASS  {name}")
+        _pass += 1
+    else:
+        print(f"  FAIL  {name}  got={got!r}  expected={expected!r}")
+        _fail += 1
+
+_pass = _fail = 0
+
+print("Testing network_delay_time:")
+_test("example1", network_delay_time([[2,1,1],[2,3,1],[3,4,1]], 4, 2), 2)
+_test("example2", network_delay_time([[1,2,1]], 2, 1), 1)
+_test("unreachable", network_delay_time([[1,2,1]], 2, 2), -1)
+_test("single node", network_delay_time([], 1, 1), 0)
+_test("two paths", network_delay_time([[1,2,10],[1,3,5],[2,4,1],[3,4,1]], 4, 1), 6)
+
+print(f"\\n{'='*40}")
+print(f"Results: {_pass}/{_pass+_fail} tests passed")
+if _fail == 0:
+    print("🎉 All tests passed!")
+''',
+                'hints': [
+                    'Build an adjacency list from times: graph[u].append((v, w)).',
+                    'Run Dijkstra from node k. dist[node] = shortest time to reach node from k.',
+                    'After Dijkstra, if any node has dist = infinity, return -1 (unreachable).',
+                    'Otherwise return max(dist.values()) — the time when the last node finally receives the signal.',
+                    'Remember: nodes are labeled 1..n, so initialize dist for all nodes 1 through n.',
+                ]
+            },
+            {
+                'id': 2,
+                'title': 'Number of Connected Components (Union-Find)',
+                'description': 'Given n nodes (0 to n-1) and a list of undirected edges, return the number of connected components in the graph. Use Union-Find for O(E × α(n)) time.',
+                'starter_code': '''def count_components(n, edges):
+    """
+    n: number of nodes (0..n-1)
+    edges: list of [u, v] undirected edges
+    Returns: number of connected components
+    """
+    # Implement Union-Find here
+    parent = list(range(n))
+    rank = [0] * n
+
+    def find(x):
+        # YOUR CODE HERE
+        pass
+
+    def union(x, y):
+        # YOUR CODE HERE
+        pass
+
+    # YOUR CODE HERE (connect edges and count components)
+    pass
+''',
+                'test_code': '''
+def _test(name, got, expected):
+    global _pass, _fail
+    if got == expected:
+        print(f"  PASS  {name}")
+        _pass += 1
+    else:
+        print(f"  FAIL  {name}  got={got!r}  expected={expected!r}")
+        _fail += 1
+
+_pass = _fail = 0
+
+print("Testing count_components:")
+_test("n=5 edges=[[0,1],[1,2],[3,4]] -> 2",
+      count_components(5, [[0,1],[1,2],[3,4]]), 2)
+_test("n=5 edges=[[0,1],[1,2],[2,3],[3,4]] -> 1",
+      count_components(5, [[0,1],[1,2],[2,3],[3,4]]), 1)
+_test("n=3 no edges -> 3",
+      count_components(3, []), 3)
+_test("n=1 no edges -> 1",
+      count_components(1, []), 1)
+_test("n=4 edges=[[0,1],[2,3]] -> 2",
+      count_components(4, [[0,1],[2,3]]), 2)
+
+print(f"\\n{'='*40}")
+print(f"Results: {_pass}/{_pass+_fail} tests passed")
+if _fail == 0:
+    print("🎉 All tests passed!")
+''',
+                'hints': [
+                    'Start with n components (each node is its own component).',
+                    'find(x): if parent[x] != x, recursively find root and apply path compression (parent[x] = find(parent[x])).',
+                    'union(x, y): find roots px, py. If same, return False (already connected). Otherwise link by rank and decrement component count.',
+                    'Process each edge with union(u, v). Edges that don\'t reduce component count connect already-joined nodes.',
+                    'Final answer: the component count after all unions.',
+                ]
+            },
+        ],
+        'quiz': [
+            {
+                'question': 'Why does Dijkstra\'s algorithm fail with negative edge weights?',
+                'options': ['It only works on undirected graphs', 'A node\'s distance can be updated after it\'s been finalized, breaking the greedy assumption', 'It requires sorted edges', 'Negative weights cause infinite loops'],
+                'answer': 1,
+                'explanation': 'Dijkstra\'s greedy assumption is: once a node is popped from the min-heap, its shortest distance is final. Negative edges can create shortcuts discovered later, making a previously "finalized" distance wrong. Bellman-Ford handles negative weights by relaxing all edges V-1 times without this assumption.'
+            },
+            {
+                'question': 'Topological sort is only possible on which type of graph?',
+                'options': ['Undirected graphs', 'Directed Acyclic Graphs (DAGs)', 'Complete graphs', 'Weighted graphs'],
+                'answer': 1,
+                'explanation': 'Topological sort requires a Directed Acyclic Graph (DAG). Direction is needed to define ordering. Cycles make topological sort impossible — if A depends on B and B depends on A, no valid ordering exists. Kahn\'s algorithm detects cycles by checking if all nodes were sorted.'
+            },
+            {
+                'question': 'What does "path compression" do in Union-Find?',
+                'options': ['Removes edges from the graph', 'Makes every node point directly to its root, flattening the tree for faster future lookups', 'Merges two components', 'Compresses the adjacency list'],
+                'answer': 1,
+                'explanation': 'During find(x), path compression makes every node on the path from x to the root point directly to the root. This flattens the tree so future find() calls are nearly O(1). Combined with union by rank, the amortized cost per operation is O(α(n)) — effectively constant.'
+            },
+            {
+                'question': 'In Dijkstra\'s algorithm, why do we skip heap entries where d > dist[node]?',
+                'options': ['To save memory', 'These are stale entries — a shorter path was already found and processed', 'To avoid counting a node twice in the result', 'Because negative distances are invalid'],
+                'answer': 1,
+                'explanation': 'When a shorter path to a node is found, we push a new (shorter_dist, node) entry but don\'t remove the old one (heaps don\'t support efficient deletion). When the old entry is eventually popped, d > dist[node] tells us a better distance is already recorded. Skipping it avoids redundant processing.'
+            },
+            {
+                'question': 'What does topological sort return when the graph has a cycle?',
+                'options': ['Raises an exception', 'Returns an empty list (cycle detected)', 'Returns the nodes in any order', 'Returns the cycle itself'],
+                'answer': 1,
+                'explanation': 'In Kahn\'s algorithm, if a cycle exists, some nodes will never reach in-degree 0 (each node in the cycle always has an incoming edge from another cycle node). The output order will have fewer nodes than the graph, which we check: if len(order) != len(graph), a cycle exists and we return [].'
+            },
+        ]
+    },
 ]
