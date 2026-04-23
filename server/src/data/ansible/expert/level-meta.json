@@ -1,0 +1,8 @@
+{
+  "id": "expert",
+  "tech": "ansible",
+  "displayName": "Expert",
+  "description": "Master Ansible collections, Ansible Vault for secrets management, and performance tuning with strategies and mitogen.",
+  "estimatedHours": 6,
+  "moduleOrder": ["module-01-collections", "module-02-vault", "module-03-performance"]
+}

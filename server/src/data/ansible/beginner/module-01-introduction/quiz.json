@@ -1,0 +1,187 @@
+{
+  "quizId": "quiz-ansible-beginner-01",
+  "moduleId": "module-01-introduction",
+  "passingScore": 70,
+  "questions": [
+    {
+      "id": "q1",
+      "order": 1,
+      "text": "What makes Ansible 'agentless'?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "It uses a lightweight daemon installed on managed nodes"},
+        {"id": "b", "text": "It communicates over SSH/WinRM without installing software on managed nodes"},
+        {"id": "c", "text": "It runs playbooks locally on each managed node"},
+        {"id": "d", "text": "It requires only a client library on managed nodes"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Ansible is agentless because it connects to managed nodes using existing protocols (SSH for Linux, WinRM for Windows) and does not require any Ansible software to be pre-installed on those nodes. This reduces overhead and simplifies security.",
+      "citations": [
+        {"label": "Ansible Concepts — Agentless", "url": "https://docs.ansible.com/ansible/latest/getting_started/basic_concepts.html"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "order": 2,
+      "text": "Which command verifies your Ansible installation and shows the ansible-core version?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "ansible -v"},
+        {"id": "b", "text": "ansible --check"},
+        {"id": "c", "text": "ansible --version"},
+        {"id": "d", "text": "ansible-core --version"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "Running 'ansible --version' prints the ansible version, ansible-core version, Python version, and the location of config files. In Ansible 2.19, you'll see 'ansible [core 2.19.x]' in the output.",
+      "citations": [
+        {"label": "Installation Guide", "url": "https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "order": 3,
+      "text": "What is the Fully Qualified Collection Name (FQCN) for the Ansible ping module?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "builtin.ping"},
+        {"id": "b", "text": "ansible.ping"},
+        {"id": "c", "text": "ansible.builtin.ping"},
+        {"id": "d", "text": "core.ansible.ping"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "The FQCN for the ping module is ansible.builtin.ping. Ansible 2.19 recommends always using FQCNs to avoid ambiguity when multiple collections provide modules with the same short name. The format is namespace.collection.module.",
+      "citations": [
+        {"label": "Using collections", "url": "https://docs.ansible.com/ansible/latest/user_guide/collections_using.html"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q4",
+      "order": 4,
+      "text": "Which node must have Ansible installed?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "All managed nodes"},
+        {"id": "b", "text": "The control node only"},
+        {"id": "c", "text": "Both control and managed nodes"},
+        {"id": "d", "text": "A dedicated Ansible server separate from control and managed nodes"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Ansible only needs to be installed on the control node — the machine from which you run Ansible commands. Managed nodes only need Python (2.7+ or 3.5+) and SSH access. No Ansible installation is needed on them.",
+      "citations": [
+        {"label": "Control node requirements", "url": "https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#control-node-requirements"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "order": 5,
+      "text": "What connection plugin does Ansible use by default for Linux managed nodes?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "WinRM"},
+        {"id": "b", "text": "Paramiko"},
+        {"id": "c", "text": "SSH (OpenSSH)"},
+        {"id": "d", "text": "Telnet"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "Ansible uses the ssh connection plugin (OpenSSH) by default for Linux targets. It also has a paramiko fallback, but OpenSSH is preferred for its features and performance. WinRM is used for Windows targets.",
+      "citations": [
+        {"label": "Connection methods", "url": "https://docs.ansible.com/ansible/latest/getting_started/basic_concepts.html#control-node"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q6",
+      "order": 6,
+      "text": "What file format do Ansible playbooks use?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "JSON"},
+        {"id": "b", "text": "TOML"},
+        {"id": "c", "text": "XML"},
+        {"id": "d", "text": "YAML"}
+      ],
+      "correctOptionId": "d",
+      "explanation": "Ansible playbooks are written in YAML (YAML Ain't Markup Language). YAML's human-readable syntax makes playbooks easy to write and understand. Playbooks start with '---' and use indentation to define structure.",
+      "citations": [
+        {"label": "Intro to playbooks", "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_intro.html"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q7",
+      "order": 7,
+      "text": "What does 'connection: local' do in an Ansible play?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Runs tasks on a local Docker container"},
+        {"id": "b", "text": "Disables gathering of facts"},
+        {"id": "c", "text": "Runs tasks on the control node itself without SSH"},
+        {"id": "d", "text": "Uses localhost as an inventory source"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "Setting 'connection: local' tells Ansible to execute tasks on the control node itself without going through SSH. This is commonly used when running playbooks targeting localhost to avoid unnecessary SSH overhead.",
+      "citations": [
+        {"label": "Connections and privilege escalation", "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_delegation.html#local-playbooks"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q8",
+      "order": 8,
+      "text": "Which of the following is a valid Ansible module category?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "ansible.commands"},
+        {"id": "b", "text": "ansible.builtin"},
+        {"id": "c", "text": "ansible.core"},
+        {"id": "d", "text": "ansible.modules"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "ansible.builtin is the collection namespace for modules that ship with ansible-core, such as ansible.builtin.copy, ansible.builtin.ping, ansible.builtin.debug. These are always available without installing additional collections.",
+      "citations": [
+        {"label": "ansible.builtin collection", "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/index.html"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q9",
+      "order": 9,
+      "text": "What is the default inventory file location in Ansible?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "/etc/ansible/hosts"},
+        {"id": "b", "text": "/etc/ansible/inventory"},
+        {"id": "c", "text": "~/.ansible/hosts"},
+        {"id": "d", "text": "/usr/share/ansible/inventory"}
+      ],
+      "correctOptionId": "a",
+      "explanation": "The default inventory file is /etc/ansible/hosts. You can override this with the -i flag (e.g., ansible-playbook -i inventory.ini playbook.yml) or by setting inventory in ansible.cfg. Ansible 2.19 also supports dynamic inventory plugins.",
+      "citations": [
+        {"label": "How to build your inventory", "url": "https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q10",
+      "order": 10,
+      "text": "Which Ansible component groups related tasks, variables, handlers, and files into a reusable, shareable structure?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Play"},
+        {"id": "b", "text": "Task"},
+        {"id": "c", "text": "Role"},
+        {"id": "d", "text": "Collection"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "A Role is the primary mechanism for organizing and reusing Ansible content. Roles have a defined directory structure (tasks/, handlers/, vars/, defaults/, files/, templates/, meta/) and can be shared via Ansible Galaxy. A Collection is a distribution format that can contain roles, plugins, and modules.",
+      "citations": [
+        {"label": "Roles", "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html"}
+      ],
+      "points": 10
+    }
+  ]
+}

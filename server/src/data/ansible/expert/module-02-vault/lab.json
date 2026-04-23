@@ -1,0 +1,28 @@
+{
+  "id": "lab-ansible-expert-02",
+  "moduleId": "module-02-vault",
+  "title": "Vault-Secured Variable File",
+  "description": "Write a playbook that uses a vault-encrypted variable (simulated with !vault syntax) for a database password, and references it securely.",
+  "language": "yaml",
+  "monacoLanguage": "yaml",
+  "starterCode": "---\n# Write a playbook that:\n# 1. Defines a 'db_password' variable using the !vault YAML tag\n#    (simulate the encrypted value as a multiline string starting with $ANSIBLE_VAULT)\n# 2. Creates a task using ansible.builtin.template that references {{ db_password }}\n#    to write /etc/myapp/db.conf\n# 3. Sets file mode to '0600' (owner-read-only) for security\n# 4. Uses no_log: true on any task that prints or uses the password\n\n- name: Secure database configuration\n  hosts: dbservers\n  become: true\n  vars:\n    # Add vault-encrypted db_password here\n  tasks:\n    # Deploy db config template\n    # Use no_log: true\n",
+  "solutionCode": "---\n- name: Secure database configuration\n  hosts: dbservers\n  become: true\n  vars:\n    db_password: !vault |\n      $ANSIBLE_VAULT;1.1;AES256\n      66386439653236336462626566653065\n      37636661613639373937313637633233\n  tasks:\n    - name: Deploy database config\n      ansible.builtin.template:\n        src: db.conf.j2\n        dest: /etc/myapp/db.conf\n        owner: root\n        group: myapp\n        mode: '0600'\n      no_log: true\n",
+  "hints": [
+    "The !vault YAML tag marks a variable as vault-encrypted",
+    "Vault-encrypted content starts with $ANSIBLE_VAULT;1.1;AES256",
+    "mode: '0600' means only owner can read — critical for credential files",
+    "no_log: true prevents the task's parameters from appearing in output"
+  ],
+  "validationRules": [
+    {"id": "has-vault-tag", "type": "contains", "pattern": "!vault", "errorMessage": "Use the !vault YAML tag to mark the encrypted variable", "points": 25},
+    {"id": "has-ansible-vault-header", "type": "contains", "pattern": "$ANSIBLE_VAULT", "errorMessage": "The vault value should start with $ANSIBLE_VAULT;1.1;AES256", "points": 20},
+    {"id": "has-template", "type": "contains", "pattern": "ansible.builtin.template", "errorMessage": "Use ansible.builtin.template to deploy the config file", "points": 20},
+    {"id": "has-no-log", "type": "contains", "pattern": "no_log: true", "errorMessage": "Add no_log: true to prevent secrets from appearing in logs", "points": 20},
+    {"id": "valid-yaml", "type": "yamlParse", "errorMessage": "YAML is invalid — !vault tag requires proper indentation", "points": 15}
+  ],
+  "simulatedOutput": {
+    "success": "PLAY [Secure database configuration] *******************\n\nTASK [Gathering Facts] *********************************\nok: [db1.example.com]\n\nTASK [Deploy database config] **************************\nchanged: [db1.example.com]\n\nPLAY RECAP *********************************************\ndb1.example.com : ok=2  changed=1  unreachable=0  failed=0\n\nNote: Vault variables were properly decrypted. Sensitive data was not logged (no_log: true).",
+    "failure": "Vault validation failed. Ensure !vault tag, $ANSIBLE_VAULT header, template module, and no_log: true are all present."
+  },
+  "maxScore": 100
+}

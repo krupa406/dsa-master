@@ -1,0 +1,64 @@
+{
+  "id": "lab-ansible-beginner-03",
+  "moduleId": "module-03-playbooks",
+  "title": "Write a Web Server Playbook",
+  "description": "Write a complete playbook that installs nginx, deploys a config file, and uses a handler to restart nginx when the config changes.",
+  "language": "yaml",
+  "monacoLanguage": "yaml",
+  "starterCode": "---\n# Write a playbook that:\n# 1. Targets 'webservers' group with privilege escalation (become: true)\n# 2. Installs nginx using ansible.builtin.package (state: present)\n# 3. Copies /tmp/nginx.conf to /etc/nginx/nginx.conf using ansible.builtin.copy\n#    and notifies the 'Restart nginx' handler\n# 4. Defines a handler named 'Restart nginx' that restarts the nginx service\n\n- name: Configure web server\n  hosts: webservers\n  # Add privilege escalation\n  tasks:\n    # Task 1: Install nginx\n\n    # Task 2: Deploy nginx config\n\n  # Add handlers section\n",
+  "solutionCode": "---\n- name: Configure web server\n  hosts: webservers\n  become: true\n  tasks:\n    - name: Install nginx\n      ansible.builtin.package:\n        name: nginx\n        state: present\n\n    - name: Deploy nginx config\n      ansible.builtin.copy:\n        src: /tmp/nginx.conf\n        dest: /etc/nginx/nginx.conf\n      notify: Restart nginx\n\n  handlers:\n    - name: Restart nginx\n      ansible.builtin.service:\n        name: nginx\n        state: restarted\n",
+  "hints": [
+    "Use 'become: true' for privilege escalation (sudo)",
+    "ansible.builtin.package is cross-platform (works on apt and yum)",
+    "Use 'notify: Handler Name' in a task to trigger a handler",
+    "Handlers go in a 'handlers:' section at the same level as 'tasks:'"
+  ],
+  "validationRules": [
+    {
+      "id": "has-become",
+      "type": "contains",
+      "pattern": "become: true",
+      "errorMessage": "Add 'become: true' for privilege escalation",
+      "points": 15
+    },
+    {
+      "id": "has-package",
+      "type": "contains",
+      "pattern": "ansible.builtin.package",
+      "errorMessage": "Use ansible.builtin.package to install nginx",
+      "points": 20
+    },
+    {
+      "id": "has-copy-or-template",
+      "type": "contains",
+      "pattern": "ansible.builtin.copy",
+      "errorMessage": "Use ansible.builtin.copy to deploy the config file",
+      "points": 20
+    },
+    {
+      "id": "has-notify",
+      "type": "contains",
+      "pattern": "notify:",
+      "errorMessage": "Use 'notify:' to trigger a handler when config changes",
+      "points": 15
+    },
+    {
+      "id": "has-handlers",
+      "type": "contains",
+      "pattern": "handlers:",
+      "errorMessage": "Add a 'handlers:' section",
+      "points": 15
+    },
+    {
+      "id": "valid-yaml",
+      "type": "yamlParse",
+      "errorMessage": "YAML is invalid — check indentation",
+      "points": 15
+    }
+  ],
+  "simulatedOutput": {
+    "success": "PLAY [Configure web server] ****************************\n\nTASK [Gathering Facts] *********************************\nok: [web1.example.com]\nok: [web2.example.com]\n\nTASK [Install nginx] ***********************************\nchanged: [web1.example.com]\nchanged: [web2.example.com]\n\nTASK [Deploy nginx config] *****************************\nchanged: [web1.example.com]\nchanged: [web2.example.com]\n\nRUNNING HANDLER [Restart nginx] ************************\nchanged: [web1.example.com]\nchanged: [web2.example.com]\n\nPLAY RECAP *********************************************\nweb1.example.com : ok=4  changed=3  unreachable=0  failed=0\nweb2.example.com : ok=4  changed=3  unreachable=0  failed=0",
+    "failure": "ERROR! Syntax errors detected. Check 'become: true', module FQCNs, notify/handlers structure."
+  },
+  "maxScore": 100
+}

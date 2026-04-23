@@ -1,0 +1,8 @@
+{
+  "id": "intermediate",
+  "tech": "ansible",
+  "displayName": "Intermediate",
+  "description": "Master Ansible roles, Jinja2 templates, loops, error handling, and variable precedence.",
+  "estimatedHours": 5,
+  "moduleOrder": ["module-01-roles", "module-02-templates", "module-03-loops-errors"]
+}

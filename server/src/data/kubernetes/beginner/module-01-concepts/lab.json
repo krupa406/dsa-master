@@ -1,0 +1,28 @@
+{
+  "id": "lab-kubernetes-beginner-01",
+  "moduleId": "module-01-concepts",
+  "title": "Write Your First Kubernetes Manifest",
+  "description": "Write a Kubernetes Namespace manifest with proper metadata, labels, and annotations following Kubernetes 1.35 conventions.",
+  "language": "yaml",
+  "monacoLanguage": "yaml",
+  "starterCode": "# Write a Kubernetes Namespace manifest that:\n# 1. Has apiVersion: v1 and kind: Namespace\n# 2. Has metadata.name: 'production'\n# 3. Has a label: environment: production\n# 4. Has a label: team: platform\n# 5. Has annotation: description: 'Production environment namespace'\n",
+  "solutionCode": "apiVersion: v1\nkind: Namespace\nmetadata:\n  name: production\n  labels:\n    environment: production\n    team: platform\n  annotations:\n    description: 'Production environment namespace'\n",
+  "hints": [
+    "apiVersion for core resources (Namespace, Pod, Service) is 'v1'",
+    "Labels go under metadata.labels as key-value pairs",
+    "Annotations go under metadata.annotations",
+    "Namespace names must be lowercase alphanumeric or hyphens"
+  ],
+  "validationRules": [
+    {"id": "has-apiversion", "type": "contains", "pattern": "apiVersion: v1", "errorMessage": "Set apiVersion: v1 for core Kubernetes resources", "points": 20},
+    {"id": "has-kind-namespace", "type": "contains", "pattern": "kind: Namespace", "errorMessage": "Set kind: Namespace", "points": 20},
+    {"id": "has-name-production", "type": "contains", "pattern": "name: production", "errorMessage": "Set metadata.name to 'production'", "points": 20},
+    {"id": "has-labels", "type": "contains", "pattern": "labels:", "errorMessage": "Add labels under metadata", "points": 20},
+    {"id": "valid-yaml", "type": "yamlParse", "errorMessage": "YAML is invalid — check indentation", "points": 20}
+  ],
+  "simulatedOutput": {
+    "success": "namespace/production created\n\nNAME         STATUS   AGE\nproduction   Active   0s\n\nLabels:\n  environment=production\n  team=platform\n\nAnnotations:\n  description: Production environment namespace",
+    "failure": "Error from server: Namespace manifest validation failed. Check apiVersion, kind, name, and metadata structure."
+  },
+  "maxScore": 100
+}

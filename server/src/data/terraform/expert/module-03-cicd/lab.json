@@ -1,0 +1,30 @@
+{
+  "id": "lab-terraform-expert-03",
+  "moduleId": "module-03-cicd",
+  "title": "Write a GitHub Actions Terraform Workflow",
+  "description": "Write a GitHub Actions workflow YAML that implements plan-on-PR and apply-on-merge with OIDC authentication.",
+  "language": "yaml",
+  "monacoLanguage": "yaml",
+  "starterCode": "# Write a GitHub Actions workflow that:\n# 1. Triggers on pull_request (branches: main) and push (branches: main)\n# 2. Has permissions: id-token: write, contents: read, pull-requests: write\n# 3. Uses actions/checkout@v4\n# 4. Uses aws-actions/configure-aws-credentials@v4 with:\n#    - role-to-assume: arn:aws:iam::123456789012:role/GitHubActionsRole\n#    - aws-region: us-east-1\n# 5. Runs 'terraform init' and 'terraform validate'\n# 6. On pull_request: runs 'terraform plan -out=tfplan.binary'\n# 7. On push to main: runs 'terraform apply -auto-approve tfplan.binary'\n\nname: Terraform CI/CD\n",
+  "solutionCode": "name: Terraform CI/CD\n\non:\n  pull_request:\n    branches: [main]\n  push:\n    branches: [main]\n\njobs:\n  terraform:\n    runs-on: ubuntu-latest\n    permissions:\n      id-token: write\n      contents: read\n      pull-requests: write\n\n    steps:\n      - name: Checkout code\n        uses: actions/checkout@v4\n\n      - name: Configure AWS credentials via OIDC\n        uses: aws-actions/configure-aws-credentials@v4\n        with:\n          role-to-assume: arn:aws:iam::123456789012:role/GitHubActionsRole\n          aws-region: us-east-1\n\n      - name: Terraform Init\n        run: terraform init\n\n      - name: Terraform Validate\n        run: terraform validate\n\n      - name: Terraform Plan\n        if: github.event_name == 'pull_request'\n        run: terraform plan -out=tfplan.binary\n\n      - name: Terraform Apply\n        if: github.ref == 'refs/heads/main' && github.event_name == 'push'\n        run: terraform apply -auto-approve tfplan.binary\n",
+  "hints": [
+    "Use 'on: pull_request: branches: [main]' and 'on: push: branches: [main]'",
+    "OIDC requires 'permissions: id-token: write'",
+    "Plan only on PR: 'if: github.event_name == \"pull_request\"'",
+    "Apply only on main push: 'if: github.ref == \"refs/heads/main\"'"
+  ],
+  "validationRules": [
+    {"id": "has-pull-request-trigger", "type": "contains", "pattern": "pull_request:", "errorMessage": "Add pull_request trigger", "points": 10},
+    {"id": "has-push-trigger", "type": "contains", "pattern": "push:", "errorMessage": "Add push trigger", "points": 10},
+    {"id": "has-id-token-write", "type": "contains", "pattern": "id-token: write", "errorMessage": "Add id-token: write permission for OIDC", "points": 20},
+    {"id": "has-oidc-action", "type": "contains", "pattern": "configure-aws-credentials", "errorMessage": "Use aws-actions/configure-aws-credentials for OIDC auth", "points": 20},
+    {"id": "has-plan-step", "type": "contains", "pattern": "terraform plan", "errorMessage": "Add terraform plan step", "points": 15},
+    {"id": "has-apply-step", "type": "contains", "pattern": "terraform apply", "errorMessage": "Add terraform apply step", "points": 15},
+    {"id": "valid-yaml", "type": "yamlParse", "errorMessage": "YAML is invalid — check indentation", "points": 10}
+  ],
+  "simulatedOutput": {
+    "success": "Workflow validation passed!\n\nTriggers: pull_request (main), push (main)\nPermissions: id-token:write (OIDC enabled)\nSteps:\n  [ok] Checkout\n  [ok] AWS OIDC authentication\n  [ok] terraform init\n  [ok] terraform validate\n  [ok] terraform plan (on PR only)\n  [ok] terraform apply (on push to main only)\n\nWorkflow follows GitOps best practices.",
+    "failure": "Workflow validation failed. Check triggers, OIDC permissions, configure-aws-credentials action, plan/apply conditional steps, and YAML syntax."
+  },
+  "maxScore": 100
+}

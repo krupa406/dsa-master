@@ -1,0 +1,28 @@
+{
+  "id": "lab-terraform-expert-02",
+  "moduleId": "module-02-testing",
+  "title": "Write a Terraform Test File",
+  "description": "Write a .tftest.hcl test file with a plan-only run block, assert conditions, and a mock_provider for unit testing.",
+  "language": "hcl",
+  "monacoLanguage": "hcl",
+  "starterCode": "# Write a Terraform test file (would be saved as tests/vpc.tftest.hcl) that:\n# 1. Sets variables: environment = \"test\", cidr_block = \"10.99.0.0/16\"\n# 2. Uses mock_provider \"aws\" with a mock_data \"aws_availability_zones\"\n#    that returns names = [\"us-east-1a\", \"us-east-1b\"]\n# 3. Has a run block named \"validate_vpc_plan\" with command = plan\n# 4. Contains two assert blocks:\n#    - output.vpc_cidr == \"10.99.0.0/16\"\n#    - length(output.subnet_ids) == 2\n\n# Variables for tests\n\n# Mock provider\n\n# Test run block\n",
+  "solutionCode": "variables {\n  environment = \"test\"\n  cidr_block  = \"10.99.0.0/16\"\n}\n\nmock_provider \"aws\" {\n  mock_data \"aws_availability_zones\" {\n    defaults = {\n      names = [\"us-east-1a\", \"us-east-1b\"]\n    }\n  }\n}\n\nrun \"validate_vpc_plan\" {\n  command = plan\n\n  assert {\n    condition     = output.vpc_cidr == \"10.99.0.0/16\"\n    error_message = \"VPC CIDR should match the test variable\"\n  }\n\n  assert {\n    condition     = length(output.subnet_ids) == 2\n    error_message = \"Should create one subnet per availability zone (2 total)\"\n  }\n}\n",
+  "hints": [
+    "Test files use .tftest.hcl extension",
+    "variables {} block at top level sets test-specific variable values",
+    "mock_provider overrides a real provider with mock responses",
+    "assert blocks inside run blocks use condition (bool) and error_message"
+  ],
+  "validationRules": [
+    {"id": "has-variables-block", "type": "contains", "pattern": "variables {", "errorMessage": "Add a variables {} block at the top level", "points": 15},
+    {"id": "has-mock-provider", "type": "contains", "pattern": "mock_provider \"aws\"", "errorMessage": "Add a mock_provider block for aws", "points": 25},
+    {"id": "has-mock-data", "type": "contains", "pattern": "mock_data", "errorMessage": "Add a mock_data block inside mock_provider", "points": 20},
+    {"id": "has-run-plan", "type": "contains", "pattern": "command = plan", "errorMessage": "Set command = plan for a plan-only test", "points": 15},
+    {"id": "has-assert", "type": "contains", "pattern": "assert {", "errorMessage": "Add assert blocks with conditions", "points": 25}
+  ],
+  "simulatedOutput": {
+    "success": "terraform test\n\nTests in: tests/vpc.tftest.hcl\n  run \"validate_vpc_plan\"... pass\n    assert: output.vpc_cidr == \"10.99.0.0/16\" (pass)\n    assert: length(output.subnet_ids) == 2 (pass)\n\nTest Summary: 1 passed, 0 failed.",
+    "failure": "Test file validation failed. Check variables block, mock_provider, mock_data defaults, run block with command=plan, and assert conditions."
+  },
+  "maxScore": 100
+}

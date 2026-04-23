@@ -1,0 +1,19 @@
+{
+  "id": "module-03-resources",
+  "title": "Terraform Resources and Data Sources",
+  "slug": "resources",
+  "order": 3,
+  "estimatedMinutes": 35,
+  "learningObjectives": [
+    "Write resource blocks with required and optional arguments",
+    "Use data sources to query existing infrastructure",
+    "Understand resource dependencies (implicit and explicit)",
+    "Use count and for_each for resource iteration"
+  ],
+  "theory": {
+    "format": "html",
+    "content": "<h2>Resource Blocks</h2><p>Resources are the most important element in Terraform. Each resource block describes one or more infrastructure objects (EC2 instances, S3 buckets, DNS records, etc.).</p><pre><code>resource \"aws_s3_bucket\" \"app_data\" {\n  bucket = \"myapp-data-${var.environment}\"\n\n  tags = local.common_tags\n}\n\nresource \"aws_s3_bucket_versioning\" \"app_data\" {\n  bucket = aws_s3_bucket.app_data.id\n  versioning_configuration {\n    status = \"Enabled\"\n  }\n}</code></pre><h2>Data Sources</h2><p>Data sources allow Terraform to fetch information from existing infrastructure or external sources, without managing it.</p><pre><code># Fetch the latest Amazon Linux 2 AMI\ndata \"aws_ami\" \"amazon_linux\" {\n  most_recent = true\n  owners      = [\"amazon\"]\n  filter {\n    name   = \"name\"\n    values = [\"amzn2-ami-hvm-*-x86_64-gp2\"]\n  }\n}\n\nresource \"aws_instance\" \"web\" {\n  ami = data.aws_ami.amazon_linux.id\n}</code></pre><h2>Resource Dependencies</h2><p><strong>Implicit</strong>: Reference another resource's attribute — Terraform infers the dependency.</p><p><strong>Explicit</strong>: Use <code>depends_on</code> for non-attribute dependencies.</p><pre><code>resource \"aws_instance\" \"app\" {\n  # Implicit: waits for SG to be created\n  vpc_security_group_ids = [aws_security_group.app.id]\n  \n  # Explicit: waits for IAM role policies\n  depends_on = [aws_iam_role_policy.app_policy]\n}</code></pre><figure class=\"diagram-block\"><div class=\"mermaid\">flowchart TD\n  VPC[\"aws_vpc.main\nCIDR: 10.0.0.0/16\"]\n  IGW[\"aws_internet_gateway.main\nattached to VPC\"]\n  SUB[\"aws_subnet.public\nCIDR: 10.0.1.0/24\"]\n  SG[\"aws_security_group.web\nports 80, 443\"]\n  EC2[\"aws_instance.web\nt3.micro + nginx\"]\n  VPC -->|\"implicit ref via vpc_id\"| IGW\n  VPC -->|\"implicit ref via vpc_id\"| SUB\n  VPC -->|\"implicit ref via vpc_id\"| SG\n  SUB -->|\"implicit ref via subnet_id\"| EC2\n  SG -->|\"implicit ref via security_group_ids\"| EC2\n  style VPC fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd\n  style EC2 fill:#1e3a2f,stroke:#22c55e,color:#86efac</div><figcaption>Terraform resource dependency graph — Terraform automatically infers creation order from attribute references. Resources at the bottom depend on those above.</figcaption></figure><h2>count and for_each</h2><pre><code># count\nresource \"aws_instance\" \"web\" {\n  count         = var.instance_count\n  ami           = data.aws_ami.amazon_linux.id\n  instance_type = \"t3.micro\"\n  tags = { Name = \"web-${count.index}\" }\n}\n\n# for_each with a map\nresource \"aws_s3_bucket\" \"data\" {\n  for_each = toset([\"logs\", \"backups\", \"artifacts\"])\n  bucket   = \"myapp-${each.key}-${var.environment}\"\n}</code></pre><p><a href='https://developer.hashicorp.com/terraform/language/resources' target='_blank'>Resources Documentation →</a></p>"
+  },
+  "prerequisites": ["module-02-providers"],
+  "tags": ["resources", "data-sources", "count", "for_each", "dependencies"]
+}

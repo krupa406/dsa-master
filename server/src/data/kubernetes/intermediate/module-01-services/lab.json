@@ -1,0 +1,29 @@
+{
+  "id": "lab-kubernetes-intermediate-01",
+  "moduleId": "module-01-services",
+  "title": "Write an Ingress with TLS",
+  "description": "Write an Ingress manifest with TLS termination and path-based routing to two backend Services.",
+  "language": "yaml",
+  "monacoLanguage": "yaml",
+  "starterCode": "# Write an Ingress manifest that:\n# 1. apiVersion: networking.k8s.io/v1, kind: Ingress\n# 2. Name: production-ingress, namespace: production\n# 3. ingressClassName: nginx\n# 4. TLS: host app.example.com, secretName: app-tls\n# 5. Rules for host: app.example.com:\n#    - /api (Prefix) -> api-service:8080\n#    - / (Prefix) -> frontend-service:80\n",
+  "solutionCode": "apiVersion: networking.k8s.io/v1\nkind: Ingress\nmetadata:\n  name: production-ingress\n  namespace: production\nspec:\n  ingressClassName: nginx\n  tls:\n    - hosts:\n        - app.example.com\n      secretName: app-tls\n  rules:\n    - host: app.example.com\n      http:\n        paths:\n          - path: /api\n            pathType: Prefix\n            backend:\n              service:\n                name: api-service\n                port:\n                  number: 8080\n          - path: /\n            pathType: Prefix\n            backend:\n              service:\n                name: frontend-service\n                port:\n                  number: 80\n",
+  "hints": [
+    "apiVersion for Ingress is networking.k8s.io/v1",
+    "TLS section references a Secret containing the TLS certificate",
+    "pathType: Prefix matches the path and any subpaths",
+    "Backend service uses service.name and service.port.number"
+  ],
+  "validationRules": [
+    {"id": "has-ingress-apiversion", "type": "contains", "pattern": "networking.k8s.io/v1", "errorMessage": "Use apiVersion: networking.k8s.io/v1 for Ingress", "points": 15},
+    {"id": "has-ingress-class", "type": "contains", "pattern": "ingressClassName: nginx", "errorMessage": "Set ingressClassName: nginx", "points": 15},
+    {"id": "has-tls", "type": "contains", "pattern": "tls:", "errorMessage": "Add TLS configuration", "points": 20},
+    {"id": "has-secret-name", "type": "contains", "pattern": "secretName: app-tls", "errorMessage": "Set secretName for the TLS certificate", "points": 15},
+    {"id": "has-two-paths", "type": "contains", "pattern": "/api", "errorMessage": "Add /api path routing", "points": 15},
+    {"id": "valid-yaml", "type": "yamlParse", "errorMessage": "YAML is invalid — check Ingress spec indentation", "points": 20}
+  ],
+  "simulatedOutput": {
+    "success": "ingress.networking.k8s.io/production-ingress created\n\nNAME                  CLASS   HOSTS             ADDRESS          PORTS     AGE\nproduction-ingress    nginx   app.example.com   52.14.200.100    80, 443   10s\n\nRouting:\n  https://app.example.com/api  -> api-service:8080\n  https://app.example.com/     -> frontend-service:80\n  TLS: app-tls (app.example.com)",
+    "failure": "Ingress validation failed. Check apiVersion (networking.k8s.io/v1), ingressClassName, TLS section, and path rules."
+  },
+  "maxScore": 100
+}

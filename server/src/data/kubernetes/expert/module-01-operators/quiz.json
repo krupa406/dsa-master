@@ -1,0 +1,157 @@
+{
+  "quizId": "quiz-kubernetes-expert-01",
+  "moduleId": "module-01-operators",
+  "passingScore": 70,
+  "questions": [
+    {
+      "id": "q1", "order": 1,
+      "text": "What is a Kubernetes Operator?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "A human cluster administrator"},
+        {"id": "b", "text": "A controller that encodes operational knowledge for managing complex stateful applications"},
+        {"id": "c", "text": "A built-in Kubernetes resource type"},
+        {"id": "d", "text": "A Helm plugin for automated deployments"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "An Operator is a method of packaging, deploying, and managing a Kubernetes application using Custom Resources and controllers. It encodes operational domain knowledge — like how to scale, backup, or upgrade a stateful app — into automated software.",
+      "citations": [{"label": "Operator pattern", "url": "https://kubernetes.io/docs/concepts/extend-kubernetes/operator/"}],
+      "points": 10
+    },
+    {
+      "id": "q2", "order": 2,
+      "text": "What is a CustomResourceDefinition (CRD)?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "A template for creating Pods"},
+        {"id": "b", "text": "A way to extend the Kubernetes API with custom resource types"},
+        {"id": "c", "text": "A ConfigMap with schema validation"},
+        {"id": "d", "text": "A custom RBAC role definition"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "A CRD lets you define custom resource types (e.g., kind: Database) that are stored and managed by the Kubernetes API server just like built-in resources. Once a CRD is installed, users can create instances (Custom Resources) of that type.",
+      "citations": [{"label": "Extend the Kubernetes API with CRDs", "url": "https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/"}],
+      "points": 10
+    },
+    {
+      "id": "q3", "order": 3,
+      "text": "In the Operator pattern, what triggers the reconcile loop?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "A cron job scheduled every minute"},
+        {"id": "b", "text": "Manual kubectl commands only"},
+        {"id": "c", "text": "Changes to watched resources (desired state) or periodic re-sync"},
+        {"id": "d", "text": "Prometheus alerts"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "The controller's reconcile loop is triggered by events: creates, updates, or deletes of watched resources (Custom Resources and owned objects). It may also run periodically (requeueAfter) to self-heal drift. The goal is always to drive actual state to desired state.",
+      "citations": [{"label": "Controllers", "url": "https://kubernetes.io/docs/concepts/architecture/controller/"}],
+      "points": 10
+    },
+    {
+      "id": "q4", "order": 4,
+      "text": "Which tool is the most widely used for bootstrapping Kubernetes Operator projects in Go?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "kubeadm"},
+        {"id": "b", "text": "Operator SDK / Kubebuilder"},
+        {"id": "c", "text": "kustomize"},
+        {"id": "d", "text": "helm create"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Operator SDK (from Red Hat) and Kubebuilder (from the Kubernetes community) are the primary scaffolding tools for building Go-based operators. They generate boilerplate, integrate controller-runtime, and set up CRD generation via controller-gen.",
+      "citations": [{"label": "Operator SDK", "url": "https://sdk.operatorframework.io/docs/building-operators/golang/quickstart/"}],
+      "points": 10
+    },
+    {
+      "id": "q5", "order": 5,
+      "text": "What does 'finalizers' on a Custom Resource accomplish?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Marks the resource as immutable after creation"},
+        {"id": "b", "text": "Prevents the resource from being deleted until the operator completes cleanup"},
+        {"id": "c", "text": "Forces a rolling restart on delete"},
+        {"id": "d", "text": "Adds an owner reference to child resources"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Finalizers are keys in metadata.finalizers that prevent deletion. When you delete a CR with a finalizer, Kubernetes sets deletionTimestamp but does not remove it. The operator sees this, runs cleanup, then removes the finalizer, allowing deletion to complete.",
+      "citations": [{"label": "Finalizers", "url": "https://kubernetes.io/docs/concepts/workloads/controllers/garbage-collection/#foreground-deletion"}],
+      "points": 10
+    },
+    {
+      "id": "q6", "order": 6,
+      "text": "What is OperatorHub.io?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "A Kubernetes dashboard for managing operators"},
+        {"id": "b", "text": "A community registry for discovering and installing Kubernetes Operators"},
+        {"id": "c", "text": "The official Kubernetes operator documentation site"},
+        {"id": "d", "text": "A paid service for running operators in the cloud"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "OperatorHub.io is a public registry of community and vendor-built operators that can be installed via Operator Lifecycle Manager (OLM). It includes operators for databases, monitoring, messaging, and more.",
+      "citations": [{"label": "OperatorHub", "url": "https://operatorhub.io/"}],
+      "points": 10
+    },
+    {
+      "id": "q7", "order": 7,
+      "text": "Which field in a CRD spec enables OpenAPI schema validation for Custom Resources?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "spec.validation.rules"},
+        {"id": "b", "text": "spec.versions[*].schema.openAPIV3Schema"},
+        {"id": "c", "text": "spec.jsonSchema"},
+        {"id": "d", "text": "metadata.annotations.validation"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "In CRD spec, each version can define spec.versions[*].schema.openAPIV3Schema to validate Custom Resource fields. Kubernetes 1.35 enforces structural schemas and supports CEL-based validation rules via x-kubernetes-validations.",
+      "citations": [{"label": "Structural schemas", "url": "https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/#specifying-a-structural-schema"}],
+      "points": 10
+    },
+    {
+      "id": "q8", "order": 8,
+      "text": "What is the purpose of ownerReferences in resources created by an Operator?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Sets RBAC permissions for the resource"},
+        {"id": "b", "text": "Enables cascading deletion — when the owner CR is deleted, child resources are garbage collected"},
+        {"id": "c", "text": "Marks resources as managed by the Operator SDK"},
+        {"id": "d", "text": "Prevents the resource from being modified manually"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Setting ownerReferences on child resources (Deployments, Services, etc.) to point to the parent Custom Resource enables Kubernetes garbage collection. When the CR is deleted, all owned resources are automatically cleaned up, preventing resource leaks.",
+      "citations": [{"label": "Owners and dependents", "url": "https://kubernetes.io/docs/concepts/workloads/controllers/garbage-collection/#owners-and-dependents"}],
+      "points": 10
+    },
+    {
+      "id": "q9", "order": 9,
+      "text": "What does Operator Lifecycle Manager (OLM) provide?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Kubernetes cluster bootstrapping"},
+        {"id": "b", "text": "A framework for installing, updating, and managing the lifecycle of Operators in a cluster"},
+        {"id": "c", "text": "Container image scanning for operator images"},
+        {"id": "d", "text": "A replacement for Helm for operator-managed apps"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "OLM extends Kubernetes to manage the installation and lifecycle of Operators themselves. It handles dependency resolution, automatic upgrades, RBAC, and namespace targeting for operators. OLM is bundled with OpenShift and available standalone.",
+      "citations": [{"label": "Operator Lifecycle Manager", "url": "https://olm.operatorframework.io/docs/"}],
+      "points": 10
+    },
+    {
+      "id": "q10", "order": 10,
+      "text": "In the controller-runtime library, what does the Reconciler interface require you to implement?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Start() and Stop() methods"},
+        {"id": "b", "text": "Reconcile(ctx, Request) (Result, error)"},
+        {"id": "c", "text": "Watch() and Handle() methods"},
+        {"id": "d", "text": "OnCreate(), OnUpdate(), OnDelete() callbacks"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "The controller-runtime Reconciler interface has a single method: Reconcile(context.Context, reconcile.Request) (reconcile.Result, error). The Request contains the namespace/name of the resource to reconcile. This simplifies the controller logic to a single idempotent function.",
+      "citations": [{"label": "controller-runtime Reconciler", "url": "https://pkg.go.dev/sigs.k8s.io/controller-runtime/pkg/reconcile#Reconciler"}],
+      "points": 10
+    }
+  ]
+}

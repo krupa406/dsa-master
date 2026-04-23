@@ -1,0 +1,19 @@
+{
+  "id": "module-03-playbooks",
+  "title": "Writing Ansible Playbooks",
+  "slug": "playbooks",
+  "order": 3,
+  "estimatedMinutes": 35,
+  "learningObjectives": [
+    "Understand playbook structure: plays, tasks, and handlers",
+    "Use variables, facts, and conditionals in tasks",
+    "Write idempotent tasks using modules like copy and template",
+    "Use notify and handlers for service restarts"
+  ],
+  "theory": {
+    "format": "html",
+    "content": "<h2>Playbook Structure</h2><p>A playbook is a YAML file containing one or more <strong>plays</strong>. Each play targets a group of hosts and runs an ordered list of <strong>tasks</strong>.</p><pre><code>---\n- name: Configure web server\n  hosts: webservers\n  become: true  # run as root\n  vars:\n    http_port: 80\n  tasks:\n    - name: Install nginx\n      ansible.builtin.package:\n        name: nginx\n        state: present\n    - name: Start nginx\n      ansible.builtin.service:\n        name: nginx\n        state: started\n        enabled: true</code></pre><figure class=\"diagram-block\"><div class=\"mermaid\">sequenceDiagram\n  participant CN as Control Node\n  participant MN as Managed Nodes\n  CN->>MN: 1. Gather Facts (OS, IP, memory...)\n  MN-->>CN: ansible_facts returned\n  loop Each Task in order\n    CN->>MN: 2. Execute Module (e.g. package, copy)\n    MN-->>CN: Result: ok / changed / failed\n  end\n  Note over CN,MN: Tasks that changed notified handlers\n  CN->>MN: 3. Run Handlers ONCE (e.g. restart nginx)\n  MN-->>CN: Handler complete</div><figcaption>Ansible playbook execution flow — facts gathered first, tasks run in order, handlers triggered once at the end only if a task reported 'changed'.</figcaption></figure><h2>Variables</h2><p>Variables can be defined in: vars block, vars_files, inventory, extra vars (-e), or gathered as <strong>facts</strong> from managed nodes.</p><pre><code># Using a variable\n- name: Create directory\n  ansible.builtin.file:\n    path: \"{{ install_dir }}\"\n    state: directory</code></pre><h2>Ansible Facts</h2><p>Facts are system properties gathered automatically (gather_facts: true by default). Access them via <code>ansible_facts</code>:</p><pre><code>- name: Show OS family\n  ansible.builtin.debug:\n    msg: \"OS: {{ ansible_facts['distribution'] }}\"</code></pre><h2>Conditionals (when)</h2><pre><code>- name: Install on Debian only\n  ansible.builtin.apt:\n    name: nginx\n  when: ansible_facts['os_family'] == 'Debian'</code></pre><h2>Handlers</h2><p>Handlers run only when notified by a task that changed. They are used for service restarts:</p><pre><code>tasks:\n  - name: Copy nginx config\n    ansible.builtin.template:\n      src: nginx.conf.j2\n      dest: /etc/nginx/nginx.conf\n    notify: Restart nginx\n\nhandlers:\n  - name: Restart nginx\n    ansible.builtin.service:\n      name: nginx\n      state: restarted</code></pre><p><a href='https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_intro.html' target='_blank'>Official Playbook Guide →</a></p>"
+  },
+  "prerequisites": ["module-02-inventory"],
+  "tags": ["playbooks", "tasks", "handlers", "variables", "facts", "conditionals"]
+}

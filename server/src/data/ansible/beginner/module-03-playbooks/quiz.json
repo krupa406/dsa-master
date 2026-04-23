@@ -1,0 +1,157 @@
+{
+  "quizId": "quiz-ansible-beginner-03",
+  "moduleId": "module-03-playbooks",
+  "passingScore": 70,
+  "questions": [
+    {
+      "id": "q1", "order": 1,
+      "text": "What does 'become: true' do in an Ansible play?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Enables fact gathering"},
+        {"id": "b", "text": "Escalates privileges (e.g., sudo) on managed nodes"},
+        {"id": "c", "text": "Runs tasks asynchronously"},
+        {"id": "d", "text": "Enables check mode (dry run)"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "'become: true' enables privilege escalation, which by default uses sudo to run tasks as root. You can customize it with become_user, become_method, and become_flags. It replaces the deprecated 'sudo: yes' directive.",
+      "citations": [{"label": "Privilege escalation", "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_privilege_escalation.html"}],
+      "points": 10
+    },
+    {
+      "id": "q2", "order": 2,
+      "text": "When does a handler run in Ansible?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "After every task in the play"},
+        {"id": "b", "text": "Only when explicitly called with ansible.builtin.meta"},
+        {"id": "c", "text": "Once at the end of a play, only if notified by a changed task"},
+        {"id": "d", "text": "Before any tasks run"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "Handlers run once at the end of a play, and only if at least one task that notified them reported a 'changed' status. If multiple tasks notify the same handler, it still only runs once. Use 'meta: flush_handlers' to run handlers mid-play.",
+      "citations": [{"label": "Handlers: running operations on change", "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_handlers.html"}],
+      "points": 10
+    },
+    {
+      "id": "q3", "order": 3,
+      "text": "What are Ansible facts?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "User-defined variables in playbooks"},
+        {"id": "b", "text": "System properties automatically gathered from managed nodes"},
+        {"id": "c", "text": "Output from previous task runs"},
+        {"id": "d", "text": "Encrypted variables stored in Ansible Vault"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Facts are variables automatically gathered from managed nodes during the 'Gathering Facts' task. They include OS type, IP addresses, memory, CPU info, etc. Available via ansible_facts['distribution'], etc. You can disable gathering with 'gather_facts: false'.",
+      "citations": [{"label": "Discovering variables: facts and magic variables", "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_vars_facts.html"}],
+      "points": 10
+    },
+    {
+      "id": "q4", "order": 4,
+      "text": "Which module should you use to install packages in a cross-platform way (works on both apt and yum)?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "ansible.builtin.apt"},
+        {"id": "b", "text": "ansible.builtin.yum"},
+        {"id": "c", "text": "ansible.builtin.package"},
+        {"id": "d", "text": "ansible.builtin.install"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "ansible.builtin.package is a generic OS package manager module that delegates to the appropriate package manager (apt, yum, dnf, etc.) based on the OS. Use it for cross-platform playbooks. Use apt/yum directly when you need platform-specific options.",
+      "citations": [{"label": "ansible.builtin.package", "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/package_module.html"}],
+      "points": 10
+    },
+    {
+      "id": "q5", "order": 5,
+      "text": "How do you reference a variable named 'http_port' in a task?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "$http_port"},
+        {"id": "b", "text": "%(http_port)s"},
+        {"id": "c", "text": "{{ http_port }}"},
+        {"id": "d", "text": "${http_port}"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "Ansible uses Jinja2 templating syntax: {{ variable_name }}. Always quote strings that start with {{ in YAML to avoid parsing errors: e.g., dest: \"{{ install_dir }}/config.conf\". Double braces are mandatory — single braces are not valid.",
+      "citations": [{"label": "Using variables", "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#referencing-simple-variables"}],
+      "points": 10
+    },
+    {
+      "id": "q6", "order": 6,
+      "text": "What does the 'when' clause do in an Ansible task?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Sets a timeout for the task"},
+        {"id": "b", "text": "Skips the task unless the condition is true"},
+        {"id": "c", "text": "Waits for a condition before starting the task"},
+        {"id": "d", "text": "Runs the task on a specific schedule"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "The 'when' clause is a conditional that skips a task if the expression evaluates to false. It uses Jinja2 expressions but without {{ }}. Example: when: ansible_facts['os_family'] == 'Debian'. Multiple conditions can be combined with 'and'/'or' or as a list.",
+      "citations": [{"label": "Conditionals", "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_conditionals.html"}],
+      "points": 10
+    },
+    {
+      "id": "q7", "order": 7,
+      "text": "What is the purpose of the 'state: present' parameter in ansible.builtin.package?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Upgrades the package to the latest version"},
+        {"id": "b", "text": "Installs the package if not already installed (idempotent)"},
+        {"id": "c", "text": "Checks if the package is installed without making changes"},
+        {"id": "d", "text": "Forces reinstallation of the package"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "state: present installs the package if it's not already installed. If it's already installed, no action is taken (the task reports 'ok' not 'changed'). This is idempotency — running the playbook multiple times has the same effect as running it once. Use state: latest to also upgrade.",
+      "citations": [{"label": "ansible.builtin.package module", "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/package_module.html"}],
+      "points": 10
+    },
+    {
+      "id": "q8", "order": 8,
+      "text": "If two tasks notify the same handler, how many times does the handler run?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Twice — once per notification"},
+        {"id": "b", "text": "Zero times — handlers only run if explicitly called"},
+        {"id": "c", "text": "Once — handlers are deduplicated"},
+        {"id": "d", "text": "It depends on the listen keyword"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "Handlers are deduplicated — even if notified multiple times in a play, a handler only runs once at the end of that play. This prevents multiple service restarts when several config files change. Use 'meta: flush_handlers' if you need handlers to run immediately.",
+      "citations": [{"label": "Handlers", "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_handlers.html"}],
+      "points": 10
+    },
+    {
+      "id": "q9", "order": 9,
+      "text": "What does 'gather_facts: false' do in a play?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Disables all variable collection"},
+        {"id": "b", "text": "Skips the automatic fact-gathering step, speeding up the play"},
+        {"id": "c", "text": "Prevents tasks from accessing group_vars"},
+        {"id": "d", "text": "Runs the play without privilege escalation"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Setting gather_facts: false skips the 'Gathering Facts' task that runs at the start of each play. This speeds up execution when you don't need system facts. Note: ansible_facts variables will be unavailable if you do this, so 'when' conditions using them will fail.",
+      "citations": [{"label": "Playbooks intro — gather_facts", "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_intro.html#playbook-syntax"}],
+      "points": 10
+    },
+    {
+      "id": "q10", "order": 10,
+      "text": "Which flag runs a playbook in 'dry run' mode to show what would change without making changes?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "--dry-run"},
+        {"id": "b", "text": "--simulate"},
+        {"id": "c", "text": "--check"},
+        {"id": "d", "text": "--no-changes"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "The --check flag runs a playbook in check mode (dry run). Ansible simulates the actions without actually making changes and reports what would have changed. Some modules support --diff to show exact file changes. Not all modules support check mode fully.",
+      "citations": [{"label": "Check mode (dry run)", "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_checkmode.html"}],
+      "points": 10
+    }
+  ]
+}

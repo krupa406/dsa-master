@@ -1,0 +1,28 @@
+{
+  "id": "lab-terraform-beginner-03",
+  "moduleId": "module-03-resources",
+  "title": "S3 Buckets with for_each",
+  "description": "Write a Terraform config that uses for_each to create multiple S3 buckets from a set, with a data source for the current AWS region.",
+  "language": "hcl",
+  "monacoLanguage": "hcl",
+  "starterCode": "# Write a Terraform configuration that:\n# 1. Uses data source 'aws_region' (current) to get the current region\n# 2. Creates aws_s3_bucket resources using for_each over a set:\n#    toset([\"logs\", \"backups\", \"artifacts\"])\n# 3. Names each bucket: \"myapp-${each.key}-${data.aws_region.current.name}\"\n# 4. Adds tags with Name = each.key and ManagedBy = \"Terraform\"\n# 5. Outputs a map of bucket names using a for expression\n\n# Data source for current region\n\n# S3 buckets using for_each\n\n# Output: map of bucket_name => bucket ARN\n",
+  "solutionCode": "data \"aws_region\" \"current\" {}\n\nresource \"aws_s3_bucket\" \"app\" {\n  for_each = toset([\"logs\", \"backups\", \"artifacts\"])\n  bucket   = \"myapp-${each.key}-${data.aws_region.current.name}\"\n\n  tags = {\n    Name      = each.key\n    ManagedBy = \"Terraform\"\n  }\n}\n\noutput \"bucket_arns\" {\n  value       = { for k, v in aws_s3_bucket.app : k => v.arn }\n  description = \"Map of bucket purpose to ARN\"\n}\n",
+  "hints": [
+    "data sources use 'data \"type\" \"name\" {}' syntax",
+    "for_each with toset() uses each.key (no each.value for sets)",
+    "Reference data source: data.aws_region.current.name",
+    "for expression in output: { for k, v in resource : k => v.attribute }"
+  ],
+  "validationRules": [
+    {"id": "has-data-source", "type": "contains", "pattern": "data \"aws_region\"", "errorMessage": "Add a data source for the current AWS region", "points": 20},
+    {"id": "has-for-each", "type": "contains", "pattern": "for_each", "errorMessage": "Use for_each to create multiple S3 buckets", "points": 25},
+    {"id": "has-toset", "type": "contains", "pattern": "toset", "errorMessage": "Use toset() to convert the list to a set for for_each", "points": 15},
+    {"id": "has-each-key", "type": "contains", "pattern": "each.key", "errorMessage": "Reference the current item with each.key", "points": 20},
+    {"id": "has-output", "type": "contains", "pattern": "output \"bucket_arns\"", "errorMessage": "Add an output showing bucket ARNs", "points": 20}
+  ],
+  "simulatedOutput": {
+    "success": "data.aws_region.current: Reading...\ndata.aws_region.current: Read complete after 0s [id=us-east-1]\n\nTerraform will perform the following actions:\n  + aws_s3_bucket.app[\"artifacts\"] will be created\n  + aws_s3_bucket.app[\"backups\"] will be created\n  + aws_s3_bucket.app[\"logs\"] will be created\n\nPlan: 3 to add, 0 to change, 0 to destroy.\n\nOutputs:\n  bucket_arns = {\n    artifacts = \"arn:aws:s3:::myapp-artifacts-us-east-1\"\n    backups   = \"arn:aws:s3:::myapp-backups-us-east-1\"\n    logs      = \"arn:aws:s3:::myapp-logs-us-east-1\"\n  }",
+    "failure": "Configuration error. Check data source syntax, for_each with toset(), each.key usage, and output for expression."
+  },
+  "maxScore": 100
+}

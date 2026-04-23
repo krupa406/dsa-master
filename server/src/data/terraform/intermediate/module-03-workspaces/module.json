@@ -1,0 +1,19 @@
+{
+  "id": "module-03-workspaces",
+  "title": "Terraform Workspaces",
+  "slug": "workspaces",
+  "order": 3,
+  "estimatedMinutes": 35,
+  "learningObjectives": [
+    "Create and switch between Terraform workspaces",
+    "Use terraform.workspace variable for environment-specific config",
+    "Understand workspace vs. separate configurations for environments",
+    "Configure workspace-specific variable values"
+  ],
+  "theory": {
+    "format": "html",
+    "content": "<h2>What are Workspaces?</h2><p>Workspaces allow you to manage multiple, distinct state files from the same configuration. Each workspace has its own state file, making it possible to deploy the same infrastructure to different environments (dev, staging, prod) from one codebase.</p><figure class=\"diagram-block\"><div class=\"mermaid\">flowchart LR\n  CF[\"Same Configuration\nmain.tf + variables.tf\"]\n  subgraph WS [\"Workspaces — separate state files\"]\n    DEF[\"default\nterraform.tfstate\"]\n    STG[\"staging\nenv:/staging/terraform.tfstate\"]\n    PRD[\"prod\nenv:/prod/terraform.tfstate\"]\n  end\n  CF --> DEF\n  CF --> STG\n  CF --> PRD\n  DEF -.->|\"dev resources\"| DEV_INF[\"Dev Infra\n1 server\"]\n  STG -.->|\"staging resources\"| STG_INF[\"Staging Infra\n2 servers\"]\n  PRD -.->|\"prod resources\"| PRD_INF[\"Prod Infra\n5 servers\"]\n  style DEF fill:#1e293b,stroke:#475569,color:#e2e8f0\n  style STG fill:#1e3a2f,stroke:#22c55e,color:#86efac\n  style PRD fill:#3a1e1e,stroke:#ef4444,color:#fca5a5</div><figcaption>Terraform workspaces — same configuration, isolated state files per environment. Each workspace manages its own resources independently.</figcaption></figure><h2>Workspace Commands</h2><pre><code># List workspaces\nterraform workspace list\n\n# Create and switch to a new workspace\nterraform workspace new staging\n\n# Switch workspace\nterraform workspace select production\n\n# Show current workspace\nterraform workspace show\n\n# Delete a workspace\nterraform workspace delete staging</code></pre><h2>Using terraform.workspace</h2><pre><code>locals {\n  instance_type = {\n    default    = \"t3.micro\"\n    staging    = \"t3.small\"\n    production = \"t3.large\"\n  }\n}\n\nresource \"aws_instance\" \"app\" {\n  instance_type = local.instance_type[terraform.workspace]\n  ami           = data.aws_ami.app.id\n  tags = {\n    Environment = terraform.workspace\n  }\n}</code></pre><h2>Workspace-Specific Variable Files</h2><pre><code># Apply using workspace-specific vars\nterraform apply -var-file=\"environments/${terraform.workspace}.tfvars\"\n\n# environments/staging.tfvars\ninstance_count = 2\ninstance_type  = \"t3.small\"\n\n# environments/production.tfvars\ninstance_count = 10\ninstance_type  = \"t3.large\"</code></pre><h2>Workspaces vs. Separate Configurations</h2><p>Workspaces work well for similar environments. For very different infrastructure between environments (different account, VPCs, architectures), consider separate root configurations with shared modules. Workspaces with a shared backend store state as:</p><pre><code># S3 backend with workspaces\n# Default: env:/default/app/terraform.tfstate  \n# Staging: env:/staging/app/terraform.tfstate\n# Prod:    env:/production/app/terraform.tfstate</code></pre><p><a href='https://developer.hashicorp.com/terraform/language/state/workspaces' target='_blank'>Workspaces Documentation →</a></p>"
+  },
+  "prerequisites": ["module-02-state"],
+  "tags": ["workspaces", "environments", "state", "terraform.workspace"]
+}

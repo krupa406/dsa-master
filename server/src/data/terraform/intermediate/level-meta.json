@@ -1,0 +1,8 @@
+{
+  "id": "intermediate",
+  "tech": "terraform",
+  "displayName": "Intermediate",
+  "description": "Master Terraform modules, remote state management, and workspace-based environment separation.",
+  "estimatedHours": 5,
+  "moduleOrder": ["module-01-modules", "module-02-state", "module-03-workspaces"]
+}

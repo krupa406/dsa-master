@@ -1,0 +1,57 @@
+{
+  "id": "lab-ansible-beginner-02",
+  "moduleId": "module-02-inventory",
+  "title": "Build a Multi-Group YAML Inventory",
+  "description": "Create a YAML inventory with webservers and dbservers groups, a parent datacenter group, and set ansible_user for webservers.",
+  "language": "yaml",
+  "monacoLanguage": "yaml",
+  "starterCode": "# Create a YAML inventory file\n# Requirements:\n# - Group 'webservers' with web1.example.com and web2.example.com\n# - Group 'dbservers' with db1.example.com\n# - Parent group 'datacenter' containing both webservers and dbservers\n# - Set ansible_user: deploy for the webservers group\nall:\n  children:\n    # Add your groups here\n",
+  "solutionCode": "all:\n  children:\n    webservers:\n      hosts:\n        web1.example.com:\n        web2.example.com:\n      vars:\n        ansible_user: deploy\n    dbservers:\n      hosts:\n        db1.example.com:\n    datacenter:\n      children:\n        webservers:\n        dbservers:\n",
+  "hints": [
+    "In YAML inventory, groups go under 'all.children'",
+    "Hosts go under 'groupname.hosts'",
+    "Group variables go under 'groupname.vars'",
+    "Nested groups use 'parentgroup.children'"
+  ],
+  "validationRules": [
+    {
+      "id": "has-webservers",
+      "type": "contains",
+      "pattern": "webservers:",
+      "errorMessage": "Create a 'webservers' group",
+      "points": 20
+    },
+    {
+      "id": "has-dbservers",
+      "type": "contains",
+      "pattern": "dbservers:",
+      "errorMessage": "Create a 'dbservers' group",
+      "points": 20
+    },
+    {
+      "id": "has-datacenter",
+      "type": "contains",
+      "pattern": "datacenter:",
+      "errorMessage": "Create a 'datacenter' parent group",
+      "points": 20
+    },
+    {
+      "id": "has-ansible-user",
+      "type": "contains",
+      "pattern": "ansible_user",
+      "errorMessage": "Set ansible_user for webservers group",
+      "points": 10
+    },
+    {
+      "id": "valid-yaml",
+      "type": "yamlParse",
+      "errorMessage": "YAML is not valid — check indentation",
+      "points": 30
+    }
+  ],
+  "simulatedOutput": {
+    "success": "Inventory validation passed!\n\nGroups found:\n  datacenter (parent)\n    webservers: web1.example.com, web2.example.com\n    dbservers: db1.example.com\n\nGroup vars:\n  webservers: ansible_user=deploy\n\nTotal hosts: 3",
+    "failure": "Inventory validation failed. Check that all required groups exist and YAML is valid."
+  },
+  "maxScore": 100
+}

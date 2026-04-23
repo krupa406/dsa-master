@@ -1,0 +1,29 @@
+{
+  "id": "lab-ansible-expert-03",
+  "moduleId": "module-03-performance",
+  "title": "Async Task with Status Polling",
+  "description": "Write a playbook that launches a long-running database migration asynchronously and polls for completion using async_status.",
+  "language": "yaml",
+  "monacoLanguage": "yaml",
+  "starterCode": "---\n# Write a playbook that:\n# 1. Uses 'strategy: free' for parallel execution\n# 2. Runs '/opt/db/migrate.sh' with async: 1800 and poll: 0\n#    Register the result as 'migration_job'\n# 3. Uses ansible.builtin.async_status with the job ID\n#    to poll every 30 seconds, up to 60 retries\n# 4. Uses 'until: job_result.finished' to detect completion\n\n- name: Database migration\n  hosts: dbservers\n  become: true\n  # Add strategy here\n  tasks:\n    - name: Start database migration\n      # async + poll: 0 for fire-and-forget\n\n    - name: Wait for migration completion\n      # Use ansible.builtin.async_status\n",
+  "solutionCode": "---\n- name: Database migration\n  hosts: dbservers\n  become: true\n  strategy: free\n  tasks:\n    - name: Start database migration\n      ansible.builtin.command: /opt/db/migrate.sh\n      async: 1800\n      poll: 0\n      register: migration_job\n\n    - name: Wait for migration completion\n      ansible.builtin.async_status:\n        jid: \"{{ migration_job.ansible_job_id }}\"\n      register: job_result\n      until: job_result.finished\n      retries: 60\n      delay: 30\n",
+  "hints": [
+    "async: N sets the maximum runtime in seconds",
+    "poll: 0 means 'fire and forget' — don't wait for it",
+    "async_status needs the 'jid' (job ID) from the registered variable",
+    "Use until: job_result.finished with retries and delay to poll"
+  ],
+  "validationRules": [
+    {"id": "has-strategy-free", "type": "contains", "pattern": "strategy: free", "errorMessage": "Add 'strategy: free' for parallel host execution", "points": 15},
+    {"id": "has-async", "type": "contains", "pattern": "async:", "errorMessage": "Add 'async:' to run the task asynchronously", "points": 20},
+    {"id": "has-poll-zero", "type": "contains", "pattern": "poll: 0", "errorMessage": "Use 'poll: 0' to fire-and-forget (don't block)", "points": 15},
+    {"id": "has-async-status", "type": "contains", "pattern": "ansible.builtin.async_status", "errorMessage": "Use ansible.builtin.async_status to check job status", "points": 20},
+    {"id": "has-until-finished", "type": "contains", "pattern": "job_result.finished", "errorMessage": "Use 'until: job_result.finished' to detect completion", "points": 15},
+    {"id": "valid-yaml", "type": "yamlParse", "errorMessage": "YAML is invalid", "points": 15}
+  ],
+  "simulatedOutput": {
+    "success": "PLAY [Database migration] ******************************\n\nTASK [Start database migration] ************************\nchanged: [db1.example.com]\nchanged: [db2.example.com]\n\nTASK [Wait for migration completion] *******************\nRETRY [Wait for migration completion](1): 2 of 60\nRETRY [Wait for migration completion](2): 3 of 60\nok: [db1.example.com]\nok: [db2.example.com]\n\nPLAY RECAP *********************************************\ndb1.example.com : ok=2  changed=1  unreachable=0  failed=0\ndb2.example.com : ok=2  changed=1  unreachable=0  failed=0",
+    "failure": "ERROR! Check async:, poll: 0, async_status module, and until: job_result.finished."
+  },
+  "maxScore": 100
+}

@@ -1,0 +1,30 @@
+{
+  "id": "lab-kubernetes-beginner-03",
+  "moduleId": "module-03-deployments",
+  "title": "Write a Deployment and Service",
+  "description": "Write a Deployment with 3 replicas and a RollingUpdate strategy, paired with a LoadBalancer Service.",
+  "language": "yaml",
+  "monacoLanguage": "yaml",
+  "starterCode": "# Write a Deployment manifest that:\n# 1. Creates 'web-deployment' in namespace 'production'\n# 2. Has 3 replicas with selector/template label: app=web\n# 3. Uses image: nginx:1.27, containerPort: 80\n# 4. Has RollingUpdate strategy: maxSurge=1, maxUnavailable=0\n\n# Then write a Service manifest that:\n# 5. Name: web-service, namespace: production\n# 6. Type: LoadBalancer\n# 7. Selects pods with label: app=web\n# 8. Maps port 80 -> targetPort 80\n\n---\napiVersion: apps/v1\nkind: Deployment\n# Complete the deployment\n",
+  "solutionCode": "---\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: web-deployment\n  namespace: production\nspec:\n  replicas: 3\n  selector:\n    matchLabels:\n      app: web\n  strategy:\n    type: RollingUpdate\n    rollingUpdate:\n      maxSurge: 1\n      maxUnavailable: 0\n  template:\n    metadata:\n      labels:\n        app: web\n    spec:\n      containers:\n        - name: nginx\n          image: nginx:1.27\n          ports:\n            - containerPort: 80\n---\napiVersion: v1\nkind: Service\nmetadata:\n  name: web-service\n  namespace: production\nspec:\n  type: LoadBalancer\n  selector:\n    app: web\n  ports:\n    - protocol: TCP\n      port: 80\n      targetPort: 80\n",
+  "hints": [
+    "Deployment selector.matchLabels must match template.metadata.labels",
+    "strategy.type: RollingUpdate with rollingUpdate.maxSurge and maxUnavailable",
+    "Service selector matches the Pod labels (not the Deployment labels)",
+    "Use '---' separator between multiple YAML documents in one file"
+  ],
+  "validationRules": [
+    {"id": "has-deployment", "type": "contains", "pattern": "kind: Deployment", "errorMessage": "Add a Deployment resource", "points": 15},
+    {"id": "has-replicas-3", "type": "contains", "pattern": "replicas: 3", "errorMessage": "Set replicas: 3", "points": 15},
+    {"id": "has-rolling-update", "type": "contains", "pattern": "RollingUpdate", "errorMessage": "Add RollingUpdate strategy", "points": 15},
+    {"id": "has-service", "type": "contains", "pattern": "kind: Service", "errorMessage": "Add a Service resource", "points": 15},
+    {"id": "has-loadbalancer", "type": "contains", "pattern": "LoadBalancer", "errorMessage": "Set Service type: LoadBalancer", "points": 20},
+    {"id": "has-selector-app-web", "type": "contains", "pattern": "app: web", "errorMessage": "Use label selector app: web", "points": 10},
+    {"id": "valid-yaml", "type": "yamlParse", "errorMessage": "YAML is invalid — check indentation and --- separators", "points": 10}
+  ],
+  "simulatedOutput": {
+    "success": "deployment.apps/web-deployment created\nservice/web-service created\n\nNAME             READY   UP-TO-DATE   AVAILABLE   AGE\nweb-deployment   3/3     3            3           30s\n\nNAME          TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)\nweb-service   LoadBalancer   10.96.12.100   52.14.180.200   80:31234/TCP",
+    "failure": "Deployment/Service validation failed. Check replicas, RollingUpdate strategy, Service type, and selector labels."
+  },
+  "maxScore": 100
+}

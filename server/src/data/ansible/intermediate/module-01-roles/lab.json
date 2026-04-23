@@ -1,0 +1,26 @@
+{
+  "id": "lab-ansible-intermediate-01",
+  "moduleId": "module-01-roles",
+  "title": "Define a Role's tasks/main.yml",
+  "description": "Write the tasks/main.yml for a 'webserver' role that installs nginx, enables it, and copies an index file.",
+  "language": "yaml",
+  "monacoLanguage": "yaml",
+  "starterCode": "---\n# This is roles/webserver/tasks/main.yml\n# Write tasks to:\n# 1. Install nginx (ansible.builtin.package, state: present)\n# 2. Start and enable nginx service (ansible.builtin.service, state: started, enabled: true)\n# 3. Copy files/index.html to /var/www/html/index.html\n#    Use the 'owner' parameter to set owner to 'www-data'\n",
+  "solutionCode": "---\n- name: Install nginx\n  ansible.builtin.package:\n    name: nginx\n    state: present\n\n- name: Start and enable nginx\n  ansible.builtin.service:\n    name: nginx\n    state: started\n    enabled: true\n\n- name: Copy index page\n  ansible.builtin.copy:\n    src: index.html\n    dest: /var/www/html/index.html\n    owner: www-data\n    mode: '0644'\n",
+  "hints": [
+    "In a role's tasks/main.yml, you list tasks directly (no play header needed)",
+    "ansible.builtin.service 'enabled: true' ensures nginx starts on boot",
+    "In a role, 'src: index.html' looks in the role's files/ directory automatically"
+  ],
+  "validationRules": [
+    {"id": "has-package", "type": "contains", "pattern": "ansible.builtin.package", "errorMessage": "Use ansible.builtin.package to install nginx", "points": 25},
+    {"id": "has-service-enabled", "type": "contains", "pattern": "enabled: true", "errorMessage": "Enable nginx to start on boot with 'enabled: true'", "points": 25},
+    {"id": "has-copy", "type": "contains", "pattern": "ansible.builtin.copy", "errorMessage": "Use ansible.builtin.copy to deploy the index file", "points": 25},
+    {"id": "valid-yaml", "type": "yamlParse", "errorMessage": "YAML is invalid", "points": 25}
+  ],
+  "simulatedOutput": {
+    "success": "Role task validation passed!\n\nTasks found:\n  [ok] Install nginx (ansible.builtin.package)\n  [ok] Start and enable nginx (ansible.builtin.service)\n  [ok] Copy index page (ansible.builtin.copy)\n\nRole structure is valid.",
+    "failure": "Role task validation failed. Check module FQCNs and required parameters."
+  },
+  "maxScore": 100
+}

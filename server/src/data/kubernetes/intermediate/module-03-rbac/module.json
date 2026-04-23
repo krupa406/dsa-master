@@ -1,0 +1,19 @@
+{
+  "id": "module-03-rbac",
+  "title": "Kubernetes RBAC",
+  "slug": "rbac",
+  "order": 3,
+  "estimatedMinutes": 40,
+  "learningObjectives": [
+    "Understand RBAC components: Roles, ClusterRoles, RoleBindings, ClusterRoleBindings",
+    "Create least-privilege Roles for applications and users",
+    "Configure ServiceAccount-based access for Pods",
+    "Use kubectl auth can-i to verify permissions"
+  ],
+  "theory": {
+    "format": "html",
+    "content": "<h2>Role-Based Access Control (RBAC)</h2><p>RBAC controls who can perform which actions on which resources. Kubernetes RBAC is enabled by default since 1.8 and consists of four resource types.</p><figure class=\"diagram-block\"><div class=\"mermaid\">flowchart TD\n  SA[\"ServiceAccount\nor User / Group\"]\n  RB[\"RoleBinding\n(namespace-scoped)\"]\n  CRB[\"ClusterRoleBinding\n(cluster-scoped)\"]\n  R[\"Role\nverbs on namespace resources\"]\n  CR[\"ClusterRole\nverbs on cluster resources\"]\n  NRES[\"Namespace Resources\npods, services, secrets...\"]\n  CRES[\"Cluster Resources\nnodes, namespaces, CRDs...\"]\n  SA -->|\"subjects\"| RB\n  SA -->|\"subjects\"| CRB\n  RB -->|\"roleRef\"| R\n  CRB -->|\"roleRef\"| CR\n  R -->|\"rules: get, list, watch\"| NRES\n  CR -->|\"rules: get, list, watch\"| CRES\n  CR -->|\"also grants\"| NRES\n  style SA fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd\n  style R fill:#1e293b,stroke:#475569,color:#e2e8f0\n  style CR fill:#2d1e3a,stroke:#a78bfa,color:#c4b5fd</div><figcaption>Kubernetes RBAC model — Subjects (ServiceAccounts/Users) are bound to Roles via RoleBindings. ClusterRoles can be bound cluster-wide or limited to a namespace via RoleBinding.</figcaption></figure><h2>RBAC Components</h2><ul><li><strong>Role</strong>: Grants permissions within a specific namespace</li><li><strong>ClusterRole</strong>: Grants permissions cluster-wide or on cluster-scoped resources</li><li><strong>RoleBinding</strong>: Binds a Role to a subject (user, group, ServiceAccount) in a namespace</li><li><strong>ClusterRoleBinding</strong>: Binds a ClusterRole to a subject cluster-wide</li></ul><h2>Creating a Role</h2><pre><code>apiVersion: rbac.authorization.k8s.io/v1\nkind: Role\nmetadata:\n  name: pod-reader\n  namespace: production\nrules:\n  - apiGroups: [\"\"]         # \"\" = core API group\n    resources: [\"pods\", \"pods/log\"]\n    verbs: [\"get\", \"list\", \"watch\"]</code></pre><h2>RoleBinding</h2><pre><code>apiVersion: rbac.authorization.k8s.io/v1\nkind: RoleBinding\nmetadata:\n  name: read-pods\n  namespace: production\nroleRef:\n  apiGroup: rbac.authorization.k8s.io\n  kind: Role\n  name: pod-reader\nsubjects:\n  - kind: ServiceAccount\n    name: monitoring-sa\n    namespace: monitoring\n  - kind: User\n    name: jane@example.com\n    apiGroup: rbac.authorization.k8s.io</code></pre><h2>ServiceAccounts for Pods</h2><pre><code>apiVersion: v1\nkind: ServiceAccount\nmetadata:\n  name: my-app-sa\n  namespace: production\n---\napiVersion: apps/v1\nkind: Deployment\nspec:\n  template:\n    spec:\n      serviceAccountName: my-app-sa  # Use this SA</code></pre><h2>Common Verbs and Resources</h2><table><tr><th>Verb</th><th>HTTP</th></tr><tr><td>get, list, watch</td><td>GET</td></tr><tr><td>create</td><td>POST</td></tr><tr><td>update, patch</td><td>PUT/PATCH</td></tr><tr><td>delete</td><td>DELETE</td></tr></table><h2>Verify Permissions</h2><pre><code># Can the current user list Pods?\nkubectl auth can-i list pods -n production\n\n# Can a ServiceAccount get Secrets?\nkubectl auth can-i get secrets \\\n  --as=system:serviceaccount:production:my-app-sa -n production</code></pre><p><a href='https://kubernetes.io/docs/reference/access-authn-authz/rbac/' target='_blank'>RBAC Documentation →</a></p>"
+  },
+  "prerequisites": ["module-02-configmaps"],
+  "tags": ["rbac", "roles", "clusterroles", "serviceaccounts", "security", "least-privilege"]
+}

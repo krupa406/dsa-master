@@ -1,0 +1,19 @@
+{
+  "id": "module-03-performance",
+  "title": "Ansible Performance Tuning",
+  "slug": "performance",
+  "order": 3,
+  "estimatedMinutes": 45,
+  "learningObjectives": [
+    "Configure SSH multiplexing and pipelining for faster execution",
+    "Use free and host_pinned strategies for parallel execution",
+    "Implement async tasks and polling for long-running operations",
+    "Profile playbooks with callback plugins and optimize bottlenecks"
+  ],
+  "theory": {
+    "format": "html",
+    "content": "<h2>SSH Performance</h2><p>By default, Ansible opens a new SSH connection for each task. Enable these settings in <code>ansible.cfg</code> to dramatically improve speed:</p><figure class=\"diagram-block\"><div class=\"mermaid\">flowchart LR\n  subgraph \"linear (default) — task-by-task\"\n    direction TB\n    A1[\"Host A: Task 1\"] --> A2[\"Host A: Task 2\"] --> A3[\"Host A: Task 3\"]\n    B1[\"Host B: Task 1\"] --> B2[\"Host B: Task 2\"] --> B3[\"Host B: Task 3\"]\n  end\n  subgraph \"free strategy — host-independent\"\n    direction TB\n    C1[\"Host A: Task 1\"] --> C2[\"Task 2\"] --> C3[\"Task 3\"] --> C4[\"Task 4\"]\n    D1[\"Host B: Task 1\"] --> D2[\"Task 2\"]\n  end\n  style C4 fill:#1e3a2f,stroke:#22c55e,color:#86efac</div><figcaption>Ansible execution strategies — 'linear' waits for all hosts to finish each task before proceeding; 'free' lets faster hosts race ahead independently.</figcaption></figure><pre><code>[ssh_connection]\npipelining = True          # Reduces SSH connections per task\ncontrol_path_dir = /tmp/.ansible/cp\ncontrol_persist = 30s      # Keep SSH connection alive 30s\n\n[defaults]\nforks = 20                 # Run against 20 hosts in parallel (default: 5)</code></pre><h2>Execution Strategies</h2><p>The default strategy is <strong>linear</strong> — all hosts complete each task before moving to the next.</p><pre><code># Free strategy: hosts advance independently\n- name: Fast deployment\n  hosts: webservers\n  strategy: free\n  tasks:\n    ...\n\n# Host-pinned: like free but pins to forks count\n  strategy: host_pinned</code></pre><h2>Async Tasks</h2><p>Use async for long-running tasks to avoid SSH timeouts:</p><pre><code>- name: Run long database migration\n  ansible.builtin.command: /opt/migrate.sh\n  async: 3600    # Max runtime: 1 hour\n  poll: 0        # Don't wait — fire and forget\n  register: migration_job\n\n- name: Wait for migration to complete\n  ansible.builtin.async_status:\n    jid: \"{{ migration_job.ansible_job_id }}\"\n  register: job_result\n  until: job_result.finished\n  retries: 60\n  delay: 30</code></pre><h2>Fact Caching</h2><pre><code>[defaults]\ngathering = smart          # Only gather if no cached facts\nfact_caching = redis\nfact_caching_connection = localhost:6379\nfact_caching_timeout = 86400  # Cache for 24 hours</code></pre><h2>Profiling with Callbacks</h2><pre><code>[defaults]\ncallbacks_enabled = ansible.posix.profile_tasks,ansible.posix.timer\n\n# profile_tasks shows per-task timing:\n# Tuesday 12 April 2024  11:23:45 +0000\n# Install nginx ------- 4.32s\n# Copy config --------- 1.11s</code></pre><h2>Limit Gathered Facts</h2><pre><code># Gather only network facts\n- hosts: all\n  gather_facts: true\n  gather_subset:\n    - '!all'\n    - network</code></pre><p><a href='https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_strategies.html' target='_blank'>Strategies Documentation →</a></p>"
+  },
+  "prerequisites": ["module-02-vault"],
+  "tags": ["performance", "pipelining", "async", "strategies", "forks", "fact-caching"]
+}

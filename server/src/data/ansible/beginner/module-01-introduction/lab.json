@@ -1,0 +1,49 @@
+{
+  "id": "lab-ansible-beginner-01",
+  "moduleId": "module-01-introduction",
+  "title": "Your First Ansible Ad-Hoc Command",
+  "description": "Write an Ansible ad-hoc style playbook that pings localhost and gathers facts using Fully Qualified Collection Names (FQCN).",
+  "language": "yaml",
+  "monacoLanguage": "yaml",
+  "starterCode": "---\n# Complete this playbook\n# Use FQCN for all modules (e.g., ansible.builtin.ping)\n- name: My first Ansible playbook\n  hosts: localhost\n  # Add connection type here\n  tasks:\n    - name: Ping the control node\n      # Add the ping module here\n\n    - name: Print a message\n      # Use ansible.builtin.debug to print 'Hello from Ansible 2.19!'\n",
+  "solutionCode": "---\n- name: My first Ansible playbook\n  hosts: localhost\n  connection: local\n  tasks:\n    - name: Ping the control node\n      ansible.builtin.ping:\n\n    - name: Print a message\n      ansible.builtin.debug:\n        msg: 'Hello from Ansible 2.19!'\n",
+  "hints": [
+    "Use 'connection: local' when targeting localhost to avoid SSH",
+    "The FQCN for ping is ansible.builtin.ping (not just ping)",
+    "ansible.builtin.debug uses the 'msg' parameter to print text"
+  ],
+  "validationRules": [
+    {
+      "id": "has-fqcn-ping",
+      "type": "contains",
+      "pattern": "ansible.builtin.ping",
+      "errorMessage": "Use the FQCN: ansible.builtin.ping (not just 'ping')",
+      "points": 30
+    },
+    {
+      "id": "has-connection-local",
+      "type": "contains",
+      "pattern": "connection: local",
+      "errorMessage": "Add 'connection: local' under the play to avoid SSH to localhost",
+      "points": 20
+    },
+    {
+      "id": "has-debug",
+      "type": "contains",
+      "pattern": "ansible.builtin.debug",
+      "errorMessage": "Add an ansible.builtin.debug task to print a message",
+      "points": 20
+    },
+    {
+      "id": "valid-yaml",
+      "type": "yamlParse",
+      "errorMessage": "Your YAML is not valid — check indentation and syntax",
+      "points": 30
+    }
+  ],
+  "simulatedOutput": {
+    "success": "PLAY [My first Ansible playbook] ***********************\n\nTASK [Gathering Facts] ******************************\nok: [localhost]\n\nTASK [Ping the control node] ************************\nok: [localhost]\n\nTASK [Print a message] ******************************\nok: [localhost] => {\n    \"msg\": \"Hello from Ansible 2.19!\"\n}\n\nPLAY RECAP ******************************************\nlocalhost : ok=3  changed=0  unreachable=0  failed=0  skipped=0",
+    "failure": "ERROR! Couldn't resolve module/action. Hint: use FQCN (ansible.builtin.ping) and add connection: local for localhost targets."
+  },
+  "maxScore": 100
+}

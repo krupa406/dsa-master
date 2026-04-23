@@ -1,0 +1,19 @@
+{
+  "id": "module-02-testing",
+  "title": "Terraform Testing",
+  "slug": "testing",
+  "order": 2,
+  "estimatedMinutes": 45,
+  "learningObjectives": [
+    "Write tests using the native terraform test framework (1.6+)",
+    "Use run blocks with assert conditions and command types",
+    "Mock providers for unit-level testing without real infrastructure",
+    "Integrate tests into CI/CD pipelines"
+  ],
+  "theory": {
+    "format": "html",
+    "content": "<h2>Terraform Test Framework</h2><p>Terraform 1.6 introduced a native testing framework with <code>.tftest.hcl</code> files. Tests can verify infrastructure behavior, validate outputs, and check module correctness without relying on third-party tools like Terratest.</p><figure class=\"diagram-block\"><div class=\"mermaid\">flowchart LR\n  TF[\"*.tftest.hcl\ntest file\"]\n  CMD[\"terraform test\ncommand\"]\n  RUN1[\"run block 1\n(apply or plan)\"]\n  RUN2[\"run block 2\n(apply or plan)\"]\n  ASS[\"assert blocks\ncondition = expression\nerror_message = ...\"]\n  PASS[\"✅ All assertions true\nPASS\"]\n  FAIL[\"❌ Assertion false\nFAIL + error_message\"]\n  CLEAN[\"Auto-cleanup\ndestroy test resources\"]\n  TF --> CMD\n  CMD --> RUN1 --> RUN2 --> ASS\n  ASS -->|all true| PASS\n  ASS -->|any false| FAIL\n  PASS --> CLEAN\n  FAIL --> CLEAN\n  style PASS fill:#1e3a2f,stroke:#22c55e,color:#86efac\n  style FAIL fill:#3a1e1e,stroke:#ef4444,color:#fca5a5</div><figcaption>Terraform test framework flow (stable in 1.6+, enhanced in 1.13) — test files define run blocks with apply/plan steps and assert conditions. Test resources are automatically destroyed after each run.</figcaption></figure><h2>Test File Structure</h2><pre><code># tests/main.tftest.hcl\n\n# Optional: override variables for tests\nvariables {\n  environment    = \"test\"\n  instance_count = 1\n}\n\n# Plan-only test (no real infra created)\nrun \"validate_plan\" {\n  command = plan\n\n  assert {\n    condition     = aws_instance.app.instance_type == \"t3.micro\"\n    error_message = \"Wrong instance type for test environment\"\n  }\n}\n\n# Apply test (creates real infra)\nrun \"create_and_verify\" {\n  command = apply\n\n  assert {\n    condition     = output.instance_ip != \"\"\n    error_message = \"Instance IP should not be empty\"\n  }\n}</code></pre><h2>Provider Mocking (Terraform 1.7+)</h2><pre><code># tests/mock_test.tftest.hcl\nmock_provider \"aws\" {\n  mock_resource \"aws_instance\" {\n    defaults = {\n      id        = \"i-mock12345\"\n      public_ip = \"1.2.3.4\"\n    }\n  }\n  mock_data \"aws_ami\" {\n    defaults = {\n      id = \"ami-mock123\"\n    }\n  }\n}\n\nrun \"unit_test_with_mocks\" {\n  command = plan\n  assert {\n    condition     = aws_instance.app.ami == \"ami-mock123\"\n    error_message = \"AMI should match mocked data source\"\n  }\n}</code></pre><h2>Running Tests</h2><pre><code># Run all tests\nterraform test\n\n# Run specific test file\nterraform test -filter=tests/main.tftest.hcl\n\n# Verbose output\nterraform test -verbose</code></pre><h2>Test Modules</h2><pre><code># Reference a specific module in test\nrun \"test_vpc_module\" {\n  module {\n    source = \"./modules/vpc\"\n  }\n  variables {\n    cidr_block  = \"10.0.0.0/16\"\n    environment = \"test\"\n  }\n  assert {\n    condition     = output.vpc_id != \"\"\n    error_message = \"VPC ID must be set\"\n  }\n}</code></pre><p><a href='https://developer.hashicorp.com/terraform/language/tests' target='_blank'>Testing Documentation →</a></p>"
+  },
+  "prerequisites": ["module-01-custom-providers"],
+  "tags": ["testing", "tftest", "mocking", "assertions", "ci-cd"]
+}

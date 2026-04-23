@@ -1,0 +1,19 @@
+{
+  "id": "module-01-modules",
+  "title": "Terraform Modules",
+  "slug": "modules",
+  "order": 1,
+  "estimatedMinutes": 40,
+  "learningObjectives": [
+    "Create reusable modules with inputs and outputs",
+    "Call child modules from root configuration",
+    "Use public modules from the Terraform Registry",
+    "Understand module versioning and source addresses"
+  ],
+  "theory": {
+    "format": "html",
+    "content": "<h2>What are Modules?</h2><p>A Terraform module is a container for related resources. Every Terraform configuration is technically a module (the 'root module'). Modules enable reuse, encapsulation, and composition of infrastructure.</p><figure class=\"diagram-block\"><div class=\"mermaid\">flowchart TD\n  RM[\"Root Module\nmain.tf (your project)\"]\n  NM[\"module 'network'\n./modules/network\nvpc, subnets, routes\"]\n  CM[\"module 'compute'\n./modules/compute\nEC2, ASG, LB\"]\n  DM[\"module 'database'\n./modules/database\nRDS, parameter groups\"]\n  RM -->|\"module call + inputs\"| NM\n  RM -->|\"module call + inputs\"| CM\n  RM -->|\"module call + inputs\"| DM\n  NM -->|\"output: vpc_id, subnet_ids\"| CM\n  NM -->|\"output: vpc_id\"| DM\n  CM -->|\"output: sg_id\"| DM\n  style RM fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd\n  style NM fill:#1e293b,stroke:#475569,color:#e2e8f0\n  style CM fill:#1e293b,stroke:#475569,color:#e2e8f0\n  style DM fill:#1e293b,stroke:#475569,color:#e2e8f0</div><figcaption>Terraform module composition — the root module calls child modules, passing inputs and consuming outputs. Modules encapsulate reusable infrastructure patterns.</figcaption></figure><h2>Module Structure</h2><pre><code>modules/\n  vpc/\n    main.tf       # Resources\n    variables.tf  # Input variables\n    outputs.tf    # Output values\n    versions.tf   # Provider requirements\n    README.md</code></pre><h2>Creating a Module</h2><pre><code># modules/vpc/variables.tf\nvariable \"cidr_block\" {\n  type        = string\n  description = \"VPC CIDR block\"\n}\nvariable \"environment\" {\n  type = string\n}\n\n# modules/vpc/main.tf\nresource \"aws_vpc\" \"this\" {\n  cidr_block = var.cidr_block\n  tags       = { Environment = var.environment }\n}\n\n# modules/vpc/outputs.tf\noutput \"vpc_id\" {\n  value = aws_vpc.this.id\n}</code></pre><h2>Calling a Module</h2><pre><code># root main.tf\nmodule \"vpc\" {\n  source      = \"./modules/vpc\"\n  cidr_block  = \"10.0.0.0/16\"\n  environment = var.environment\n}\n\n# Reference module output\nresource \"aws_subnet\" \"app\" {\n  vpc_id = module.vpc.vpc_id\n}</code></pre><h2>Registry Modules</h2><pre><code>module \"eks\" {\n  source  = \"terraform-aws-modules/eks/aws\"\n  version = \"~> 20.0\"\n  \n  cluster_name    = \"my-cluster\"\n  cluster_version = \"1.31\"\n}</code></pre><h2>Module Sources</h2><ul><li><code>./local/path</code> — Local filesystem</li><li><code>github.com/org/repo//subdir</code> — GitHub (double slash for subdirectory)</li><li><code>namespace/module/provider</code> — Terraform Registry</li><li><code>app.terraform.io/org/module/provider</code> — Private registry</li></ul><p><a href='https://developer.hashicorp.com/terraform/language/modules' target='_blank'>Modules Documentation →</a></p>"
+  },
+  "prerequisites": [],
+  "tags": ["modules", "reusability", "registry", "inputs", "outputs"]
+}

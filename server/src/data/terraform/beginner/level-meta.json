@@ -1,0 +1,8 @@
+{
+  "id": "beginner",
+  "tech": "terraform",
+  "displayName": "Beginner",
+  "description": "Learn Terraform fundamentals: HCL syntax, providers, resources, and basic state management.",
+  "estimatedHours": 4,
+  "moduleOrder": ["module-01-hcl-basics", "module-02-providers", "module-03-resources"]
+}

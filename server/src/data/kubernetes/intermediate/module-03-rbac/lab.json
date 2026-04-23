@@ -1,0 +1,28 @@
+{
+  "id": "lab-kubernetes-intermediate-03",
+  "moduleId": "module-03-rbac",
+  "title": "Create Role and RoleBinding for a ServiceAccount",
+  "description": "Write a ServiceAccount, Role with pod read access, and RoleBinding connecting them.",
+  "language": "yaml",
+  "monacoLanguage": "yaml",
+  "starterCode": "# Write three manifests:\n# 1. ServiceAccount: monitoring-sa in namespace: monitoring\n# 2. Role: pod-reader in namespace: production with rules:\n#    - apiGroups: [\"\"] resources: [\"pods\", \"pods/log\"] verbs: [\"get\", \"list\", \"watch\"]\n# 3. RoleBinding: monitoring-pod-reader in namespace: production\n#    - Binds Role: pod-reader to ServiceAccount monitoring-sa (in namespace: monitoring)\n\n---\n# ServiceAccount\n\n---\n# Role\n\n---\n# RoleBinding\n",
+  "solutionCode": "---\napiVersion: v1\nkind: ServiceAccount\nmetadata:\n  name: monitoring-sa\n  namespace: monitoring\n---\napiVersion: rbac.authorization.k8s.io/v1\nkind: Role\nmetadata:\n  name: pod-reader\n  namespace: production\nrules:\n  - apiGroups: [\"\"]\n    resources: [\"pods\", \"pods/log\"]\n    verbs: [\"get\", \"list\", \"watch\"]\n---\napiVersion: rbac.authorization.k8s.io/v1\nkind: RoleBinding\nmetadata:\n  name: monitoring-pod-reader\n  namespace: production\nroleRef:\n  apiGroup: rbac.authorization.k8s.io\n  kind: Role\n  name: pod-reader\nsubjects:\n  - kind: ServiceAccount\n    name: monitoring-sa\n    namespace: monitoring\n",
+  "hints": [
+    "RBAC apiVersion is: rbac.authorization.k8s.io/v1",
+    "Core API resources (pods) use apiGroups: [\"\"] (empty string)",
+    "RoleBinding.roleRef is immutable after creation",
+    "ServiceAccount in subjects needs both name and namespace"
+  ],
+  "validationRules": [
+    {"id": "has-serviceaccount", "type": "contains", "pattern": "kind: ServiceAccount", "errorMessage": "Add a ServiceAccount resource", "points": 20},
+    {"id": "has-role", "type": "contains", "pattern": "kind: Role", "errorMessage": "Add a Role resource", "points": 20},
+    {"id": "has-rolebinding", "type": "contains", "pattern": "kind: RoleBinding", "errorMessage": "Add a RoleBinding resource", "points": 20},
+    {"id": "has-rbac-apiversion", "type": "contains", "pattern": "rbac.authorization.k8s.io/v1", "errorMessage": "Use apiVersion: rbac.authorization.k8s.io/v1 for RBAC resources", "points": 20},
+    {"id": "valid-yaml", "type": "yamlParse", "errorMessage": "YAML is invalid — check indentation", "points": 20}
+  ],
+  "simulatedOutput": {
+    "success": "serviceaccount/monitoring-sa created\nrole.rbac.authorization.k8s.io/pod-reader created\nrolebinding.rbac.authorization.k8s.io/monitoring-pod-reader created\n\nVerification:\n  kubectl auth can-i list pods -n production \\\n    --as=system:serviceaccount:monitoring:monitoring-sa\n  yes\n\n  kubectl auth can-i get secrets -n production \\\n    --as=system:serviceaccount:monitoring:monitoring-sa\n  no",
+    "failure": "RBAC validation failed. Check ServiceAccount, Role rules (apiGroups, resources, verbs), and RoleBinding subjects."
+  },
+  "maxScore": 100
+}

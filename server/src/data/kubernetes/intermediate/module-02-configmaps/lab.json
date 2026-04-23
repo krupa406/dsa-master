@@ -1,0 +1,28 @@
+{
+  "id": "lab-kubernetes-intermediate-02",
+  "moduleId": "module-02-configmaps",
+  "title": "ConfigMap and Secret in a Pod",
+  "description": "Write a ConfigMap, a Secret, and a Pod that consumes both as environment variables.",
+  "language": "yaml",
+  "monacoLanguage": "yaml",
+  "starterCode": "# Write three Kubernetes manifests separated by ---:\n# 1. ConfigMap named 'app-config' with:\n#    - APP_ENV: production\n#    - LOG_LEVEL: warn\n# 2. Secret named 'app-secrets' type: Opaque with stringData:\n#    - DB_PASSWORD: SuperSecret123\n# 3. Pod named 'app-pod' that:\n#    - Loads ConfigMap as envFrom\n#    - Loads DB_PASSWORD from Secret using env[].valueFrom.secretKeyRef\n\n---\n# ConfigMap\n\n---\n# Secret\n\n---\n# Pod\n",
+  "solutionCode": "---\napiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: app-config\ndata:\n  APP_ENV: production\n  LOG_LEVEL: warn\n---\napiVersion: v1\nkind: Secret\nmetadata:\n  name: app-secrets\ntype: Opaque\nstringData:\n  DB_PASSWORD: SuperSecret123\n---\napiVersion: v1\nkind: Pod\nmetadata:\n  name: app-pod\nspec:\n  containers:\n    - name: app\n      image: busybox:1.36\n      command: [\"sh\", \"-c\", \"env && sleep 3600\"]\n      envFrom:\n        - configMapRef:\n            name: app-config\n      env:\n        - name: DB_PASSWORD\n          valueFrom:\n            secretKeyRef:\n              name: app-secrets\n              key: DB_PASSWORD\n",
+  "hints": [
+    "Use stringData in Secrets to avoid base64 encoding manually",
+    "envFrom loads all ConfigMap keys as environment variables",
+    "secretKeyRef requires both name (secret name) and key (key in secret)",
+    "Use --- to separate multiple manifests in one file"
+  ],
+  "validationRules": [
+    {"id": "has-configmap", "type": "contains", "pattern": "kind: ConfigMap", "errorMessage": "Add a ConfigMap resource", "points": 20},
+    {"id": "has-secret", "type": "contains", "pattern": "kind: Secret", "errorMessage": "Add a Secret resource", "points": 20},
+    {"id": "has-envfrom", "type": "contains", "pattern": "envFrom:", "errorMessage": "Use envFrom to load ConfigMap into Pod", "points": 20},
+    {"id": "has-secretkeyref", "type": "contains", "pattern": "secretKeyRef:", "errorMessage": "Use secretKeyRef to load Secret value into env var", "points": 20},
+    {"id": "valid-yaml", "type": "yamlParse", "errorMessage": "YAML is invalid — check --- separators and indentation", "points": 20}
+  ],
+  "simulatedOutput": {
+    "success": "configmap/app-config created\nsecret/app-secrets created\npod/app-pod created\n\nPod environment variables:\n  APP_ENV=production (from ConfigMap)\n  LOG_LEVEL=warn (from ConfigMap)\n  DB_PASSWORD=****** (from Secret, masked)",
+    "failure": "Validation failed. Check ConfigMap data, Secret stringData, envFrom configMapRef, and env secretKeyRef."
+  },
+  "maxScore": 100
+}

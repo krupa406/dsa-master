@@ -1,0 +1,19 @@
+{
+  "id": "module-02-templates",
+  "title": "Jinja2 Templates in Ansible",
+  "slug": "templates",
+  "order": 2,
+  "estimatedMinutes": 35,
+  "learningObjectives": [
+    "Write Jinja2 templates with variable substitution",
+    "Use filters, tests, and control structures in templates",
+    "Deploy templates with ansible.builtin.template",
+    "Use set_fact and register to create dynamic variables"
+  ],
+  "theory": {
+    "format": "html",
+    "content": "<h2>Jinja2 Templating</h2><p>Ansible uses Jinja2 as its templating engine. Templates allow you to generate dynamic configuration files using variables, filters, and control structures.</p><figure class=\"diagram-block\"><div class=\"mermaid\">flowchart LR\n  J2[\"nginx.conf.j2\n(Jinja2 template file)\"]\n  GV[\"group_vars/\nhost_vars/\"]\n  HF[\"Hostvars / Facts\nansible_facts\"]\n  TM[\"ansible.builtin.template\nmodule\"]\n  OUT[\"nginx.conf\n(rendered on managed node)\"]\n  J2 -->|template source| TM\n  GV -->|variables| TM\n  HF -->|runtime facts| TM\n  TM -->|rendered file| OUT\n  style TM fill:#1e293b,stroke:#3b82f6,color:#93c5fd\n  style OUT fill:#1e3a2f,stroke:#22c55e,color:#86efac</div><figcaption>Jinja2 template rendering pipeline — the template file, group/host variables, and gathered facts are combined at runtime to produce the final config file.</figcaption></figure><h2>Template File (.j2)</h2><pre><code># nginx.conf.j2\nserver {\n    listen {{ nginx_port | default(80) }};\n    server_name {{ ansible_hostname }};\n\n    {% if enable_ssl %}\n    listen 443 ssl;\n    ssl_certificate {{ ssl_cert_path }};\n    {% endif %}\n\n    location / {\n        root {{ web_root }};\n        index index.html;\n    }\n}</code></pre><h2>Deploying a Template</h2><pre><code>- name: Deploy nginx config\n  ansible.builtin.template:\n    src: nginx.conf.j2\n    dest: /etc/nginx/nginx.conf\n    owner: root\n    mode: '0644'\n  notify: Restart nginx</code></pre><h2>Jinja2 Filters</h2><p>Filters transform variable values using the pipe <code>|</code> operator:</p><ul><li><code>{{ name | upper }}</code> — convert to uppercase</li><li><code>{{ list | join(',') }}</code> — join list items</li><li><code>{{ value | default('fallback') }}</code> — provide default if undefined</li><li><code>{{ path | basename }}</code> — extract filename from path</li><li><code>{{ string | regex_replace('old', 'new') }}</code> — regex substitution</li></ul><h2>Control Structures</h2><pre><code>{% for host in groups['webservers'] %}\nupstream backend {\n    server {{ hostvars[host]['ansible_host'] }}:8080;\n}\n{% endfor %}\n\n{% if ansible_distribution == 'Ubuntu' %}\n# Ubuntu-specific config\n{% elif ansible_distribution == 'CentOS' %}\n# CentOS-specific config\n{% endif %}</code></pre><h2>register and set_fact</h2><pre><code>- name: Check nginx status\n  ansible.builtin.command: nginx -t\n  register: nginx_test\n  ignore_errors: true\n\n- name: Set fact based on result\n  ansible.builtin.set_fact:\n    nginx_config_valid: \"{{ nginx_test.rc == 0 }}\"\n\n- name: Show result\n  ansible.builtin.debug:\n    msg: \"Config valid: {{ nginx_config_valid }}\"</code></pre><p><a href='https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_templating.html' target='_blank'>Official Templating Guide →</a></p>"
+  },
+  "prerequisites": ["module-01-roles"],
+  "tags": ["jinja2", "templates", "filters", "set_fact", "register"]
+}

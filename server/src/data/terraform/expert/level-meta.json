@@ -1,0 +1,8 @@
+{
+  "id": "expert",
+  "tech": "terraform",
+  "displayName": "Expert",
+  "description": "Master custom provider development, Terraform testing frameworks, and CI/CD pipeline integration.",
+  "estimatedHours": 6,
+  "moduleOrder": ["module-01-custom-providers", "module-02-testing", "module-03-cicd"]
+}

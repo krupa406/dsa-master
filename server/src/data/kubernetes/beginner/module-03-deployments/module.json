@@ -1,0 +1,19 @@
+{
+  "id": "module-03-deployments",
+  "title": "Deployments and Services",
+  "slug": "deployments",
+  "order": 3,
+  "estimatedMinutes": 35,
+  "learningObjectives": [
+    "Create Deployments with replica counts and label selectors",
+    "Perform rolling updates and rollbacks",
+    "Expose Deployments with Services (ClusterIP, NodePort, LoadBalancer)",
+    "Use kubectl to scale, update, and roll back Deployments"
+  ],
+  "theory": {
+    "format": "html",
+    "content": "<h2>Deployments</h2><p>A Deployment manages a ReplicaSet, which ensures a specified number of Pod replicas are running. Deployments enable rolling updates and rollbacks.</p><figure class=\"diagram-block\"><div class=\"mermaid\">flowchart TD\n  DEP[\"Deployment\ndesired: replicas=3\nimage: nginx:1.26\"]\n  RS_NEW[\"ReplicaSet v2\nnginx:1.26\n(new — scaling up)\"]\n  RS_OLD[\"ReplicaSet v1\nnginx:1.25\n(old — scaling down to 0)\"]\n  P1[\"Pod nginx:1.26\"]\n  P2[\"Pod nginx:1.26\"]\n  P3[\"Pod nginx:1.26\"]\n  P_OLD[\"Pod nginx:1.25\n(terminating)\"]\n  DEP -->|\"manages (rolling update)\"| RS_NEW\n  DEP -.->|\"kept for rollback\"| RS_OLD\n  RS_NEW --> P1\n  RS_NEW --> P2\n  RS_NEW --> P3\n  RS_OLD -.-> P_OLD\n  style DEP fill:#1e293b,stroke:#3b82f6,color:#93c5fd\n  style RS_NEW fill:#1e3a2f,stroke:#22c55e,color:#86efac\n  style RS_OLD fill:#3a1e1e,stroke:#ef4444,color:#fca5a5,stroke-dasharray:5 5\n  style P_OLD fill:#3a1e1e,stroke:#ef4444,color:#fca5a5</div><figcaption>Deployment rolling update — the Deployment creates a new ReplicaSet (v2) and gradually scales it up while scaling down the old ReplicaSet (v1). Old RS is retained for rollback.</figcaption></figure><pre><code>apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: nginx-deployment\n  namespace: default\nspec:\n  replicas: 3\n  selector:\n    matchLabels:\n      app: nginx\n  template:\n    metadata:\n      labels:\n        app: nginx\n    spec:\n      containers:\n        - name: nginx\n          image: nginx:1.27\n          ports:\n            - containerPort: 80\n          resources:\n            requests:\n              cpu: \"100m\"\n              memory: \"128Mi\"</code></pre><h2>Rolling Updates</h2><pre><code>spec:\n  strategy:\n    type: RollingUpdate\n    rollingUpdate:\n      maxSurge: 1        # Create 1 extra Pod during update\n      maxUnavailable: 0  # Keep all existing Pods available</code></pre><h2>Services</h2><p>Services provide a stable IP and DNS name for a set of Pods, with load balancing.</p><pre><code>apiVersion: v1\nkind: Service\nmetadata:\n  name: nginx-service\nspec:\n  selector:\n    app: nginx          # Selects Pods with this label\n  ports:\n    - protocol: TCP\n      port: 80          # Service port\n      targetPort: 80    # Pod port\n  type: ClusterIP       # Only within cluster</code></pre><h2>Service Types</h2><ul><li><strong>ClusterIP</strong> (default): Accessible only within the cluster</li><li><strong>NodePort</strong>: Exposes on each Node's IP at a static port (30000-32767)</li><li><strong>LoadBalancer</strong>: Creates an external load balancer (cloud providers)</li><li><strong>ExternalName</strong>: Maps to an external DNS name</li></ul><h2>kubectl Deployment Commands</h2><pre><code># Scale a deployment\nkubectl scale deployment nginx-deployment --replicas=5\n\n# Update image (triggers rolling update)\nkubectl set image deployment/nginx-deployment nginx=nginx:1.28\n\n# Check rollout status\nkubectl rollout status deployment/nginx-deployment\n\n# View rollout history\nkubectl rollout history deployment/nginx-deployment\n\n# Roll back to previous version\nkubectl rollout undo deployment/nginx-deployment</code></pre><p><a href='https://kubernetes.io/docs/concepts/workloads/controllers/deployment/' target='_blank'>Deployments Documentation →</a></p>"
+  },
+  "prerequisites": ["module-02-pods"],
+  "tags": ["deployments", "services", "rolling-update", "rollback", "replicas", "labels"]
+}

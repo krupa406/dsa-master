@@ -1,0 +1,19 @@
+{
+  "id": "module-02-inventory",
+  "title": "Ansible Inventory",
+  "slug": "inventory",
+  "order": 2,
+  "estimatedMinutes": 30,
+  "learningObjectives": [
+    "Create static INI and YAML inventory files",
+    "Organize hosts into groups and nested groups",
+    "Set host and group variables inline and in separate files",
+    "Use built-in inventory variables"
+  ],
+  "theory": {
+    "format": "html",
+    "content": "<h2>What is Inventory?</h2><p>An Ansible <strong>inventory</strong> is a file (or a dynamic source) that defines the managed nodes Ansible can communicate with. It maps hosts to groups so you can run plays against subsets of your infrastructure.</p><h2>INI Format</h2><pre><code>[webservers]\nweb1.example.com\nweb2.example.com ansible_user=admin\n\n[dbservers]\ndb1.example.com ansible_port=2222\n\n[datacenter:children]\nwebservers\ndbservers</code></pre><h2>YAML Format</h2><pre><code>all:\n  children:\n    webservers:\n      hosts:\n        web1.example.com:\n        web2.example.com:\n          ansible_user: admin\n    dbservers:\n      hosts:\n        db1.example.com:\n          ansible_port: 2222</code></pre><figure class=\"diagram-block\"><div class=\"mermaid\">flowchart TD\n  ALL[\"all\n(every host in inventory)\"]\n  DC[\"datacenter\n(parent group)\"]\n  WEB[\"webservers\nansible_user: deploy\"]\n  DB[\"dbservers\"]\n  W1[\"web1.example.com\"]\n  W2[\"web2.example.com\"]\n  D1[\"db1.example.com\"]\n  UG[\"ungrouped\n(no explicit group)\"]\n  ALL --> DC\n  ALL --> UG\n  DC --> WEB\n  DC --> DB\n  WEB --> W1\n  WEB --> W2\n  DB --> D1\n  style ALL fill:#1e293b,stroke:#475569,color:#e2e8f0\n  style DC fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd\n  style WEB fill:#1e3a2f,stroke:#22c55e,color:#86efac\n  style DB fill:#3a1e1e,stroke:#ef4444,color:#fca5a5</div><figcaption>Ansible inventory group hierarchy — hosts belong to groups, groups can have parent groups. Variables can be set at any level.</figcaption></figure><h2>Host and Group Variables</h2><p>Variables can be set inline (as above) or in separate files:</p><ul><li><code>host_vars/web1.example.com.yml</code> — per-host variables</li><li><code>group_vars/webservers.yml</code> — per-group variables</li><li><code>group_vars/all.yml</code> — variables for all hosts</li></ul><h2>Special Groups</h2><ul><li><code>all</code> — all hosts in inventory</li><li><code>ungrouped</code> — hosts not in any group</li></ul><h2>Inventory Variables</h2><table><tr><th>Variable</th><th>Purpose</th></tr><tr><td>ansible_host</td><td>Override the connection IP/hostname</td></tr><tr><td>ansible_user</td><td>SSH username</td></tr><tr><td>ansible_port</td><td>SSH port (default 22)</td></tr><tr><td>ansible_connection</td><td>Connection plugin (ssh, local, winrm)</td></tr></table><p><a href='https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html' target='_blank'>Official Inventory Guide →</a></p>"
+  },
+  "prerequisites": ["module-01-introduction"],
+  "tags": ["inventory", "hosts", "groups", "variables"]
+}

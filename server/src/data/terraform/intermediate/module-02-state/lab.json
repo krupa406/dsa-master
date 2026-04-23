@@ -1,0 +1,28 @@
+{
+  "id": "lab-terraform-intermediate-02",
+  "moduleId": "module-02-state",
+  "title": "Configure S3 Remote Backend",
+  "description": "Write a Terraform configuration with an S3 backend for remote state storage with DynamoDB locking, and a remote state data source.",
+  "language": "hcl",
+  "monacoLanguage": "hcl",
+  "starterCode": "# Write a Terraform configuration that:\n# 1. Configures an S3 backend with:\n#    - bucket: \"my-company-terraform-state\"\n#    - key: \"production/app/terraform.tfstate\"\n#    - region: \"us-east-1\"\n#    - encrypt: true\n#    - dynamodb_table: \"terraform-locks\"\n# 2. Adds a terraform_remote_state data source reading from:\n#    the same S3 bucket but key: \"production/network/terraform.tfstate\"\n# 3. Outputs the vpc_id from the remote state\n\nterraform {\n  # Add S3 backend here\n}\n\n# Remote state data source\n\n# Output\n",
+  "solutionCode": "terraform {\n  backend \"s3\" {\n    bucket         = \"my-company-terraform-state\"\n    key            = \"production/app/terraform.tfstate\"\n    region         = \"us-east-1\"\n    encrypt        = true\n    dynamodb_table = \"terraform-locks\"\n  }\n}\n\ndata \"terraform_remote_state\" \"network\" {\n  backend = \"s3\"\n  config = {\n    bucket = \"my-company-terraform-state\"\n    key    = \"production/network/terraform.tfstate\"\n    region = \"us-east-1\"\n  }\n}\n\noutput \"vpc_id\" {\n  value       = data.terraform_remote_state.network.outputs.vpc_id\n  description = \"VPC ID from network state\"\n}\n",
+  "hints": [
+    "Backend config goes inside terraform {} block with 'backend \"s3\" {}'",
+    "DynamoDB table for locking uses dynamodb_table = \"table-name\"",
+    "Remote state data source: data.terraform_remote_state.name.outputs.key",
+    "Always enable encrypt = true for security compliance"
+  ],
+  "validationRules": [
+    {"id": "has-s3-backend", "type": "contains", "pattern": "backend \"s3\"", "errorMessage": "Add an S3 backend block inside terraform {}", "points": 25},
+    {"id": "has-encrypt", "type": "contains", "pattern": "encrypt        = true", "errorMessage": "Enable encryption with encrypt = true", "points": 15},
+    {"id": "has-dynamodb", "type": "contains", "pattern": "dynamodb_table", "errorMessage": "Add DynamoDB table for state locking", "points": 20},
+    {"id": "has-remote-state-source", "type": "contains", "pattern": "terraform_remote_state", "errorMessage": "Add a terraform_remote_state data source", "points": 25},
+    {"id": "has-remote-state-output", "type": "contains", "pattern": "remote_state.network.outputs", "errorMessage": "Reference the remote state outputs in your output block", "points": 15}
+  ],
+  "simulatedOutput": {
+    "success": "Initializing the backend...\nSuccessfully configured the backend \"s3\"!\n\nTerraform will store state in: s3://my-company-terraform-state/production/app/terraform.tfstate\nState locking: enabled (DynamoDB table: terraform-locks)\nEncryption: enabled\n\nRemote state data source: s3://my-company-terraform-state/production/network/terraform.tfstate",
+    "failure": "Backend configuration error. Check S3 backend syntax, encryption flag, DynamoDB table, and remote state data source."
+  },
+  "maxScore": 100
+}

@@ -1,0 +1,19 @@
+{
+  "id": "module-02-state",
+  "title": "Terraform State Management",
+  "slug": "state",
+  "order": 2,
+  "estimatedMinutes": 40,
+  "learningObjectives": [
+    "Understand what Terraform state is and why it's critical",
+    "Configure remote backends (S3, Terraform Cloud)",
+    "Use state locking to prevent concurrent modifications",
+    "Manipulate state with terraform state commands"
+  ],
+  "theory": {
+    "format": "html",
+    "content": "<h2>What is Terraform State?</h2><p>State is a JSON file (<code>terraform.tfstate</code>) that maps your configuration to real-world resources. Terraform uses state to: determine what changes to make, track resource metadata (like IDs), and improve performance by caching attribute values.</p><figure class=\"diagram-block\"><div class=\"mermaid\">sequenceDiagram\n  participant C as .tf Config\n  participant TF as Terraform Core\n  participant S as State File\n  participant A as Cloud API\n  TF->>S: Read current state (what TF knows)\n  TF->>A: Refresh (read real resource attributes)\n  TF->>TF: Compute diff (desired vs actual)\n  Note over TF: Plan: create 1, update 2, destroy 0\n  TF->>A: Apply: create/update/delete resources\n  A-->>TF: Return resource attributes (IDs, IPs...)\n  TF->>S: Write new state\n  Note over S: terraform.tfstate updated</div><figcaption>Terraform state lifecycle — state is read before planning, compared against real infrastructure, and updated after every apply. Remote state enables team collaboration.</figcaption></figure><h2>Remote Backend (S3)</h2><pre><code>terraform {\n  backend \"s3\" {\n    bucket         = \"my-terraform-state\"\n    key            = \"prod/vpc/terraform.tfstate\"\n    region         = \"us-east-1\"\n    encrypt        = true\n    dynamodb_table = \"terraform-state-lock\"  # State locking\n  }\n}</code></pre><h2>Terraform Cloud Backend</h2><pre><code>terraform {\n  cloud {\n    organization = \"my-org\"\n    workspaces {\n      name = \"production-vpc\"\n    }\n  }\n}</code></pre><h2>State Locking</h2><p>Remote backends support state locking to prevent concurrent modifications. S3 uses DynamoDB; Terraform Cloud handles locking automatically.</p><h2>State Commands</h2><pre><code># List all resources in state\nterraform state list\n\n# Show details of a resource\nterraform state show aws_instance.web\n\n# Move a resource (rename or refactor)\nterraform state mv aws_instance.old aws_instance.new\n\n# Remove a resource from state (without destroying)\nterraform state rm aws_instance.legacy\n\n# Import existing resource into state\nterraform import aws_s3_bucket.existing my-bucket-name\n\n# Pull current state\nterraform state pull</code></pre><h2>Sensitive Data in State</h2><p>Terraform state may contain sensitive values. Always encrypt state at rest and restrict access. Use remote state backends with access controls — never commit state files to version control.</p><h2>Remote State Data Source</h2><pre><code>data \"terraform_remote_state\" \"network\" {\n  backend = \"s3\"\n  config = {\n    bucket = \"my-terraform-state\"\n    key    = \"prod/vpc/terraform.tfstate\"\n    region = \"us-east-1\"\n  }\n}\n\nresource \"aws_instance\" \"app\" {\n  subnet_id = data.terraform_remote_state.network.outputs.subnet_id\n}</code></pre><p><a href='https://developer.hashicorp.com/terraform/language/state' target='_blank'>State Documentation →</a></p>"
+  },
+  "prerequisites": ["module-01-modules"],
+  "tags": ["state", "backend", "s3", "locking", "dynamodb", "remote-state"]
+}

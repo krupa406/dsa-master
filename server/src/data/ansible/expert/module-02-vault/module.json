@@ -1,0 +1,19 @@
+{
+  "id": "module-02-vault",
+  "title": "Ansible Vault",
+  "slug": "vault",
+  "order": 2,
+  "estimatedMinutes": 40,
+  "learningObjectives": [
+    "Encrypt and decrypt variables and files with ansible-vault",
+    "Use vault-encrypted variables inline in playbooks",
+    "Manage multiple vault IDs for different environments",
+    "Integrate vault with CI/CD pipelines securely"
+  ],
+  "theory": {
+    "format": "html",
+    "content": "<h2>What is Ansible Vault?</h2><p>Ansible Vault encrypts sensitive data — passwords, API keys, certificates — so you can safely store them in version control. Vault uses AES-256 symmetric encryption.</p><figure class=\"diagram-block\"><div class=\"mermaid\">sequenceDiagram\n  participant D as Developer\n  participant V as ansible-vault\n  participant G as Git Repository\n  participant R as Playbook Runtime\n  D->>V: ansible-vault encrypt secrets.yml\n  V-->>D: AES256-encrypted .yml file\n  D->>G: git commit && git push (safe)\n  Note over G: Encrypted content in repo\n  G->>R: git pull / CI checkout\n  R->>V: Decrypt with vault password\n  V-->>R: Plaintext variables in memory\n  R->>R: Use vars in tasks (never written to disk)</div><figcaption>Ansible Vault encrypt/decrypt lifecycle — secrets are encrypted before committing to Git and decrypted in-memory only at playbook runtime.</figcaption></figure><h2>Encrypting Files</h2><pre><code># Encrypt an entire file\nansible-vault encrypt group_vars/all/secrets.yml\n\n# Create a new encrypted file\nansible-vault create group_vars/production/vault.yml\n\n# View encrypted file without decrypting on disk\nansible-vault view secrets.yml\n\n# Edit encrypted file in-place\nansible-vault edit secrets.yml\n\n# Decrypt a file\nansible-vault decrypt secrets.yml\n\n# Re-key (change password)\nansible-vault rekey secrets.yml</code></pre><h2>Encrypting Single Variables</h2><pre><code># Encrypt a single string value\nansible-vault encrypt_string 'MyS3cretP@ss' --name 'db_password'\n\n# Output can be pasted directly into a vars file:\ndb_password: !vault |\n  $ANSIBLE_VAULT;1.1;AES256\n  66386439653236336462626566653...\n  ...</code></pre><h2>Running Playbooks with Vault</h2><pre><code># Prompt for password\nansible-playbook site.yml --ask-vault-pass\n\n# Use password file\nansible-playbook site.yml --vault-password-file ~/.vault_pass\n\n# Use environment variable\nexport ANSIBLE_VAULT_PASSWORD_FILE=~/.vault_pass\nansible-playbook site.yml</code></pre><h2>Multiple Vault IDs</h2><pre><code># Encrypt with a specific vault ID label\nansible-vault encrypt_string 'prod_secret' \\\n  --vault-id prod@~/.vault_prod \\\n  --name 'api_key'\n\n# Run playbook providing multiple vault passwords\nansible-playbook site.yml \\\n  --vault-id dev@~/.vault_dev \\\n  --vault-id prod@~/.vault_prod</code></pre><h2>Best Practices</h2><ul><li>Store vault passwords in a secrets manager (AWS Secrets Manager, HashiCorp Vault)</li><li>Use vault IDs to separate dev/staging/prod secrets</li><li>Never commit unencrypted secrets — use pre-commit hooks</li><li>Separate vaulted variables from plain variables (keep group_vars/all/vars.yml and group_vars/all/vault.yml)</li></ul><p><a href='https://docs.ansible.com/ansible/latest/vault_guide/index.html' target='_blank'>Vault Guide →</a></p>"
+  },
+  "prerequisites": ["module-01-collections"],
+  "tags": ["vault", "security", "encryption", "secrets", "aes256"]
+}

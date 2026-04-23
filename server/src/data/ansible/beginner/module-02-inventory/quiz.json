@@ -1,0 +1,167 @@
+{
+  "quizId": "quiz-ansible-beginner-02",
+  "moduleId": "module-02-inventory",
+  "passingScore": 70,
+  "questions": [
+    {
+      "id": "q1",
+      "order": 1,
+      "text": "In an INI inventory, how do you define a group of groups (nested groups)?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "[groupname:nested]"},
+        {"id": "b", "text": "[groupname:children]"},
+        {"id": "c", "text": "[groupname:subgroups]"},
+        {"id": "d", "text": "[groupname:parent]"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "In INI inventory, you create a group of groups using the ':children' suffix. For example, '[datacenter:children]' followed by group names allows you to target all hosts in both groups with a single group name.",
+      "citations": [{"label": "Inventory — Groups of Groups", "url": "https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html#grouping-groups-parent-child-group-relationships"}],
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "order": 2,
+      "text": "What inventory variable overrides the IP address/hostname used for the SSH connection?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "ansible_ip"},
+        {"id": "b", "text": "ansible_hostname"},
+        {"id": "c", "text": "ansible_host"},
+        {"id": "d", "text": "ansible_address"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "ansible_host overrides the address Ansible uses to connect to the host. This is useful when the inventory name is a label (e.g., 'db-primary') but the actual IP is different (e.g., 192.168.1.10).",
+      "citations": [{"label": "Connecting to hosts: behavioral inventory parameters", "url": "https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html#connecting-to-hosts-behavioral-inventory-parameters"}],
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "order": 3,
+      "text": "Which special group contains ALL hosts in the inventory?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "hosts"},
+        {"id": "b", "text": "default"},
+        {"id": "c", "text": "all"},
+        {"id": "d", "text": "global"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "The 'all' group is a built-in group that implicitly contains every host defined in the inventory. You can use it to apply variables to all hosts via group_vars/all.yml or target all hosts in a play with 'hosts: all'.",
+      "citations": [{"label": "Default groups", "url": "https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html#default-groups"}],
+      "points": 10
+    },
+    {
+      "id": "q4",
+      "order": 4,
+      "text": "Where should you place a file to set variables for the 'webservers' group?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "vars/webservers.yml"},
+        {"id": "b", "text": "host_vars/webservers.yml"},
+        {"id": "c", "text": "group_vars/webservers.yml"},
+        {"id": "d", "text": "inventory/vars/webservers.yml"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "Ansible automatically loads variables from group_vars/<groupname>.yml (or group_vars/<groupname>/main.yml). Similarly, host_vars/<hostname>.yml is used for host-specific variables. These directories should be adjacent to your inventory file or playbook.",
+      "citations": [{"label": "Organizing host and group variables", "url": "https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html#organizing-host-and-group-variables"}],
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "order": 5,
+      "text": "Which ansible_connection value would you use for Windows managed nodes?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "ssh"},
+        {"id": "b", "text": "local"},
+        {"id": "c", "text": "winrm"},
+        {"id": "d", "text": "psrp"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "For Windows nodes, ansible_connection should be set to 'winrm' (Windows Remote Management). This requires the pywinrm Python library. Alternatively, 'psrp' (PowerShell Remoting Protocol) can be used for better performance on Windows.",
+      "citations": [{"label": "Setting up Windows hosts", "url": "https://docs.ansible.com/ansible/latest/os_guide/windows_setup.html"}],
+      "points": 10
+    },
+    {
+      "id": "q6",
+      "order": 6,
+      "text": "In a YAML inventory, where do you define group-level variables?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Under groupname.variables"},
+        {"id": "b", "text": "Under groupname.vars"},
+        {"id": "c", "text": "Under groupname.defaults"},
+        {"id": "d", "text": "Under all.vars.groupname"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "In YAML inventory format, group variables are defined under 'groupname.vars'. For example: webservers: vars: ansible_user: deploy. This is equivalent to creating a group_vars/webservers.yml file.",
+      "citations": [{"label": "YAML inventory", "url": "https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html#inventory-basics-formats-hosts-and-groups"}],
+      "points": 10
+    },
+    {
+      "id": "q7",
+      "order": 7,
+      "text": "Which special group contains hosts not assigned to any other group?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "orphans"},
+        {"id": "b", "text": "ungrouped"},
+        {"id": "c", "text": "misc"},
+        {"id": "d", "text": "default"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "The 'ungrouped' group automatically contains all hosts that have not been assigned to any custom group. Like 'all', it is a built-in group. Hosts in 'ungrouped' are still members of 'all'.",
+      "citations": [{"label": "Default groups", "url": "https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html#default-groups"}],
+      "points": 10
+    },
+    {
+      "id": "q8",
+      "order": 8,
+      "text": "How would you specify hosts web1 through web5 using Ansible's range pattern?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "web[1-5].example.com"},
+        {"id": "b", "text": "web{1..5}.example.com"},
+        {"id": "c", "text": "web(1-5).example.com"},
+        {"id": "d", "text": "web1:web5.example.com"}
+      ],
+      "correctOptionId": "a",
+      "explanation": "Ansible supports numeric and alphabetic ranges in inventory using brackets: web[1:5].example.com or web[1-5].example.com (both work). You can also use alpha ranges: db[a:f].example.com. This expands to individual hostnames without listing each one.",
+      "citations": [{"label": "Adding ranges of hosts", "url": "https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html#adding-ranges-of-hosts"}],
+      "points": 10
+    },
+    {
+      "id": "q9",
+      "order": 9,
+      "text": "Variable precedence in Ansible: which takes higher priority?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "group_vars/all takes priority over host_vars"},
+        {"id": "b", "text": "host_vars takes priority over group_vars"},
+        {"id": "c", "text": "group_vars/webservers takes priority over host_vars"},
+        {"id": "d", "text": "They have equal priority, last-write wins"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Host variables (host_vars) take higher precedence than group variables (group_vars). Among group variables, child group vars take priority over parent group vars. This allows you to set defaults at the group level and override them per host.",
+      "citations": [{"label": "Variable precedence", "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#variable-precedence-where-should-i-put-a-variable"}],
+      "points": 10
+    },
+    {
+      "id": "q10",
+      "order": 10,
+      "text": "Which command lists all hosts in your inventory?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "ansible all --list"},
+        {"id": "b", "text": "ansible-inventory --list"},
+        {"id": "c", "text": "ansible --inventory list"},
+        {"id": "d", "text": "ansible-playbook --list-hosts"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "ansible-inventory --list outputs your entire inventory as JSON, showing all hosts and groups. Use --graph for a more readable tree view. This is especially useful for debugging dynamic inventories and verifying that host/group variables are set correctly.",
+      "citations": [{"label": "ansible-inventory", "url": "https://docs.ansible.com/ansible/latest/cli/ansible-inventory.html"}],
+      "points": 10
+    }
+  ]
+}

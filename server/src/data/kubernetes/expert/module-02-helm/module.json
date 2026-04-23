@@ -1,0 +1,19 @@
+{
+  "id": "module-02-helm",
+  "title": "Helm Chart Development",
+  "slug": "helm",
+  "order": 2,
+  "estimatedMinutes": 50,
+  "learningObjectives": [
+    "Understand Helm chart structure and templating",
+    "Create and package custom Helm charts",
+    "Use values.yaml overrides and helpers",
+    "Manage chart dependencies and releases"
+  ],
+  "theory": {
+    "format": "html",
+    "content": "<h2>What is Helm?</h2><p>Helm is the package manager for Kubernetes. A <strong>chart</strong> is a collection of files describing a set of Kubernetes resources. <strong>Releases</strong> are instances of a chart deployed to a cluster.</p><figure class=\"diagram-block\"><div class=\"mermaid\">flowchart LR\n  CH[\"Helm Chart\nmychart/\"]\n  CY[\"Chart.yaml\nname, version, appVersion\"]\n  VY[\"values.yaml\ndefault values\"]\n  TMP[\"templates/\n*.yaml (Go templates)\"]\n  HLP[\"_helpers.tpl\nnamed templates\"]\n  subgraph INSTALL [\"helm install myrelease ./mychart\"]\n    OVR[\"--set / -f overrides\"]\n    TE[\"Template Engine\nGo + Sprig functions\"]\n    MAN[\"Rendered Manifests\n(valid Kubernetes YAML)\"]\n  end\n  KA[\"Kubernetes API\nkubectl apply equivalent\"]\n  REL[\"Release Secret\nmyrelease-v1 (state)\"]\n  CH --> CY\n  CH --> VY\n  CH --> TMP\n  TMP --> HLP\n  VY --> TE\n  OVR --> TE\n  TMP --> TE\n  TE --> MAN --> KA --> REL\n  style TE fill:#1e293b,stroke:#475569,color:#e2e8f0\n  style REL fill:#2d1e3a,stroke:#a78bfa,color:#c4b5fd</div><figcaption>Helm chart rendering and installation — templates are rendered using values (with override priority) and applied to Kubernetes. Each install creates a versioned release Secret for rollback support.</figcaption></figure><h2>Chart Structure</h2><pre><code>mychart/\n  Chart.yaml          # Chart metadata\n  values.yaml         # Default values\n  templates/\n    deployment.yaml   # Kubernetes manifests (Helm templates)\n    service.yaml\n    _helpers.tpl      # Named templates (partials)\n  charts/             # Chart dependencies\n  .helmignore</code></pre><h2>Chart.yaml</h2><pre><code>apiVersion: v2\nname: mychart\ndescription: A sample Helm chart\ntype: application\nversion: 0.1.0       # Chart version\nappVersion: \"1.0.0\"  # App version</code></pre><h2>Templating</h2><p>Helm templates use Go templating with the Sprig function library:</p><pre><code># deployment.yaml\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: {{ include \"mychart.fullname\" . }}\n  labels:\n    {{- include \"mychart.labels\" . | nindent 4 }}\nspec:\n  replicas: {{ .Values.replicaCount }}\n  template:\n    spec:\n      containers:\n        - name: {{ .Chart.Name }}\n          image: \"{{ .Values.image.repository }}:{{ .Values.image.tag }}\"\n          ports:\n            - containerPort: {{ .Values.service.port }}</code></pre><h2>values.yaml</h2><pre><code>replicaCount: 2\nimage:\n  repository: nginx\n  tag: \"1.25\"\nservice:\n  type: ClusterIP\n  port: 80</code></pre><h2>Key Commands</h2><pre><code># Install\nhelm install myrelease ./mychart\n\n# Override values\nhelm install myrelease ./mychart --set replicaCount=3\nhelm install myrelease ./mychart -f custom-values.yaml\n\n# Upgrade\nhelm upgrade myrelease ./mychart --set image.tag=1.26\n\n# Rollback\nhelm rollback myrelease 1\n\n# List releases\nhelm list\n\n# Debug/dry-run\nhelm install --dry-run --debug myrelease ./mychart</code></pre><h2>Chart Dependencies</h2><pre><code># Chart.yaml\ndependencies:\n  - name: postgresql\n    version: \"12.x.x\"\n    repository: \"https://charts.bitnami.com/bitnami\"\n\n# Then run:\nhelm dependency update</code></pre><p><a href='https://helm.sh/docs/topics/charts/' target='_blank'>Official Helm Charts Documentation →</a></p>"
+  },
+  "prerequisites": ["module-01-operators"],
+  "tags": ["helm", "charts", "templating", "packaging"]
+}

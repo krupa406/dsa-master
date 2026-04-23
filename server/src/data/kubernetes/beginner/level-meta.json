@@ -1,0 +1,8 @@
+{
+  "id": "beginner",
+  "tech": "kubernetes",
+  "displayName": "Beginner",
+  "description": "Learn Kubernetes core concepts: architecture, Pods, Deployments, and Services.",
+  "estimatedHours": 4,
+  "moduleOrder": ["module-01-concepts", "module-02-pods", "module-03-deployments"]
+}

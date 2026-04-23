@@ -1,0 +1,28 @@
+{
+  "id": "lab-kubernetes-beginner-02",
+  "moduleId": "module-02-pods",
+  "title": "Write a Pod with Probes and Resource Limits",
+  "description": "Write a Pod manifest with resource requests/limits, a liveness probe, and a readiness probe.",
+  "language": "yaml",
+  "monacoLanguage": "yaml",
+  "starterCode": "# Write a Pod manifest that:\n# 1. Has name: nginx-pod in namespace: default\n# 2. Uses image: nginx:1.27 with containerPort: 80\n# 3. Sets resources:\n#    requests: cpu 100m, memory 128Mi\n#    limits: cpu 200m, memory 256Mi\n# 4. Adds livenessProbe (httpGet path: /, port: 80, initialDelaySeconds: 15, periodSeconds: 20)\n# 5. Adds readinessProbe (httpGet path: /, port: 80, initialDelaySeconds: 5, periodSeconds: 10)\n\napiVersion: v1\nkind: Pod\nmetadata:\n  name: nginx-pod\n  namespace: default\nspec:\n  containers:\n    - name: nginx\n      image: nginx:1.27\n      # Add ports, resources, livenessProbe, readinessProbe\n",
+  "solutionCode": "apiVersion: v1\nkind: Pod\nmetadata:\n  name: nginx-pod\n  namespace: default\nspec:\n  containers:\n    - name: nginx\n      image: nginx:1.27\n      ports:\n        - containerPort: 80\n      resources:\n        requests:\n          cpu: \"100m\"\n          memory: \"128Mi\"\n        limits:\n          cpu: \"200m\"\n          memory: \"256Mi\"\n      livenessProbe:\n        httpGet:\n          path: /\n          port: 80\n        initialDelaySeconds: 15\n        periodSeconds: 20\n      readinessProbe:\n        httpGet:\n          path: /\n          port: 80\n        initialDelaySeconds: 5\n        periodSeconds: 10\n",
+  "hints": [
+    "CPU resources use millicores: 100m = 0.1 CPU core",
+    "Memory uses Mi (mebibytes) or Gi (gibibytes)",
+    "Probes use httpGet, tcpSocket, or exec as check methods",
+    "initialDelaySeconds lets the container start before first probe"
+  ],
+  "validationRules": [
+    {"id": "has-resources-requests", "type": "contains", "pattern": "requests:", "errorMessage": "Add resources.requests block", "points": 20},
+    {"id": "has-resources-limits", "type": "contains", "pattern": "limits:", "errorMessage": "Add resources.limits block", "points": 20},
+    {"id": "has-liveness-probe", "type": "contains", "pattern": "livenessProbe:", "errorMessage": "Add a livenessProbe", "points": 20},
+    {"id": "has-readiness-probe", "type": "contains", "pattern": "readinessProbe:", "errorMessage": "Add a readinessProbe", "points": 20},
+    {"id": "valid-yaml", "type": "yamlParse", "errorMessage": "YAML is invalid — check indentation", "points": 20}
+  ],
+  "simulatedOutput": {
+    "success": "pod/nginx-pod created\n\nNAME        READY   STATUS    RESTARTS   AGE\nnginx-pod   1/1     Running   0          30s\n\nReadiness probe: PASS (http GET / :80)\nLiveness probe: PASS (http GET / :80)\nResources: cpu=100m/200m, memory=128Mi/256Mi",
+    "failure": "Pod validation failed. Check resource requests/limits, livenessProbe, and readinessProbe syntax."
+  },
+  "maxScore": 100
+}

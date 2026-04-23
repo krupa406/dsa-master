@@ -1,0 +1,11 @@
+{
+  "id": "terraform",
+  "displayName": "Terraform",
+  "version": "1.13",
+  "tagline": "Infrastructure as Code",
+  "description": "Terraform 1.13 by HashiCorp lets you define and provision infrastructure using a declarative configuration language (HCL). It introduces the terraform stacks CLI command, improved terraform test variable definitions, the generally available terraform rpcapi command, and enhanced provider dependency management. Supports hundreds of providers and manages state.",
+  "icon": "terraform",
+  "officialDocsBaseUrl": "https://developer.hashicorp.com/terraform/docs",
+  "levels": ["beginner", "intermediate", "expert"],
+  "color": "#7B42BC"
+}

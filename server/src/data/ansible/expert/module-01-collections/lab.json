@@ -1,0 +1,27 @@
+{
+  "id": "lab-ansible-expert-01",
+  "moduleId": "module-01-collections",
+  "title": "Write a Collection requirements.yml",
+  "description": "Create a requirements.yml that installs specific versions of community.general, amazon.aws, and a private collection, then write a playbook using FQCN from those collections.",
+  "language": "yaml",
+  "monacoLanguage": "yaml",
+  "starterCode": "# Write a requirements.yml that:\n# 1. Installs community.general version >= 7.0.0\n# 2. Installs amazon.aws at exactly version 6.5.0\n# 3. Installs kubernetes.core version >= 3.0.0\n# The file must have a 'collections:' top-level key\n\n# After the requirements.yml, add a comment separator\n# Then write a playbook task that uses community.general.git_config\n# to set user.email to 'ci@example.com' (scope: global)\n",
+  "solutionCode": "collections:\n  - name: community.general\n    version: '>=7.0.0'\n  - name: amazon.aws\n    version: '6.5.0'\n  - name: kubernetes.core\n    version: '>=3.0.0'\n---\n- name: Use collections\n  hosts: localhost\n  connection: local\n  tasks:\n    - name: Configure git user email\n      community.general.git_config:\n        name: user.email\n        value: ci@example.com\n        scope: global\n",
+  "hints": [
+    "requirements.yml uses 'collections:' as the top-level key (not 'roles:')",
+    "Version constraints use pip-style operators: >=, ==, !=",
+    "Always use FQCN (namespace.collection.module) when calling collection modules"
+  ],
+  "validationRules": [
+    {"id": "has-collections-key", "type": "contains", "pattern": "collections:", "errorMessage": "Add a 'collections:' top-level key in requirements.yml", "points": 20},
+    {"id": "has-community-general", "type": "contains", "pattern": "community.general", "errorMessage": "Include community.general in the collections list", "points": 20},
+    {"id": "has-amazon-aws", "type": "contains", "pattern": "amazon.aws", "errorMessage": "Include amazon.aws in the collections list", "points": 20},
+    {"id": "has-fqcn-usage", "type": "contains", "pattern": "community.general.", "errorMessage": "Use FQCN (community.general.module_name) in your playbook task", "points": 20},
+    {"id": "valid-yaml", "type": "yamlParse", "errorMessage": "YAML is invalid — check collection list formatting", "points": 20}
+  ],
+  "simulatedOutput": {
+    "success": "Starting galaxy collection install process\nProcess install dependency map\nStarting collection install process\nInstalling 'community.general:7.5.0' to '/home/user/.ansible/collections'\nInstalling 'amazon.aws:6.5.0' to '/home/user/.ansible/collections'\nInstalling 'kubernetes.core:3.1.0' to '/home/user/.ansible/collections'\n\nPlaybook task validated: FQCN usage confirmed.",
+    "failure": "Requirements validation failed. Check 'collections:' key, version constraints, and FQCN usage."
+  },
+  "maxScore": 100
+}

@@ -1,0 +1,29 @@
+{
+  "id": "lab-kubernetes-expert-01",
+  "moduleId": "module-01-operators",
+  "title": "Define a Custom Resource Definition",
+  "description": "Write a CRD for a 'CacheCluster' custom resource with OpenAPI v3 schema validation.",
+  "language": "yaml",
+  "monacoLanguage": "yaml",
+  "starterCode": "# Write a CRD for 'CacheCluster' that:\n# 1. apiVersion: apiextensions.k8s.io/v1, kind: CustomResourceDefinition\n# 2. metadata.name: cacheclusters.caching.mycompany.com\n# 3. spec.group: caching.mycompany.com\n# 4. Version v1alpha1 (served: true, storage: true)\n# 5. OpenAPI schema with spec properties:\n#    - replicas: integer (minimum 1, maximum 10)\n#    - image: string (required)\n#    - memoryGb: number (required)\n# 6. scope: Namespaced\n# 7. names: plural=cacheclusters, singular=cachecluster, kind=CacheCluster, shortNames=[cc]\n\napiVersion: apiextensions.k8s.io/v1\nkind: CustomResourceDefinition\n",
+  "solutionCode": "apiVersion: apiextensions.k8s.io/v1\nkind: CustomResourceDefinition\nmetadata:\n  name: cacheclusters.caching.mycompany.com\nspec:\n  group: caching.mycompany.com\n  versions:\n    - name: v1alpha1\n      served: true\n      storage: true\n      schema:\n        openAPIV3Schema:\n          type: object\n          properties:\n            spec:\n              type: object\n              required: [\"image\", \"memoryGb\"]\n              properties:\n                replicas:\n                  type: integer\n                  minimum: 1\n                  maximum: 10\n                image:\n                  type: string\n                memoryGb:\n                  type: number\n  scope: Namespaced\n  names:\n    plural: cacheclusters\n    singular: cachecluster\n    kind: CacheCluster\n    shortNames:\n      - cc\n",
+  "hints": [
+    "CRD apiVersion is apiextensions.k8s.io/v1",
+    "The metadata.name must be plural.group (cacheclusters.caching.mycompany.com)",
+    "OpenAPI schema goes under versions[].schema.openAPIV3Schema",
+    "required fields go in the parent object's 'required' array, not inside properties"
+  ],
+  "validationRules": [
+    {"id": "has-crd-apiversion", "type": "contains", "pattern": "apiextensions.k8s.io/v1", "errorMessage": "Use apiVersion: apiextensions.k8s.io/v1 for CRDs", "points": 15},
+    {"id": "has-crd-kind", "type": "contains", "pattern": "kind: CustomResourceDefinition", "errorMessage": "Set kind: CustomResourceDefinition", "points": 15},
+    {"id": "has-group", "type": "contains", "pattern": "caching.mycompany.com", "errorMessage": "Set the spec.group to caching.mycompany.com", "points": 15},
+    {"id": "has-openapi-schema", "type": "contains", "pattern": "openAPIV3Schema:", "errorMessage": "Add OpenAPI v3 schema validation", "points": 20},
+    {"id": "has-names", "type": "contains", "pattern": "kind: CacheCluster", "errorMessage": "Define names with kind: CacheCluster", "points": 15},
+    {"id": "valid-yaml", "type": "yamlParse", "errorMessage": "YAML is invalid — check CRD spec indentation", "points": 20}
+  ],
+  "simulatedOutput": {
+    "success": "customresourcedefinition.apiextensions.k8s.io/cacheclusters.caching.mycompany.com created\n\nCRD registered:\n  Group: caching.mycompany.com\n  Version: v1alpha1\n  Kind: CacheCluster (cc)\n  Scope: Namespaced\n  Schema validation: enabled (replicas, image, memoryGb)\n\nYou can now create resources:\n  kubectl apply -f cachecluster.yaml",
+    "failure": "CRD validation failed. Check apiVersion (apiextensions.k8s.io/v1), metadata.name, group, versions, OpenAPI schema, and names."
+  },
+  "maxScore": 100
+}

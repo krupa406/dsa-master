@@ -1,0 +1,19 @@
+{
+  "id": "module-01-services",
+  "title": "Kubernetes Networking and Ingress",
+  "slug": "services",
+  "order": 1,
+  "estimatedMinutes": 40,
+  "learningObjectives": [
+    "Understand Kubernetes networking model and DNS",
+    "Configure Ingress for HTTP routing and TLS termination",
+    "Use NetworkPolicies to restrict pod communication",
+    "Work with EndpointSlices and headless Services"
+  ],
+  "theory": {
+    "format": "html",
+    "content": "<h2>Kubernetes Networking Model</h2><p>Every Pod gets a unique IP. All Pods can communicate with all other Pods without NAT. Services get their own stable ClusterIP from the service CIDR range. kube-proxy implements Service routing via iptables/IPVS.</p><figure class=\"diagram-block\"><div class=\"mermaid\">flowchart LR\n  EXT[\"External Traffic\n(internet / internal)\"]\n  LB[\"LoadBalancer\nCloud LB → NodePort → ClusterIP\"]\n  NP[\"NodePort\n<NodeIP>:30000-32767\"]\n  CIP[\"ClusterIP\nVirtual IP (cluster-internal only)\"]\n  EP[\"Endpoints\n(Pod IPs matching selector)\"]\n  P1[\"Pod app=web\"]\n  P2[\"Pod app=web\"]\n  P3[\"Pod app=web\"]\n  EXT --> LB --> NP --> CIP\n  EXT --> NP\n  CIP -->|\"kube-proxy routes\"| EP\n  EP --> P1\n  EP --> P2\n  EP --> P3\n  style LB fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd\n  style CIP fill:#1e293b,stroke:#475569,color:#e2e8f0\n  style EP fill:#2d1e3a,stroke:#a78bfa,color:#c4b5fd</div><figcaption>Kubernetes Service types — ClusterIP is cluster-internal; NodePort exposes on node IPs; LoadBalancer provisions a cloud load balancer. All route to matching Pods via label selectors.</figcaption></figure><h2>DNS in Kubernetes</h2><p>CoreDNS provides DNS for Services and Pods. Service DNS: <code>&lt;service&gt;.&lt;namespace&gt;.svc.cluster.local</code></p><pre><code># Full DNS: my-service.my-namespace.svc.cluster.local\n# Short form within same namespace: my-service\n# From different namespace: my-service.other-namespace</code></pre><h2>Ingress</h2><p>Ingress exposes HTTP/HTTPS routes from outside the cluster to Services. Requires an Ingress Controller (nginx-ingress, Traefik, ALB Ingress).</p><pre><code>apiVersion: networking.k8s.io/v1\nkind: Ingress\nmetadata:\n  name: app-ingress\n  annotations:\n    nginx.ingress.kubernetes.io/rewrite-target: /\nspec:\n  ingressClassName: nginx\n  tls:\n    - hosts:\n        - app.example.com\n      secretName: app-tls-secret\n  rules:\n    - host: app.example.com\n      http:\n        paths:\n          - path: /api\n            pathType: Prefix\n            backend:\n              service:\n                name: api-service\n                port:\n                  number: 80\n          - path: /\n            pathType: Prefix\n            backend:\n              service:\n                name: frontend-service\n                port:\n                  number: 80</code></pre><h2>NetworkPolicy</h2><pre><code>apiVersion: networking.k8s.io/v1\nkind: NetworkPolicy\nmetadata:\n  name: allow-api-only\n  namespace: production\nspec:\n  podSelector:\n    matchLabels:\n      app: database\n  policyTypes:\n    - Ingress\n  ingress:\n    - from:\n        - podSelector:\n            matchLabels:\n              app: api\n      ports:\n        - protocol: TCP\n          port: 5432</code></pre><h2>Headless Services</h2><p>Setting <code>clusterIP: None</code> creates a headless service — DNS returns individual Pod IPs instead of a ClusterIP. Used with StatefulSets for stable network identity.</p><p><a href='https://kubernetes.io/docs/concepts/services-networking/' target='_blank'>Services Networking Documentation →</a></p>"
+  },
+  "prerequisites": [],
+  "tags": ["networking", "ingress", "dns", "networkpolicy", "clusterip", "tls"]
+}

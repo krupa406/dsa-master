@@ -1,0 +1,28 @@
+{
+  "id": "lab-kubernetes-expert-02",
+  "moduleId": "module-02-helm",
+  "title": "Write a Helm Deployment Template",
+  "description": "Complete a Helm deployment template that uses Values, Chart metadata, and the fullname helper. The template should be production-quality.",
+  "language": "yaml",
+  "monacoLanguage": "yaml",
+  "starterCode": "# templates/deployment.yaml\n# Complete this Helm chart deployment template\n# Requirements:\n# 1. Use {{ include \"mychart.fullname\" . }} for the deployment name\n# 2. Set replicas from .Values.replicaCount\n# 3. Use the chart labels helper: {{ include \"mychart.labels\" . | nindent 4 }}\n# 4. Set image as {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: # Add Helm fullname template here\n  labels:\n    # Add labels helper here\nspec:\n  replicas: # Get from values\n  selector:\n    matchLabels:\n      {{- include \"mychart.selectorLabels\" . | nindent 6 }}\n  template:\n    metadata:\n      labels:\n        {{- include \"mychart.selectorLabels\" . | nindent 8 }}\n    spec:\n      containers:\n        - name: {{ .Chart.Name }}\n          image: # Set image from values with tag defaulting to AppVersion\n          ports:\n            - containerPort: {{ .Values.service.port }}\n              protocol: TCP\n",
+  "solutionCode": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: {{ include \"mychart.fullname\" . }}\n  labels:\n    {{- include \"mychart.labels\" . | nindent 4 }}\nspec:\n  replicas: {{ .Values.replicaCount }}\n  selector:\n    matchLabels:\n      {{- include \"mychart.selectorLabels\" . | nindent 6 }}\n  template:\n    metadata:\n      labels:\n        {{- include \"mychart.selectorLabels\" . | nindent 8 }}\n    spec:\n      containers:\n        - name: {{ .Chart.Name }}\n          image: \"{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}\"\n          ports:\n            - containerPort: {{ .Values.service.port }}\n              protocol: TCP\n",
+  "hints": [
+    "Use {{ include \"mychart.fullname\" . }} for the deployment name — never hardcode it",
+    "{{ .Values.replicaCount }} reads from values.yaml",
+    "The | nindent 4 pipeline properly indents multi-line template output",
+    "Use | default .Chart.AppVersion as a fallback for the image tag"
+  ],
+  "validationRules": [
+    {"id": "has-fullname", "type": "contains", "pattern": "include \"mychart.fullname\"", "errorMessage": "Use {{ include \"mychart.fullname\" . }} for the deployment name", "points": 25},
+    {"id": "has-replicas", "type": "contains", "pattern": ".Values.replicaCount", "errorMessage": "Set replicas from .Values.replicaCount", "points": 20},
+    {"id": "has-labels", "type": "contains", "pattern": "include \"mychart.labels\"", "errorMessage": "Include the labels helper with nindent", "points": 20},
+    {"id": "has-image-values", "type": "contains", "pattern": ".Values.image.repository", "errorMessage": "Set image from .Values.image.repository", "points": 20},
+    {"id": "has-appversion-default", "type": "contains", "pattern": ".Chart.AppVersion", "errorMessage": "Use .Chart.AppVersion as default tag fallback", "points": 15}
+  ],
+  "simulatedOutput": {
+    "success": "helm template mychart ./mychart\n---\n# Source: mychart/templates/deployment.yaml\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: myrelease-mychart\n  labels:\n    helm.sh/chart: mychart-0.1.0\n    app.kubernetes.io/name: mychart\n    app.kubernetes.io/instance: myrelease\n    app.kubernetes.io/version: \"1.0.0\"\nspec:\n  replicas: 2\n  ...\n\nTemplate rendered successfully!",
+    "failure": "Error: template rendering failed. Check that you use .Values references correctly and include the required helpers."
+  },
+  "maxScore": 100
+}

@@ -1,0 +1,28 @@
+{
+  "id": "lab-terraform-beginner-02",
+  "moduleId": "module-02-providers",
+  "title": "Configure AWS Provider with Version Constraints",
+  "description": "Write a Terraform configuration with a required_providers block, version constraints, and a provider alias for a secondary region.",
+  "language": "hcl",
+  "monacoLanguage": "hcl",
+  "starterCode": "# Write a Terraform configuration that:\n# 1. Sets required_version to >= 1.13.0 in the terraform block\n# 2. Declares required_providers with:\n#    - aws: source = hashicorp/aws, version = ~> 5.0\n#    - random: source = hashicorp/random, version >= 3.5.0\n# 3. Configures the default AWS provider with region = \"us-east-1\"\n# 4. Adds an AWS provider alias 'dr' with region = \"eu-west-1\"\n\nterraform {\n  # Add required_version and required_providers here\n}\n\n# Default provider\n\n# DR provider (alias)\n",
+  "solutionCode": "terraform {\n  required_version = \">= 1.13.0\"\n  required_providers {\n    aws = {\n      source  = \"hashicorp/aws\"\n      version = \"~> 5.0\"\n    }\n    random = {\n      source  = \"hashicorp/random\"\n      version = \">= 3.5.0\"\n    }\n  }\n}\n\nprovider \"aws\" {\n  region = \"us-east-1\"\n}\n\nprovider \"aws\" {\n  alias  = \"dr\"\n  region = \"eu-west-1\"\n}\n",
+  "hints": [
+    "required_providers goes inside the terraform {} block",
+    "Source format is 'namespace/provider' (e.g., hashicorp/aws)",
+    "~> 5.0 means >= 5.0, < 6.0 (pessimistic constraint)",
+    "Provider alias syntax: alias = \"name\" inside the provider block"
+  ],
+  "validationRules": [
+    {"id": "has-required-version", "type": "contains", "pattern": "required_version", "errorMessage": "Add required_version in the terraform block", "points": 15},
+    {"id": "has-required-providers", "type": "contains", "pattern": "required_providers", "errorMessage": "Add required_providers block", "points": 20},
+    {"id": "has-aws-provider", "type": "contains", "pattern": "hashicorp/aws", "errorMessage": "Include aws provider with source = hashicorp/aws", "points": 20},
+    {"id": "has-alias", "type": "contains", "pattern": "alias", "errorMessage": "Add a provider alias for the DR region", "points": 20},
+    {"id": "has-pessimistic-constraint", "type": "contains", "pattern": "~>", "errorMessage": "Use the pessimistic constraint operator (~>) for aws version", "points": 25}
+  ],
+  "simulatedOutput": {
+    "success": "Initializing the backend...\nInitializing provider plugins...\n- Finding hashicorp/aws versions matching \"~> 5.0\"...\n- Finding hashicorp/random versions matching \">= 3.5.0\"...\n- Installing hashicorp/aws v5.82.0...\n- Installing hashicorp/random v3.6.0...\n\nTerraform has been successfully initialized!\n\nProviders: aws (default: us-east-1), aws.dr (eu-west-1)",
+    "failure": "Provider configuration error. Check required_providers, source paths, version constraints, and alias syntax."
+  },
+  "maxScore": 100
+}

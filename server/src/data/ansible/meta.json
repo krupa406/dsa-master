@@ -1,0 +1,11 @@
+{
+  "id": "ansible",
+  "displayName": "Ansible",
+  "version": "2.19",
+  "tagline": "Agentless IT automation",
+  "description": "Ansible-core 2.19 is a powerful open-source automation tool for configuration management, application deployment, and task automation. It introduces Data Tagging for improved variable management and deprecated behavior detection, enhanced templating, and Windows Server 2025 support. It uses SSH and requires no agents on managed nodes.",
+  "icon": "ansible",
+  "officialDocsBaseUrl": "https://docs.ansible.com/ansible/latest/",
+  "levels": ["beginner", "intermediate", "expert"],
+  "color": "#EE0000"
+}

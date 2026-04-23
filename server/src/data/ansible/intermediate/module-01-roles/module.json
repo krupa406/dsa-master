@@ -1,0 +1,19 @@
+{
+  "id": "module-01-roles",
+  "title": "Ansible Roles",
+  "slug": "roles",
+  "order": 1,
+  "estimatedMinutes": 40,
+  "learningObjectives": [
+    "Understand the role directory structure",
+    "Create and apply roles using ansible-galaxy init",
+    "Use role defaults and vars with proper precedence",
+    "Share roles via Ansible Galaxy"
+  ],
+  "theory": {
+    "format": "html",
+    "content": "<h2>What is a Role?</h2><p>A role is a structured way to organize playbook content for reuse and sharing. Roles are the primary mechanism for distributing Ansible automation via <strong>Ansible Galaxy</strong>.</p><h2>Role Directory Structure</h2><pre><code>roles/\n  webserver/\n    tasks/\n      main.yml      # Main task list\n    handlers/\n      main.yml      # Handlers\n    templates/\n      nginx.conf.j2 # Jinja2 templates\n    files/\n      index.html    # Static files\n    vars/\n      main.yml      # High-priority variables\n    defaults/\n      main.yml      # Low-priority defaults\n    meta/\n      main.yml      # Role metadata, dependencies\n    README.md</code></pre><figure class=\"diagram-block\"><div class=\"mermaid\">flowchart TD\n  R[\"roles/webserver/\"]\n  T[\"tasks/main.yml\n✦ entry point for all tasks\"]\n  H[\"handlers/main.yml\n✦ event-driven responses\"]\n  TP[\"templates/*.j2\n✦ Jinja2 templates\"]\n  F[\"files/\n✦ static files (copy)\"]\n  V[\"vars/main.yml\n✦ HIGH priority variables\"]\n  D[\"defaults/main.yml\n✦ LOW priority (user overrides)\"]\n  M[\"meta/main.yml\n✦ dependencies + galaxy info\"]\n  R --> T\n  R --> H\n  R --> TP\n  R --> F\n  R --> V\n  R --> D\n  R --> M\n  style R fill:#1e293b,stroke:#3b82f6,color:#93c5fd\n  style D fill:#1e3a2f,stroke:#22c55e,color:#86efac\n  style V fill:#3a2a1e,stroke:#f97316,color:#fdba74</div><figcaption>Ansible role directory structure — each subdirectory has a specific purpose. defaults/ is for user-overridable settings; vars/ is for internal role constants.</figcaption></figure><h2>Creating a Role</h2><pre><code>ansible-galaxy role init webserver</code></pre><h2>Using Roles in a Playbook</h2><pre><code>---\n- name: Configure web tier\n  hosts: webservers\n  become: true\n  roles:\n    - webserver\n    - { role: firewall, vars: { open_ports: [80, 443] } }</code></pre><h2>Role Defaults vs Vars</h2><ul><li><code>defaults/main.yml</code> — Lowest precedence; safe to override from playbook or inventory</li><li><code>vars/main.yml</code> — High precedence; should hold role-internal constants not meant for overriding</li></ul><h2>Role Dependencies</h2><pre><code># meta/main.yml\ndependencies:\n  - role: common\n  - role: nginx\n    vars:\n      nginx_port: 8080</code></pre><p><a href='https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html' target='_blank'>Official Roles Documentation →</a></p>"
+  },
+  "prerequisites": [],
+  "tags": ["roles", "galaxy", "reusability", "structure"]
+}

@@ -1,0 +1,11 @@
+{
+  "id": "kubernetes",
+  "displayName": "Kubernetes",
+  "version": "1.35",
+  "tagline": "Container orchestration at scale",
+  "description": "Kubernetes 1.35 ('Timbernetes') is an open-source system for automating deployment, scaling, and management of containerized applications. Key features include Image Volumes GA (enabled by default), StatefulSet maxUnavailable improvements, kuberc credential plugin policy configuration, IPVS mode deprecation in kube-proxy, and built with Go 1.25. End of Life: February 2027.",
+  "icon": "kubernetes",
+  "officialDocsBaseUrl": "https://kubernetes.io/docs/",
+  "levels": ["beginner", "intermediate", "expert"],
+  "color": "#326CE5"
+}

@@ -1,0 +1,28 @@
+{
+  "id": "lab-terraform-intermediate-01",
+  "moduleId": "module-01-modules",
+  "title": "Call a VPC Module",
+  "description": "Write a root Terraform configuration that calls a local VPC module, passes variables, and uses the module's output.",
+  "language": "hcl",
+  "monacoLanguage": "hcl",
+  "starterCode": "# Write a root Terraform configuration that:\n# 1. Calls a local module at source = \"./modules/vpc\"\n# 2. Passes: cidr_block = \"10.0.0.0/16\" and environment = \"production\"\n# 3. Creates an aws_subnet using module.vpc.vpc_id\n#    cidr_block = \"10.0.1.0/24\", availability_zone = \"us-east-1a\"\n# 4. Outputs 'vpc_id' using the module output\n\n# Module call\n\n# Subnet resource\n\n# Output\n",
+  "solutionCode": "module \"vpc\" {\n  source      = \"./modules/vpc\"\n  cidr_block  = \"10.0.0.0/16\"\n  environment = \"production\"\n}\n\nresource \"aws_subnet\" \"app\" {\n  vpc_id            = module.vpc.vpc_id\n  cidr_block        = \"10.0.1.0/24\"\n  availability_zone = \"us-east-1a\"\n\n  tags = {\n    Name = \"app-subnet\"\n  }\n}\n\noutput \"vpc_id\" {\n  value       = module.vpc.vpc_id\n  description = \"The VPC ID created by the vpc module\"\n}\n",
+  "hints": [
+    "Module blocks: module \"name\" { source = \"path\", variable = value }",
+    "Reference module outputs with: module.module_name.output_name",
+    "After adding a module call, run terraform init to initialize it",
+    "Local module sources start with ./ or ../"
+  ],
+  "validationRules": [
+    {"id": "has-module-block", "type": "contains", "pattern": "module \"vpc\"", "errorMessage": "Add a module block calling the vpc module", "points": 25},
+    {"id": "has-local-source", "type": "contains", "pattern": "source      = \"./modules/vpc\"", "errorMessage": "Set source to the local module path ./modules/vpc", "points": 20},
+    {"id": "has-module-output-ref", "type": "contains", "pattern": "module.vpc.vpc_id", "errorMessage": "Reference module output with module.vpc.vpc_id", "points": 25},
+    {"id": "has-subnet-resource", "type": "contains", "pattern": "aws_subnet", "errorMessage": "Create an aws_subnet resource", "points": 15},
+    {"id": "has-output", "type": "contains", "pattern": "output \"vpc_id\"", "errorMessage": "Add an output for the vpc_id", "points": 15}
+  ],
+  "simulatedOutput": {
+    "success": "Initializing modules...\n- vpc in ./modules/vpc\n\nTerraform will perform the following actions:\n  + module.vpc.aws_vpc.this will be created\n  + aws_subnet.app will be created\n\nPlan: 2 to add, 0 to change, 0 to destroy.\n\nOutputs:\n  vpc_id = (known after apply)",
+    "failure": "Module configuration error. Check module block syntax, source path, module output reference, and subnet resource."
+  },
+  "maxScore": 100
+}

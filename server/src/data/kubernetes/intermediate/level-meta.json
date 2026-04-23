@@ -1,0 +1,8 @@
+{
+  "id": "intermediate",
+  "tech": "kubernetes",
+  "displayName": "Intermediate",
+  "description": "Master Kubernetes Services networking, ConfigMaps/Secrets, and RBAC for access control.",
+  "estimatedHours": 5,
+  "moduleOrder": ["module-01-services", "module-02-configmaps", "module-03-rbac"]
+}

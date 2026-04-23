@@ -1,0 +1,30 @@
+{
+  "id": "lab-kubernetes-expert-03",
+  "moduleId": "module-03-gitops",
+  "title": "Write an ArgoCD Application Manifest",
+  "description": "Create an ArgoCD Application that syncs a Kubernetes app from a Git repository with automated sync, pruning, and self-healing enabled.",
+  "language": "yaml",
+  "monacoLanguage": "yaml",
+  "starterCode": "# Write an ArgoCD Application manifest\n# Requirements:\n# 1. Kind: Application, apiVersion: argoproj.io/v1alpha1\n# 2. Name: webapp, namespace: argocd\n# 3. Source: https://github.com/example/webapp-config, branch HEAD, path: k8s/production\n# 4. Destination: default cluster (https://kubernetes.default.svc), namespace: webapp\n# 5. Automated sync with prune: true and selfHeal: true\n# 6. syncOptions: CreateNamespace=true\napiVersion:\nkind:\nmetadata:\n  # Add name and namespace\nspec:\n  project: default\n  source:\n    # Add repoURL, targetRevision, path\n  destination:\n    # Add server and namespace\n  syncPolicy:\n    # Add automated sync config\n",
+  "solutionCode": "apiVersion: argoproj.io/v1alpha1\nkind: Application\nmetadata:\n  name: webapp\n  namespace: argocd\nspec:\n  project: default\n  source:\n    repoURL: https://github.com/example/webapp-config\n    targetRevision: HEAD\n    path: k8s/production\n  destination:\n    server: https://kubernetes.default.svc\n    namespace: webapp\n  syncPolicy:\n    automated:\n      prune: true\n      selfHeal: true\n    syncOptions:\n      - CreateNamespace=true\n",
+  "hints": [
+    "ArgoCD resources always go in the 'argocd' namespace",
+    "targetRevision: HEAD tracks the default branch tip",
+    "prune: true removes resources deleted from Git; selfHeal: true fixes manual cluster changes",
+    "CreateNamespace=true in syncOptions auto-creates the target namespace"
+  ],
+  "validationRules": [
+    {"id": "has-argocd-apiversion", "type": "contains", "pattern": "argoproj.io/v1alpha1", "errorMessage": "Use apiVersion: argoproj.io/v1alpha1", "points": 15},
+    {"id": "has-application-kind", "type": "contains", "pattern": "kind: Application", "errorMessage": "Set kind: Application", "points": 15},
+    {"id": "has-argocd-ns", "type": "contains", "pattern": "namespace: argocd", "errorMessage": "ArgoCD Application must be in the argocd namespace", "points": 15},
+    {"id": "has-automated", "type": "contains", "pattern": "automated:", "errorMessage": "Add syncPolicy.automated for auto-sync", "points": 15},
+    {"id": "has-prune", "type": "contains", "pattern": "prune: true", "errorMessage": "Enable prune: true to remove deleted resources", "points": 15},
+    {"id": "has-selfheal", "type": "contains", "pattern": "selfHeal: true", "errorMessage": "Enable selfHeal: true to fix manual changes", "points": 15},
+    {"id": "valid-yaml", "type": "yamlParse", "errorMessage": "YAML is invalid", "points": 10}
+  ],
+  "simulatedOutput": {
+    "success": "argocd app create --upsert -f application.yaml\napplication 'webapp' created\n\nargocd app sync webapp\nSYNC    webapp  Synced  Healthy\n\nRESOURCES:\nDeployment/webapp   Synced  Healthy\nService/webapp      Synced  Healthy\nNamespace/webapp    Synced\n\nGitOps sync successful! App is tracking main branch.",
+    "failure": "Error: invalid Application manifest. Check apiVersion (argoproj.io/v1alpha1), namespace (argocd), and syncPolicy structure."
+  },
+  "maxScore": 100
+}

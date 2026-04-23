@@ -1,0 +1,19 @@
+{
+  "id": "module-02-providers",
+  "title": "Terraform Providers",
+  "slug": "providers",
+  "order": 2,
+  "estimatedMinutes": 30,
+  "learningObjectives": [
+    "Configure provider blocks with version constraints",
+    "Use required_providers in terraform block",
+    "Understand provider authentication methods",
+    "Work with multiple provider configurations (aliases)"
+  ],
+  "theory": {
+    "format": "html",
+    "content": "<h2>What are Providers?</h2><p>Providers are plugins that implement resource types for specific APIs — AWS, Azure, GCP, Kubernetes, GitHub, etc. The Terraform Registry (registry.terraform.io) hosts hundreds of providers. Each provider has its own lifecycle and version.</p><figure class=\"diagram-block\"><div class=\"mermaid\">flowchart TD\n  TF[\"Terraform Config\n(.tf files)\nrequired_providers block\"]\n  REG[\"Terraform Registry\nregistry.terraform.io\"]\n  PP[\"Provider Plugin\nbinary downloaded by init\"]\n  API[\"Cloud / Service API\nAWS, Azure, GCP, GitHub...\"]\n  INF[\"Real Infrastructure\nEC2, VMs, DNS records...\"]\n  TF -->|terraform init| REG\n  REG -->|download plugin| PP\n  PP -->|CRUD API calls| API\n  API -->|provision/manage| INF\n  INF -.->|read back attributes| PP\n  PP -.->|write to state| TF\n  style REG fill:#1e293b,stroke:#475569,color:#e2e8f0\n  style PP fill:#2d1e3a,stroke:#a78bfa,color:#c4b5fd\n  style INF fill:#1e3a2f,stroke:#22c55e,color:#86efac</div><figcaption>Terraform provider relationship — providers are plugins downloaded from the registry that translate HCL resource blocks into cloud API calls.</figcaption></figure><h2>Configuring Providers</h2><pre><code>terraform {\n  required_version = \">= 1.13.0\"\n  required_providers {\n    aws = {\n      source  = \"hashicorp/aws\"\n      version = \"~> 5.0\"\n    }\n    random = {\n      source  = \"hashicorp/random\"\n      version = \">= 3.5.0\"\n    }\n  }\n}\n\nprovider \"aws\" {\n  region = var.aws_region\n  # Credentials from env: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY\n  # or from ~/.aws/credentials\n}</code></pre><h2>Version Constraints</h2><table><tr><th>Constraint</th><th>Meaning</th></tr><tr><td>= 5.0.0</td><td>Exactly 5.0.0</td></tr><tr><td>!= 5.0.1</td><td>Not 5.0.1</td></tr><tr><td>>= 5.0, < 6.0</td><td>Any 5.x</td></tr><tr><td>~> 5.0</td><td>Pessimistic: >= 5.0, < 6.0</td></tr><tr><td>~> 5.0.0</td><td>Pessimistic: >= 5.0.0, < 5.1.0</td></tr></table><h2>Provider Aliases (Multiple Regions)</h2><pre><code>provider \"aws\" {\n  region = \"us-east-1\"\n}\n\nprovider \"aws\" {\n  alias  = \"west\"\n  region = \"us-west-2\"\n}\n\nresource \"aws_instance\" \"west_server\" {\n  provider      = aws.west\n  ami           = \"ami-0123456789abcdef0\"\n  instance_type = \"t3.micro\"\n}</code></pre><h2>Provider Lock File</h2><p>The <code>.terraform.lock.hcl</code> file locks provider versions and checksums. Commit this file to version control to ensure consistent provider versions across team members and CI/CD.</p><p><a href='https://developer.hashicorp.com/terraform/language/providers' target='_blank'>Providers Documentation →</a></p>"
+  },
+  "prerequisites": ["module-01-hcl-basics"],
+  "tags": ["providers", "registry", "version-constraints", "aliases", "authentication"]
+}

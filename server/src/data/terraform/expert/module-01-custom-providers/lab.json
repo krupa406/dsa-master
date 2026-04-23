@@ -1,0 +1,28 @@
+{
+  "id": "lab-terraform-expert-01",
+  "moduleId": "module-01-custom-providers",
+  "title": "Configure a Custom Provider in Terraform HCL",
+  "description": "Write Terraform HCL that configures a custom provider block, uses a local dev override, and references provider-specific resources.",
+  "language": "hcl",
+  "monacoLanguage": "hcl",
+  "starterCode": "# Write a Terraform configuration that:\n# 1. Declares required_providers for 'mycompany/internalapi' version ~> 1.0\n#    with source = \"mycompany/internalapi\"\n# 2. Configures the 'internalapi' provider with:\n#    - endpoint = \"https://api.internal.example.com\"\n#    - token = var.api_token (sensitive variable)\n# 3. Declares a variable 'api_token' of type string, sensitive = true\n# 4. Creates a resource 'internalapi_project' named 'main_project'\n#    with name = \"platform-team\" and team = \"infrastructure\"\n\nterraform {\n  required_providers {\n    # Add custom provider requirement\n  }\n}\n\n# Variable for API token\n\n# Provider configuration\n\n# Resource using custom provider\n",
+  "solutionCode": "terraform {\n  required_providers {\n    internalapi = {\n      source  = \"mycompany/internalapi\"\n      version = \"~> 1.0\"\n    }\n  }\n}\n\nvariable \"api_token\" {\n  type        = string\n  sensitive   = true\n  description = \"API token for internal API authentication\"\n}\n\nprovider \"internalapi\" {\n  endpoint = \"https://api.internal.example.com\"\n  token    = var.api_token\n}\n\nresource \"internalapi_project\" \"main_project\" {\n  name = \"platform-team\"\n  team = \"infrastructure\"\n}\n",
+  "hints": [
+    "Custom providers use namespace/name as source (same as public registry format)",
+    "Sensitive variables: sensitive = true prevents value from appearing in output",
+    "Pass sensitive vars to provider with token = var.api_token",
+    "Custom resource type is <provider_name>_<resource> (e.g., internalapi_project)"
+  ],
+  "validationRules": [
+    {"id": "has-custom-provider-req", "type": "contains", "pattern": "mycompany/internalapi", "errorMessage": "Declare the custom provider in required_providers", "points": 20},
+    {"id": "has-sensitive-var", "type": "contains", "pattern": "sensitive   = true", "errorMessage": "Mark the api_token variable as sensitive", "points": 20},
+    {"id": "has-provider-config", "type": "contains", "pattern": "provider \"internalapi\"", "errorMessage": "Add a provider configuration block for internalapi", "points": 20},
+    {"id": "has-endpoint", "type": "contains", "pattern": "endpoint", "errorMessage": "Set the endpoint in the provider config", "points": 15},
+    {"id": "has-custom-resource", "type": "contains", "pattern": "internalapi_project", "errorMessage": "Create a resource using the custom provider", "points": 25}
+  ],
+  "simulatedOutput": {
+    "success": "Initializing provider plugins...\n- Finding mycompany/internalapi versions matching \"~> 1.0\"...\n- Installing mycompany/internalapi v1.2.0...\n\nProvider configuration validated:\n  internalapi: endpoint=https://api.internal.example.com, token=(sensitive)\n\nTerraform will perform the following actions:\n  + internalapi_project.main_project will be created\n\nPlan: 1 to add, 0 to change, 0 to destroy.",
+    "failure": "Custom provider configuration error. Check required_providers, sensitive variable, provider block, and resource type."
+  },
+  "maxScore": 100
+}

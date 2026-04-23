@@ -1,0 +1,164 @@
+/* Import highlight.js dark theme — must come before @tailwind directives */
+@import 'highlight.js/styles/github-dark.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    @apply bg-gray-950 text-gray-100;
+  }
+  code, pre { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+}
+
+@layer components {
+  .card { @apply bg-gray-900 border border-gray-800 rounded-xl; }
+
+  .btn-primary {
+    @apply px-4 py-2 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white rounded-lg font-medium
+           transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed
+           hover:shadow-lg hover:shadow-blue-900/30;
+  }
+  .btn-secondary {
+    @apply px-4 py-2 bg-gray-800 hover:bg-gray-700 active:bg-gray-900 text-gray-200 rounded-lg font-medium
+           transition-all duration-150 border border-gray-700 hover:border-gray-600;
+  }
+  .btn-success {
+    @apply px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-lg font-medium transition-all duration-150;
+  }
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  /* ── Quiz option buttons ── */
+  .option-btn {
+    @apply w-full flex items-center gap-3 px-4 py-3 rounded-lg border text-sm transition-all duration-150 cursor-pointer;
+  }
+  .option-btn-default  { @apply border-gray-700 bg-gray-900 text-gray-300; }
+  .option-btn-hover    { @apply border-blue-500 bg-gray-800 text-white shadow-md shadow-blue-900/20 -translate-y-px; }
+  .option-btn-selected { @apply border-blue-500 bg-blue-950 text-blue-200; }
+  .option-btn-correct  { @apply border-green-600 bg-green-950 text-green-200; }
+  .option-btn-wrong    { @apply border-red-600 bg-red-950 text-red-200; }
+  .option-btn-dimmed   { @apply border-gray-800 bg-gray-900/40 text-gray-600; }
+
+  .option-letter {
+    @apply w-6 h-6 rounded-md bg-gray-800 text-gray-400 text-xs font-mono font-bold
+           flex items-center justify-center shrink-0 group-hover:bg-gray-700 transition-colors;
+  }
+
+  /* ── Explanation box ── */
+  .explanation-box { @apply rounded-xl p-4 border; }
+  .explanation-correct { @apply bg-green-950/40 border-green-800/60; }
+  .explanation-wrong   { @apply bg-red-950/40 border-red-800/60; }
+
+  /* ── Citation link ── */
+  .citation-link {
+    @apply inline-flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300
+           bg-blue-950/50 hover:bg-blue-950 border border-blue-900/60 hover:border-blue-700
+           px-2.5 py-1 rounded-lg transition-all duration-150;
+  }
+
+  /* ── Module outline sidebar ── */
+  .module-outline { @apply text-sm; }
+  .outline-link {
+    @apply block py-1 text-gray-500 hover:text-gray-200 transition-colors duration-100
+           text-xs leading-snug truncate border-l-2 border-transparent pl-3
+           hover:border-gray-600;
+  }
+  .outline-link-active { @apply text-blue-400 border-blue-500 font-medium; }
+}
+
+/* ── Animations ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn  { animation: fadeIn  0.25s ease-out both; }
+.animate-slideUp { animation: slideUp 0.2s  ease-out both; }
+
+/* ── Theory content typography ── */
+.theory-content h2 {
+  @apply text-xl font-bold text-white mt-8 mb-3 pb-2 border-b border-gray-800;
+}
+.theory-content h2:first-child { @apply mt-0; }
+.theory-content h3 { @apply text-base font-semibold text-gray-200 mt-5 mb-2; }
+.theory-content p  { @apply text-gray-300 leading-relaxed mb-4; }
+.theory-content ul, .theory-content ol { @apply text-gray-300 space-y-1.5 mb-4 pl-5; }
+.theory-content li { @apply leading-relaxed; }
+.theory-content ul li { @apply list-disc; }
+.theory-content ol li { @apply list-decimal; }
+.theory-content strong { @apply text-white font-semibold; }
+.theory-content em { @apply text-gray-200 italic; }
+.theory-content a {
+  @apply text-blue-400 hover:text-blue-300 underline underline-offset-2 transition-colors;
+}
+.theory-content table {
+  @apply w-full border-collapse mb-4 text-sm;
+}
+.theory-content th {
+  @apply bg-gray-800 text-gray-200 font-semibold px-4 py-2 text-left border border-gray-700;
+}
+.theory-content td {
+  @apply px-4 py-2 border border-gray-800 text-gray-300;
+}
+.theory-content tr:nth-child(even) td { @apply bg-gray-900/40; }
+
+/* ── Code blocks ── */
+.theory-content pre {
+  @apply rounded-xl mb-5 text-sm overflow-x-auto relative;
+  padding: 1.25rem 1.5rem !important;
+  background: #0d1117 !important;
+  border: 1px solid #21262d;
+}
+.theory-content pre code {
+  background: transparent !important;
+  padding: 0 !important;
+  font-size: 0.82rem;
+  line-height: 1.7;
+}
+.theory-content :not(pre) > code {
+  @apply bg-gray-800 text-green-300 px-1.5 py-0.5 rounded text-xs font-mono;
+}
+
+/* Copy button injected by TheoryPanel */
+.copy-btn {
+  @apply absolute top-3 right-3 text-xs text-gray-500 hover:text-gray-200
+         bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded px-2 py-0.5
+         transition-all duration-150 cursor-pointer;
+  font-family: inherit;
+}
+
+/* ── Mermaid diagrams ── */
+.theory-content figure.diagram-block {
+  @apply my-6 rounded-xl overflow-hidden border border-gray-800 bg-gray-950;
+}
+.theory-content figure.diagram-block .mermaid {
+  @apply flex justify-center p-6;
+}
+.theory-content figure.diagram-block figcaption {
+  @apply text-xs text-gray-500 text-center py-2 border-t border-gray-800 bg-gray-900/40;
+}
+/* Force mermaid SVG to be responsive */
+.theory-content .mermaid svg {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+/* ── Monaco editor host ── */
+.monaco-host { border-radius: 0.5rem; overflow: hidden; }
+
+/* ── Custom scrollbar ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { @apply bg-gray-950; }
+::-webkit-scrollbar-thumb { @apply bg-gray-700 rounded; }
+::-webkit-scrollbar-thumb:hover { @apply bg-gray-600; }
+
+/* ── details/summary collapsible ── */
+details > summary { user-select: none; }
+details[open] > summary span:first-child { content: '▾'; }

@@ -1,0 +1,27 @@
+{
+  "id": "lab-ansible-intermediate-02",
+  "moduleId": "module-02-templates",
+  "title": "Write a Jinja2 Configuration Template",
+  "description": "Write a Jinja2 template for an nginx config that uses variable substitution, a default filter, and a conditional block for SSL.",
+  "language": "yaml",
+  "monacoLanguage": "yaml",
+  "starterCode": "# Write a Jinja2 template as a playbook task context\n# The template content should:\n# 1. Use {{ nginx_port | default(80) }} for the listen port\n# 2. Use {{ ansible_hostname }} for server_name\n# 3. Use {% if enable_ssl %} ... {% endif %} for conditional SSL block\n# 4. Deploy with ansible.builtin.template to /etc/nginx/nginx.conf\n# 5. Notify a handler called 'Reload nginx'\n\n---\n- name: Deploy nginx configuration\n  hosts: webservers\n  become: true\n  vars:\n    nginx_port: 8080\n    enable_ssl: true\n    ssl_cert_path: /etc/ssl/certs/server.crt\n  tasks:\n    - name: Deploy nginx config from template\n      # Use ansible.builtin.template module\n      # src: nginx.conf.j2\n      # dest: /etc/nginx/nginx.conf\n      # Add notify for 'Reload nginx'\n\n  handlers:\n    - name: Reload nginx\n      # Reload (not restart) the nginx service\n",
+  "solutionCode": "---\n- name: Deploy nginx configuration\n  hosts: webservers\n  become: true\n  vars:\n    nginx_port: 8080\n    enable_ssl: true\n    ssl_cert_path: /etc/ssl/certs/server.crt\n  tasks:\n    - name: Deploy nginx config from template\n      ansible.builtin.template:\n        src: nginx.conf.j2\n        dest: /etc/nginx/nginx.conf\n        owner: root\n        mode: '0644'\n      notify: Reload nginx\n\n  handlers:\n    - name: Reload nginx\n      ansible.builtin.service:\n        name: nginx\n        state: reloaded\n",
+  "hints": [
+    "ansible.builtin.template is like copy but processes Jinja2 expressions",
+    "Use 'state: reloaded' in service handler to reload config without downtime",
+    "The src path is relative to the role's templates/ directory or playbook directory"
+  ],
+  "validationRules": [
+    {"id": "has-template-module", "type": "contains", "pattern": "ansible.builtin.template", "errorMessage": "Use ansible.builtin.template to deploy the config", "points": 30},
+    {"id": "has-notify-reload", "type": "contains", "pattern": "notify:", "errorMessage": "Add notify to trigger the handler on config change", "points": 20},
+    {"id": "has-handler", "type": "contains", "pattern": "handlers:", "errorMessage": "Add a handlers section with a Reload nginx handler", "points": 20},
+    {"id": "has-service-reload", "type": "contains", "pattern": "ansible.builtin.service", "errorMessage": "Use ansible.builtin.service in the handler", "points": 15},
+    {"id": "valid-yaml", "type": "yamlParse", "errorMessage": "YAML is invalid — check indentation", "points": 15}
+  ],
+  "simulatedOutput": {
+    "success": "PLAY [Deploy nginx configuration] **********************\n\nTASK [Gathering Facts] *********************************\nok: [web1.example.com]\n\nTASK [Deploy nginx config from template] ***************\nchanged: [web1.example.com]\n\nRUNNING HANDLER [Reload nginx] *************************\nchanged: [web1.example.com]\n\nPLAY RECAP *********************************************\nweb1.example.com : ok=3  changed=2  unreachable=0  failed=0",
+    "failure": "ERROR! Missing ansible.builtin.template, notify, or handler. Check your playbook structure."
+  },
+  "maxScore": 100
+}

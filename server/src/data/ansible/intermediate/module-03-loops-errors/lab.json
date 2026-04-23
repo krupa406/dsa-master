@@ -1,0 +1,29 @@
+{
+  "id": "lab-ansible-intermediate-03",
+  "moduleId": "module-03-loops-errors",
+  "title": "Loops and Block/Rescue Error Handling",
+  "description": "Write a playbook that uses loop to install packages, and block/rescue/always for error-safe service configuration.",
+  "language": "yaml",
+  "monacoLanguage": "yaml",
+  "starterCode": "---\n# Write a playbook that:\n# 1. Installs packages [nginx, git, curl] using a loop with ansible.builtin.package\n# 2. Uses a block/rescue/always structure to:\n#    - block: deploy a config template to /etc/nginx/nginx.conf\n#    - rescue: print 'Config deployment failed' with ansible.builtin.debug\n#    - always: ensure nginx service is started\n\n- name: Resilient web server setup\n  hosts: webservers\n  become: true\n  tasks:\n    - name: Install required packages\n      # Add loop here\n\n    # Add block/rescue/always here\n",
+  "solutionCode": "---\n- name: Resilient web server setup\n  hosts: webservers\n  become: true\n  tasks:\n    - name: Install required packages\n      ansible.builtin.package:\n        name: \"{{ item }}\"\n        state: present\n      loop:\n        - nginx\n        - git\n        - curl\n\n    - name: Configure nginx safely\n      block:\n        - name: Deploy nginx config\n          ansible.builtin.template:\n            src: nginx.conf.j2\n            dest: /etc/nginx/nginx.conf\n      rescue:\n        - name: Alert on failure\n          ansible.builtin.debug:\n            msg: 'Config deployment failed'\n      always:\n        - name: Ensure nginx is started\n          ansible.builtin.service:\n            name: nginx\n            state: started\n",
+  "hints": [
+    "Use 'loop:' with a YAML list under the package task",
+    "Reference the loop variable with '{{ item }}'",
+    "block:/rescue:/always: are at the same indentation as 'name:'",
+    "always: runs whether block succeeded or failed"
+  ],
+  "validationRules": [
+    {"id": "has-loop", "type": "contains", "pattern": "loop:", "errorMessage": "Add a 'loop:' keyword to iterate over packages", "points": 20},
+    {"id": "has-item", "type": "contains", "pattern": "{{ item }}", "errorMessage": "Use '{{ item }}' to reference the current loop item", "points": 15},
+    {"id": "has-block", "type": "contains", "pattern": "block:", "errorMessage": "Add a 'block:' section", "points": 20},
+    {"id": "has-rescue", "type": "contains", "pattern": "rescue:", "errorMessage": "Add a 'rescue:' section for error handling", "points": 20},
+    {"id": "has-always", "type": "contains", "pattern": "always:", "errorMessage": "Add an 'always:' section that runs regardless of outcome", "points": 10},
+    {"id": "valid-yaml", "type": "yamlParse", "errorMessage": "YAML is invalid — check block/rescue/always indentation", "points": 15}
+  ],
+  "simulatedOutput": {
+    "success": "PLAY [Resilient web server setup] **********************\n\nTASK [Install required packages] ***********************\nchanged: [web1] => (item=nginx)\nchanged: [web1] => (item=git)\nchanged: [web1] => (item=curl)\n\nTASK [Deploy nginx config] *****************************\nchanged: [web1]\n\nTASK [Ensure nginx is started] *************************\nok: [web1]\n\nPLAY RECAP *********************************************\nweb1 : ok=3  changed=2  unreachable=0  failed=0",
+    "failure": "ERROR! Check loop syntax, block/rescue/always structure, and YAML indentation."
+  },
+  "maxScore": 100
+}

@@ -1,0 +1,19 @@
+{
+  "id": "module-02-configmaps",
+  "title": "ConfigMaps and Secrets",
+  "slug": "configmaps",
+  "order": 2,
+  "estimatedMinutes": 35,
+  "learningObjectives": [
+    "Create and use ConfigMaps for application configuration",
+    "Use Secrets for sensitive data with proper security practices",
+    "Mount ConfigMaps and Secrets as volumes or environment variables",
+    "Understand Secret types and encryption at rest"
+  ],
+  "theory": {
+    "format": "html",
+    "content": "<h2>ConfigMaps</h2><p>ConfigMaps store non-sensitive configuration data as key-value pairs. They decouple configuration from container images.</p><figure class=\"diagram-block\"><div class=\"mermaid\">flowchart TD\n  CM[\"ConfigMap\nnginx.conf: |\n  worker_processes auto;\"]\n  SEC[\"Secret\ntype: Opaque\ndb-password: base64...\"]\n  subgraph POD [\"Pod\"]\n    ENV[\"Env Variable\nDB_PASSWORD=decrypted\"]\n    VMNT[\"Volume Mount\n/etc/nginx/nginx.conf\"]\n    CONT[\"Container\n(app process)\"]\n  end\n  CM -->|\"volumeMount\"| VMNT\n  SEC -->|\"env.valueFrom.secretKeyRef\"| ENV\n  CM -->|\"env.valueFrom.configMapKeyRef\"| ENV\n  VMNT --> CONT\n  ENV --> CONT\n  style CM fill:#1e293b,stroke:#475569,color:#e2e8f0\n  style SEC fill:#3a1e1e,stroke:#ef4444,color:#fca5a5\n  style CONT fill:#1e3a5f,stroke:#3b82f6,color:#93c5fd</div><figcaption>ConfigMap and Secret injection paths — both can be injected as environment variables or mounted as files. Secrets should be used for sensitive data (passwords, tokens, keys).</figcaption></figure><pre><code>apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: app-config\ndata:\n  LOG_LEVEL: \"info\"\n  DATABASE_URL: \"postgres://db:5432/myapp\"\n  config.yaml: |\n    server:\n      port: 8080\n      timeout: 30s</code></pre><h2>Using ConfigMaps</h2><pre><code># As environment variables\nspec:\n  containers:\n    - name: app\n      envFrom:\n        - configMapRef:\n            name: app-config\n      env:\n        - name: LOG_LEVEL\n          valueFrom:\n            configMapKeyRef:\n              name: app-config\n              key: LOG_LEVEL\n\n# As a volume (files)\n      volumeMounts:\n        - name: config-volume\n          mountPath: /etc/config\n  volumes:\n    - name: config-volume\n      configMap:\n        name: app-config</code></pre><h2>Secrets</h2><p>Secrets store sensitive data (passwords, tokens, keys). Data is base64-encoded — NOT encrypted by default. Enable encryption at rest in the API server for real security.</p><pre><code>apiVersion: v1\nkind: Secret\nmetadata:\n  name: db-credentials\ntype: Opaque\nstringData:              # Plain text (auto-encoded)\n  username: admin\n  password: \"S3cr3tP@ss\"\n</code></pre><h2>Secret Types</h2><ul><li><code>Opaque</code>: Generic key-value pairs</li><li><code>kubernetes.io/tls</code>: TLS certificates (tls.crt, tls.key)</li><li><code>kubernetes.io/service-account-token</code>: Service account tokens</li><li><code>kubernetes.io/dockerconfigjson</code>: Docker registry credentials</li></ul><h2>Best Practices</h2><ul><li>Enable encryption at rest in etcd</li><li>Use external secret managers (AWS Secrets Manager, Vault) with Kubernetes External Secrets Operator</li><li>Set RBAC to restrict Secret access</li><li>Never commit Secret values to Git</li></ul><p><a href='https://kubernetes.io/docs/concepts/configuration/configmap/' target='_blank'>ConfigMaps Documentation →</a></p>"
+  },
+  "prerequisites": ["module-01-services"],
+  "tags": ["configmaps", "secrets", "environment-variables", "volumes", "security"]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "lab-terraform-beginner-01",
+  "moduleId": "module-01-hcl-basics",
+  "title": "Write Your First Terraform Configuration",
+  "description": "Write a Terraform configuration with a variable, local, and output block following HCL syntax.",
+  "language": "hcl",
+  "monacoLanguage": "hcl",
+  "starterCode": "# Write a Terraform configuration that:\n# 1. Declares a variable 'environment' of type string with default 'dev'\n#    Add a validation block ensuring it's one of: dev, staging, prod\n# 2. Declares a local 'app_name' combining \"myapp-\" with var.environment\n# 3. Outputs 'full_app_name' showing the local value\n\n# Variable block\n\n# Locals block\n\n# Output block\n",
+  "solutionCode": "variable \"environment\" {\n  type        = string\n  description = \"Deployment environment\"\n  default     = \"dev\"\n  validation {\n    condition     = contains([\"dev\", \"staging\", \"prod\"], var.environment)\n    error_message = \"Environment must be dev, staging, or prod.\"\n  }\n}\n\nlocals {\n  app_name = \"myapp-${var.environment}\"\n}\n\noutput \"full_app_name\" {\n  value       = local.app_name\n  description = \"Full application name with environment suffix\"\n}\n",
+  "hints": [
+    "Variables use 'variable \"name\" { ... }' block syntax",
+    "Locals use 'locals { key = value }' — note it's 'locals' (plural) not 'local'",
+    "String interpolation: \"prefix-${var.name}\"",
+    "Validation block goes inside the variable block with condition and error_message"
+  ],
+  "validationRules": [
+    {"id": "has-variable", "type": "contains", "pattern": "variable \"environment\"", "errorMessage": "Declare a variable block named 'environment'", "points": 20},
+    {"id": "has-validation", "type": "contains", "pattern": "validation {", "errorMessage": "Add a validation block inside the variable", "points": 20},
+    {"id": "has-locals", "type": "contains", "pattern": "locals {", "errorMessage": "Add a locals block", "points": 20},
+    {"id": "has-output", "type": "contains", "pattern": "output \"full_app_name\"", "errorMessage": "Declare an output named 'full_app_name'", "points": 20},
+    {"id": "has-interpolation", "type": "contains", "pattern": "var.environment", "errorMessage": "Reference the variable with var.environment", "points": 20}
+  ],
+  "simulatedOutput": {
+    "success": "Terraform configuration valid!\n\nVariables:\n  environment: string (default: \"dev\", validated)\n\nLocals:\n  app_name = \"myapp-dev\"\n\nOutputs:\n  full_app_name = \"myapp-dev\"\n\nRun 'terraform plan' to see infrastructure changes.",
+    "failure": "HCL validation failed. Check variable block syntax, validation block, locals, and output block."
+  },
+  "maxScore": 100
+}

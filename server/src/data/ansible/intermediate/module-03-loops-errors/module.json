@@ -1,0 +1,19 @@
+{
+  "id": "module-03-loops-errors",
+  "title": "Loops and Error Handling",
+  "slug": "loops-errors",
+  "order": 3,
+  "estimatedMinutes": 40,
+  "learningObjectives": [
+    "Use loop and with_items to iterate over lists and dicts",
+    "Handle task failures with ignore_errors, block/rescue/always",
+    "Use failed_when and changed_when to customize task status",
+    "Implement retry logic with retries and delay"
+  ],
+  "theory": {
+    "format": "html",
+    "content": "<h2>Loops</h2><p>Ansible's <code>loop</code> keyword (preferred over legacy <code>with_items</code>) iterates a task over a list. The current item is available as <code>item</code>.</p><figure class=\"diagram-block\"><div class=\"mermaid\">flowchart TD\n  T[\"Task Executes\"]\n  F{Task Failed?}\n  IE[\"ignore_errors: true\nPlay continues normally\"]\n  FW[\"failed_when: condition\nCustom failure logic\"]\n  BL[\"block:\n  - task_a\n  - task_b\"]\n  RS[\"rescue:\nRun on any block failure\"]\n  AL[\"always:\nAlways runs regardless\"]\n  OK[\"✅ ok / changed\nContinue to next task\"]\n  T --> F\n  F -->|no| OK\n  F -->|yes + ignore_errors| IE\n  F -->|yes, in block| RS\n  F -->|yes + failed_when| FW\n  BL --> RS --> AL\n  style OK fill:#1e3a2f,stroke:#22c55e,color:#86efac\n  style RS fill:#3a1e1e,stroke:#ef4444,color:#fca5a5\n  style AL fill:#1e293b,stroke:#475569,color:#e2e8f0</div><figcaption>Ansible error handling decision tree — multiple strategies available: ignore_errors, failed_when conditions, and block/rescue/always for structured error recovery.</figcaption></figure><pre><code>- name: Install multiple packages\n  ansible.builtin.package:\n    name: \"{{ item }}\"\n    state: present\n  loop:\n    - nginx\n    - git\n    - curl\n\n# Loop over dicts\n- name: Create users\n  ansible.builtin.user:\n    name: \"{{ item.name }}\"\n    groups: \"{{ item.groups }}\"\n  loop:\n    - { name: alice, groups: sudo }\n    - { name: bob, groups: developers }</code></pre><h2>Loop Control</h2><pre><code>- name: Process items with label\n  ansible.builtin.debug:\n    msg: \"Processing {{ item.name }}\"\n  loop: \"{{ user_list }}\"\n  loop_control:\n    label: \"{{ item.name }}\"  # cleaner output\n    pause: 1                   # pause between iterations</code></pre><h2>Error Handling — ignore_errors</h2><pre><code>- name: Try to stop service (may not exist)\n  ansible.builtin.service:\n    name: old-service\n    state: stopped\n  ignore_errors: true</code></pre><h2>block / rescue / always</h2><pre><code>- name: Install and configure app\n  block:\n    - name: Install app\n      ansible.builtin.package:\n        name: myapp\n        state: present\n    - name: Configure app\n      ansible.builtin.template:\n        src: app.conf.j2\n        dest: /etc/myapp/app.conf\n  rescue:\n    - name: Send failure alert\n      ansible.builtin.debug:\n        msg: \"Installation failed!\"\n  always:\n    - name: Clean up temp files\n      ansible.builtin.file:\n        path: /tmp/install\n        state: absent</code></pre><h2>failed_when and changed_when</h2><pre><code>- name: Run script\n  ansible.builtin.command: /opt/check.sh\n  register: result\n  failed_when: result.rc != 0 and 'not found' not in result.stderr\n  changed_when: result.stdout != 'no changes'</code></pre><h2>Retries</h2><pre><code>- name: Wait for service to start\n  ansible.builtin.uri:\n    url: http://localhost:8080/health\n  register: result\n  until: result.status == 200\n  retries: 10\n  delay: 5</code></pre><p><a href='https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_loops.html' target='_blank'>Loops Documentation →</a></p>"
+  },
+  "prerequisites": ["module-02-templates"],
+  "tags": ["loops", "error-handling", "block", "rescue", "retries", "failed_when"]
+}

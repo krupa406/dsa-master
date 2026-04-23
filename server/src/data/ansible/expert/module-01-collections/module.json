@@ -1,0 +1,19 @@
+{
+  "id": "module-01-collections",
+  "title": "Ansible Collections",
+  "slug": "collections",
+  "order": 1,
+  "estimatedMinutes": 45,
+  "learningObjectives": [
+    "Understand the Ansible Collection format and namespace structure",
+    "Install and use collections from Ansible Galaxy and private hubs",
+    "Build a custom collection with modules and roles",
+    "Manage collection versions in requirements.yml"
+  ],
+  "theory": {
+    "format": "html",
+    "content": "<h2>What are Collections?</h2><p>Ansible Collections are a distribution format that packages modules, plugins, roles, and playbooks together. Introduced as a stable feature in Ansible 2.9, collections are the future of content distribution, replacing the monolithic Ansible package.</p><figure class=\"diagram-block\"><div class=\"mermaid\">flowchart TD\n  NS[\"namespace/\n(e.g. community, amazon, cisco)\"]\n  COLL[\"collection_name/\n(e.g. general, aws, ios)\"]\n  PLUG[\"plugins/\nmodules, lookup, filter, callback\"]\n  ROLES[\"roles/\nreusable task sets\"]\n  PLAYS[\"playbooks/\nstandalone plays\"]\n  DOCS[\"docs/\nRST documentation\"]\n  META[\"galaxy.yml\nname, version, deps\"]\n  NS --> COLL\n  COLL --> PLUG\n  COLL --> ROLES\n  COLL --> PLAYS\n  COLL --> DOCS\n  COLL --> META\n  style NS fill:#1e293b,stroke:#3b82f6,color:#93c5fd\n  style PLUG fill:#2d1e3a,stroke:#a78bfa,color:#c4b5fd</div><figcaption>Ansible Collection structure — the standard distribution format that bundles modules, roles, and playbooks under a namespace.collection naming convention.</figcaption></figure><h2>Collection Namespace</h2><p>Collections use a <code>namespace.collection</code> naming convention. For example, <code>community.general</code> or <code>amazon.aws</code>. Modules within are referenced as <code>namespace.collection.module</code>.</p><h2>Installing Collections</h2><pre><code># Install from Galaxy\nansible-galaxy collection install community.general\n\n# Install specific version\nansible-galaxy collection install amazon.aws:==6.0.0\n\n# Install from requirements.yml\nansible-galaxy collection install -r requirements.yml</code></pre><h2>requirements.yml for Collections</h2><pre><code>collections:\n  - name: community.general\n    version: '>=7.0.0'\n  - name: amazon.aws\n    version: '6.0.0'\n  - name: my_namespace.my_collection\n    source: https://my.automation.hub/\n    type: galaxy</code></pre><h2>Collection Directory Structure</h2><pre><code>my_namespace/my_collection/\n  galaxy.yml           # Collection metadata\n  README.md\n  plugins/\n    modules/\n      my_module.py\n    inventory/\n    lookup/\n  roles/\n    my_role/\n  playbooks/\n  docs/\n  tests/</code></pre><h2>Building and Publishing</h2><pre><code># Build a collection tarball\nansible-galaxy collection build\n\n# Publish to Galaxy\nansible-galaxy collection publish my_namespace-my_collection-1.0.0.tar.gz \\\n  --api-key=YOUR_TOKEN</code></pre><h2>Using Collection Content</h2><pre><code>---\n- name: Use community.general collection\n  hosts: all\n  tasks:\n    - name: Manage systemd service\n      community.general.supervisorctl:\n        name: myapp\n        state: started\n\n    - name: Use lookup plugin from collection\n      ansible.builtin.debug:\n        msg: \"{{ lookup('community.general.random_string', length=16) }}\"</code></pre><p><a href='https://docs.ansible.com/ansible/latest/collections_guide/index.html' target='_blank'>Collections Guide →</a></p>"
+  },
+  "prerequisites": [],
+  "tags": ["collections", "galaxy", "namespaces", "custom-modules", "distribution"]
+}

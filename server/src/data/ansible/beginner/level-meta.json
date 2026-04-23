@@ -1,0 +1,8 @@
+{
+  "id": "beginner",
+  "tech": "ansible",
+  "displayName": "Beginner",
+  "description": "Learn Ansible fundamentals: architecture, inventory, ad-hoc commands, and writing your first playbook.",
+  "estimatedHours": 4,
+  "moduleOrder": ["module-01-introduction", "module-02-inventory", "module-03-playbooks"]
+}
