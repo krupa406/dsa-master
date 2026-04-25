@@ -1,6 +1,6 @@
 # DevLearn — Interactive DevOps Learning Platform
 
-An interactive, self-hosted web application for learning **Ansible**, **Terraform**, and **Kubernetes** through structured modules, hands-on in-browser labs, and auto-graded quizzes with official-documentation citations.
+An interactive, self-hosted web application for learning **Ansible**, **Terraform**, **Kubernetes**, and **Git** through structured modules, hands-on in-browser labs, and auto-graded quizzes with official-documentation citations.
 
 ---
 
@@ -11,8 +11,9 @@ An interactive, self-hosted web application for learning **Ansible**, **Terrafor
 | Ansible    | ansible-core 2.19 | Beginner · Intermediate · Expert | 9 | 9 | 90 |
 | Terraform  | 1.13 | Beginner · Intermediate · Expert | 9 | 9 | 90 |
 | Kubernetes | 1.35 ("Timbernetes") | Beginner · Intermediate · Expert | 9 | 9 | 90 |
+| Git        | 2.49 | Beginner · Intermediate · Expert | 9 | 9 | 90 |
 
-**27 modules · 27 interactive labs · 270 quiz questions** — all content targets the current N-1 release of each tool.
+**36 modules · 36 interactive labs · 360 quiz questions** — all content targets the current N-1 release of each tool.
 
 ---
 
@@ -33,7 +34,7 @@ An interactive, self-hosted web application for learning **Ansible**, **Terrafor
 ### Technical Highlights
 - **Agentless quiz grading** — `correctOptionId` is never sent to the client; answers are verified server-side
 - **Per-question answer endpoint** — `/quiz/answer` returns `correct`, `correctOption`, `explanation`, and `citations` immediately after each answer, enabling real-time feedback without revealing answers upfront
-- **Tech-specific accent colours** — Ansible red, Terraform purple, Kubernetes blue throughout the UI
+- **Tech-specific accent colours** — Ansible red, Terraform purple, Kubernetes blue, Git orange throughout the UI
 - **Animated transitions** — `animate-fadeIn` / `animate-slideUp` on question cards and explanations
 - **Version-specific content** — each introductory module covers new features and deprecations in the exact N-1 release
 
@@ -109,7 +110,8 @@ An interactive, self-hosted web application for learning **Ansible**, **Terrafor
             │   │       ├── lab.json      # starter/solution code, validation rules
             │   │       └── quiz.json     # 10 questions with citations
             ├── terraform/     # same structure
-            └── kubernetes/    # same structure
+            ├── kubernetes/    # same structure
+            └── git/           # same structure
 ```
 
 ---
@@ -163,7 +165,7 @@ All endpoints are prefixed with `/api`.
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/technologies` | List all 3 technologies |
+| GET | `/technologies` | List all 4 technologies |
 | GET | `/technologies/:tech` | Technology metadata |
 | GET | `/technologies/:tech/levels` | All levels for a technology |
 | GET | `/technologies/:tech/levels/:level` | Level metadata |
@@ -181,19 +183,34 @@ All endpoints are prefixed with `/api`.
 
 ### Technologies and Versions
 
-| Technology | N-1 Version | Codename / Notes |
-|------------|------------|------------------|
+| Technology | N-1 Version | Key Features Covered |
+|------------|------------|----------------------|
 | Ansible | ansible-core **2.19** | Data Tagging, Windows Server 2025 support |
 | Terraform | **1.13** | Stacks GA, rpcapi GA |
 | Kubernetes | **1.35** | "Timbernetes" — Image Volumes GA, IPVS deprecated |
+| Git | **2.49** | reftable backend, `git refs` command, `git bundle --stdin`, `git maintenance` |
 
 ### Curriculum Map
 
 ```
 Beginner     → Core concepts, installation, first commands/configs
-Intermediate → Advanced patterns, multi-environment, error handling, roles/modules
-Expert       → Production patterns, performance, security, CI/CD, GitOps, operators
+Intermediate → Advanced patterns, error handling, hooks, roles/modules
+Expert       → Internals, production patterns, CI/CD, GitOps, workflows
 ```
+
+### Git Curriculum (9 modules)
+
+| Level | Module | Topics |
+|-------|--------|--------|
+| Beginner | Git Fundamentals | 3 areas, init/add/commit/log, SHA-1, Git 2.49 features |
+| Beginner | Branching & Merging | Branches as pointers, HEAD, fast-forward vs 3-way merge, conflict resolution |
+| Beginner | Working with Remotes | origin, fetch vs pull, push -u, tracking branches, SSH vs HTTPS |
+| Intermediate | Rebasing & History | Rebase vs merge, interactive rebase (-i), squash/fixup, golden rule |
+| Intermediate | Stash, Cherry-pick & Tags | Stash stack, cherry-pick for backports, lightweight vs annotated tags |
+| Intermediate | Hooks, Config & Aliases | Config scopes, aliases, pre-commit/commit-msg hooks, .gitignore |
+| Expert | Git Internals | 4 object types, plumbing commands, reftable backend, packfiles |
+| Expert | Advanced Tools | bisect (O(log n)), reflog recovery, worktrees, submodules, bundle |
+| Expert | Workflows & CI/CD | GitFlow vs trunk-based, conventional commits, GPG/SSH signing, GitHub Actions |
 
 Each module contains:
 - **Theory** — HTML with embedded Mermaid diagrams, tables, and code examples
@@ -231,6 +248,7 @@ Every quiz question cites one or more official documentation pages:
 - **Ansible** — https://docs.ansible.com/ansible/latest/
 - **Terraform** — https://developer.hashicorp.com/terraform/docs
 - **Kubernetes** — https://kubernetes.io/docs/
+- **Git** — https://git-scm.com/docs and https://git-scm.com/book/en/v2
 
 ---
 
