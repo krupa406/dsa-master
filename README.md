@@ -20,7 +20,7 @@ An interactive, self-hosted web application for learning **Ansible**, **Terrafor
 ## Features
 
 ### Learning Experience
-- **Structured curriculum** — 3 technologies × 3 difficulty levels × 3 modules per level
+- **Structured curriculum** — 4 technologies × 3 difficulty levels × 3 modules per level
 - **Theory panels** — rich HTML content with typography optimised for reading
 - **Architecture diagrams** — every module includes a Mermaid.js flowchart or sequence diagram illustrating the key concept (based on Mayer's Multimedia Learning / dual-coding theory)
 - **Syntax-highlighted code** — all code examples rendered with highlight.js (GitHub Dark theme)

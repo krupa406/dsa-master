@@ -69,7 +69,7 @@
         {"id": "d", "text": "A dedicated Ansible server separate from control and managed nodes"}
       ],
       "correctOptionId": "b",
-      "explanation": "Ansible only needs to be installed on the control node — the machine from which you run Ansible commands. Managed nodes only need Python (2.7+ or 3.5+) and SSH access. No Ansible installation is needed on them.",
+      "explanation": "Ansible only needs to be installed on the control node — the machine from which you run Ansible commands. Managed nodes only need Python 3.8+ (required by ansible-core 2.19) and SSH access. No Ansible installation is needed on them.",
       "citations": [
         {"label": "Control node requirements", "url": "https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#control-node-requirements"}
       ],
