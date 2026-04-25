@@ -476,7 +476,7 @@ if _fail == 0:
                 'question': 'What is the output of "banana".count("an")?',
                 'options': ['1', '2', '3', '4'],
                 'answer': 1,
-                'explanation': '"banana" contains "an" at positions 1 and 3: b[an]an[a] — wait, "an" appears at index 1 ("an") and index 3 ("an"). Count = 2.'
+                'explanation': '"banana" contains "an" at positions 1 and 3: b[an][an]a. Count = 2.'
             },
             {
                 'question': 'Which method removes whitespace from BOTH ends of a string?',
@@ -2637,7 +2637,7 @@ def knapsack(weights, values, capacity):
 
 weights = [2, 3, 4, 5]
 values  = [3, 4, 5, 6]
-print(knapsack(weights, values, 8))  # 10  (items 1+3: weight 2+4, value 3+5... actually 10 = items w=3+5, v=4+6)
+print(knapsack(weights, values, 8))  # 10  (items with weight 3+5=8 and value 4+6=10)
 </code></pre>
 
 <h3>DP Complexity Summary</h3>
