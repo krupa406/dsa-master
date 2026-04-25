@@ -1157,7 +1157,7 @@ if _fail == 0:
   <ul>
     <li><strong>Root</strong>: The topmost node (has no parent)</li>
     <li><strong>Leaf</strong>: A node with no children</li>
-    <li><strong>Height</strong>: Longest path from root to a leaf</li>
+    <li><strong>Height</strong>: Number of nodes on the longest path from root to a leaf (a root-only tree has height 1; an empty tree has height 0)</li>
     <li><strong>Parent/Child</strong>: Nodes directly connected above/below</li>
   </ul>
 </div>
@@ -1809,12 +1809,13 @@ def insertion_sort(arr):
 <h3>Comparison</h3>
 <table class="complexity-table">
   <tr><th>Algorithm</th><th>Best</th><th>Average</th><th>Worst</th><th>Stable?</th></tr>
-  <tr><td>Bubble Sort</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>Yes ✅</td></tr>
+  <tr><td>Bubble Sort</td><td>O(n)*</td><td>O(n²)</td><td>O(n²)</td><td>Yes ✅</td></tr>
   <tr><td>Selection Sort</td><td>O(n²)</td><td>O(n²)</td><td>O(n²)</td><td>No ❌</td></tr>
   <tr><td>Insertion Sort</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>Yes ✅</td></tr>
   <tr><td>Python's sort()</td><td>O(n)</td><td>O(n log n)</td><td>O(n log n)</td><td>Yes ✅</td></tr>
 </table>
-<p><small>Stable = equal elements maintain their original order</small></p>
+<p><small>Stable = equal elements maintain their original order.<br>
+* Bubble sort achieves O(n) best-case <em>only</em> with an early-exit <code>swapped</code> flag — without it, every pass always runs and the best-case is also O(n²).</small></p>
 """,
         'labs': [
             {
@@ -1827,6 +1828,8 @@ def insertion_sort(arr):
     n = len(arr)
     # Outer loop: n passes total
     # Inner loop: compare adjacent elements and swap if needed
+    # Tip: use a 'swapped' flag to exit early when no swaps occurred —
+    #      this gives O(n) best-case on an already-sorted input.
     pass
 
 # Test
@@ -2448,7 +2451,7 @@ def _test(name, got, expected):
 _pass = _fail = 0
 
 print("Testing num_islands:")
-_test("1 big island", num_islands([
+_test("1 large island + 1 isolated cell = 2 islands", num_islands([
     ["1","1","1"],
     ["1","1","0"],
     ["0","0","1"],
@@ -3082,8 +3085,8 @@ if _fail == 0:
             {
                 'question': 'You need the 5 largest elements from a list of 1,000,000 numbers. Which approach is most efficient?',
                 'options': ['Sort the list and take the last 5: O(n log n)', 'Use a min-heap of size 5: O(n log 5) ≈ O(n)', 'Linear scan keeping 5 maximums: O(n)', 'Both B and C are equally optimal'],
-                'answer': 3,
-                'explanation': 'Both a size-k min-heap and a linear scan tracking k maximums are O(n) for fixed k. The heap approach (heapq.nlargest) is generally preferred in practice as it is clean and handles ties well. Sorting is O(n log n) — wasteful when you only need the top few.'
+                'answer': 1,
+                'explanation': 'A size-k min-heap is the right tool here. It runs in O(n log k) — effectively O(n) when k is fixed and small — and scales cleanly to any k. A manual linear scan is also O(n) for fixed k, but it is tedious to implement correctly for arbitrary k and does not generalise. Python\'s heapq.nlargest uses exactly this heap approach. Sorting the entire list is O(n log n) and wastes work when you only need the top few elements.'
             },
             {
                 'question': 'In the "median of a data stream" problem, why are TWO heaps used instead of one?',
