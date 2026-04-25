@@ -19,6 +19,17 @@
         </div>
       </div>
     </div>
+
+    <!-- Level Tabs -->
+    <div class="level-tabs">
+      {% for lvl, label, emoji in [('beginner','Beginner','🟢'), ('intermediate','Intermediate','🟡'), ('advanced','Advanced','🔴')] %}
+      <a href="/module/{{ module.id }}?level={{ lvl }}"
+         class="level-tab {% if level == lvl %}active{% endif %}"
+         style="{% if level == lvl %}background: {{ module.color }}; border-color: {{ module.color }};{% endif %}">
+        {{ emoji }} {{ label }}
+      </a>
+      {% endfor %}
+    </div>
   </div>
 
   <div class="module-layout">
@@ -26,15 +37,15 @@
     <!-- Sidebar -->
     <aside class="module-sidebar">
       <div class="sidebar-section">
-        <div class="sidebar-label">This Module</div>
-        <a href="/module/{{ module.id }}" class="sidebar-link active">📖 Theory</a>
-        {% for lab in module.labs %}
-        <a href="/lab/{{ module.id }}/{{ lab.id }}" class="sidebar-link">
+        <div class="sidebar-label">{{ level | capitalize }} Level</div>
+        <a href="/module/{{ module.id }}?level={{ level }}" class="sidebar-link active">📖 Theory</a>
+        {% for lab in level_data.labs %}
+        <a href="/lab/{{ module.id }}/{{ lab.id }}?level={{ level }}" class="sidebar-link">
           {% if labs_status[lab.id] %}✅{% else %}🧪{% endif %}
           Lab {{ loop.index }}: {{ lab.title }}
         </a>
         {% endfor %}
-        <a href="/quiz/{{ module.id }}" class="sidebar-link">
+        <a href="/quiz/{{ module.id }}?level={{ level }}" class="sidebar-link">
           {% if quiz_score is not none %}
             {% if quiz_score >= 80 %}✅{% else %}🔄{% endif %}
           {% else %}📝{% endif %}
@@ -46,10 +57,10 @@
       <div class="sidebar-section">
         <div class="sidebar-label">Navigation</div>
         {% if prev_module %}
-        <a href="/module/{{ prev_module.id }}" class="sidebar-link">← {{ prev_module.icon }} {{ prev_module.title }}</a>
+        <a href="/module/{{ prev_module.id }}?level={{ level }}" class="sidebar-link">← {{ prev_module.icon }} {{ prev_module.title }}</a>
         {% endif %}
         {% if next_module %}
-        <a href="/module/{{ next_module.id }}" class="sidebar-link">{{ next_module.icon }} {{ next_module.title }} →</a>
+        <a href="/module/{{ next_module.id }}?level={{ level }}" class="sidebar-link">{{ next_module.icon }} {{ next_module.title }} →</a>
         {% endif %}
       </div>
     </aside>
@@ -57,7 +68,7 @@
     <!-- Main content -->
     <main class="module-content">
       <div class="theory-content">
-        {{ module.content | safe }}
+        {{ level_data.content | safe }}
       </div>
 
       <!-- Sandbox -->
@@ -87,10 +98,10 @@ print("Length:  ", len(numbers))
 
       <!-- Labs summary -->
       <div class="labs-summary">
-        <h3>🧪 Labs for this Module</h3>
+        <h3>🧪 Labs for this Module — {{ level | capitalize }}</h3>
         <div class="labs-grid">
-          {% for lab in module.labs %}
-          <a href="/lab/{{ module.id }}/{{ lab.id }}" class="lab-card {% if labs_status[lab.id] %}lab-done{% endif %}">
+          {% for lab in level_data.labs %}
+          <a href="/lab/{{ module.id }}/{{ lab.id }}?level={{ level }}" class="lab-card {% if labs_status[lab.id] %}lab-done{% endif %}">
             <div class="lab-card-top">
               <span class="lab-num">Lab {{ loop.index }}</span>
               {% if labs_status[lab.id] %}<span class="lab-check">✅ Completed</span>{% endif %}
@@ -107,9 +118,9 @@ print("Length:  ", len(numbers))
       <div class="quiz-cta-banner" style="border-color: {{ module.color }}">
         <div class="quiz-cta-text">
           <h3>📝 Test Your Knowledge</h3>
-          <p>Ready to check what you've learned? Take the {{ module.title }} quiz.</p>
+          <p>Ready to check what you've learned? Take the {{ module.title }} {{ level }} quiz.</p>
         </div>
-        <a href="/quiz/{{ module.id }}" class="btn btn-primary" style="background: {{ module.color }}">
+        <a href="/quiz/{{ module.id }}?level={{ level }}" class="btn btn-primary" style="background: {{ module.color }}">
           {% if quiz_score is not none %}Retake Quiz (Best: {{ quiz_score }}%){% else %}Take Quiz{% endif %}
         </a>
       </div>
@@ -117,10 +128,10 @@ print("Length:  ", len(numbers))
       <!-- Nav -->
       <div class="page-nav">
         {% if prev_module %}
-        <a href="/module/{{ prev_module.id }}" class="btn btn-outline">← {{ prev_module.icon }} {{ prev_module.title }}</a>
+        <a href="/module/{{ prev_module.id }}?level={{ level }}" class="btn btn-outline">← {{ prev_module.icon }} {{ prev_module.title }}</a>
         {% else %}<span></span>{% endif %}
         {% if next_module %}
-        <a href="/module/{{ next_module.id }}" class="btn btn-outline">{{ next_module.icon }} {{ next_module.title }} →</a>
+        <a href="/module/{{ next_module.id }}?level={{ level }}" class="btn btn-outline">{{ next_module.icon }} {{ next_module.title }} →</a>
         {% endif %}
       </div>
     </main>

@@ -112,26 +112,45 @@ def get_module(module_id):
     return None
 
 
+VALID_LEVELS = ('beginner', 'intermediate', 'advanced')
+
+
+def get_level():
+    """Read ?level= query param, defaulting to 'beginner'."""
+    level = request.args.get('level', 'beginner').lower()
+    return level if level in VALID_LEVELS else 'beginner'
+
+
 @app.route('/')
 def index():
     progress = get_progress()
     modules_with_status = []
     for m in MODULES:
         mid = str(m['id'])
+        # Count completed labs across ALL levels for the dashboard summary
         labs_done = sum(
-            1 for lab in m['labs']
-            if f"{mid}_{lab['id']}" in progress['labs_completed']
+            1 for key in progress['labs_completed']
+            if key.startswith(f"{mid}_")
         )
-        quiz_score = progress['quiz_scores'].get(mid)
+        # Best quiz score across all levels
+        best_score = None
+        for lvl in VALID_LEVELS:
+            s = progress['quiz_scores'].get(f"{mid}_{lvl}")
+            if s is not None:
+                best_score = max(best_score, s) if best_score is not None else s
+        total_labs = sum(len(m['levels'][lvl]['labs']) for lvl in VALID_LEVELS)
         modules_with_status.append({
             **m,
             'visited': m['id'] in progress['modules_visited'],
             'labs_done': labs_done,
-            'total_labs': len(m['labs']),
-            'quiz_score': quiz_score,
+            'total_labs': total_labs,
+            'quiz_score': best_score,
             'content': None,
         })
-    total_labs = sum(len(m['labs']) for m in MODULES)
+    total_labs = sum(
+        len(m['levels'][lvl]['labs'])
+        for m in MODULES for lvl in VALID_LEVELS
+    )
     completed_labs = len(progress['labs_completed'])
     completed_quizzes = len(progress['quiz_scores'])
     return render_template(
@@ -149,6 +168,7 @@ def module_page(module_id):
     m = get_module(module_id)
     if not m:
         return 'Module not found', 404
+    level = get_level()
     progress = get_progress()
     if module_id not in progress['modules_visited']:
         user_id = get_user_id()
@@ -158,16 +178,19 @@ def module_page(module_id):
                 (user_id, module_id)
             )
     mid = str(module_id)
+    level_data = m['levels'][level]
     labs_status = {
-        lab['id']: f"{mid}_{lab['id']}" in progress['labs_completed']
-        for lab in m['labs']
+        lab['id']: f"{mid}_{level}_{lab['id']}" in progress['labs_completed']
+        for lab in level_data['labs']
     }
-    quiz_score = progress['quiz_scores'].get(mid)
+    quiz_score = progress['quiz_scores'].get(f"{mid}_{level}")
     prev_module = get_module(module_id - 1)
     next_module = get_module(module_id + 1)
     return render_template(
         'module.html',
         module=m,
+        level=level,
+        level_data=level_data,
         labs_status=labs_status,
         quiz_score=quiz_score,
         prev_module=prev_module,
@@ -180,21 +203,24 @@ def lab_page(module_id, lab_id):
     m = get_module(module_id)
     if not m:
         return 'Module not found', 404
-    lab = next((l for l in m['labs'] if l['id'] == lab_id), None)
+    level = get_level()
+    level_data = m['levels'][level]
+    lab = next((l for l in level_data['labs'] if l['id'] == lab_id), None)
     if not lab:
         return 'Lab not found', 404
     progress = get_progress()
-    lab_key = f"{module_id}_{lab_id}"
+    lab_key = f"{module_id}_{level}_{lab_id}"
     is_completed = lab_key in progress['labs_completed']
-    lab_idx = next(i for i, l in enumerate(m['labs']) if l['id'] == lab_id)
-    prev_lab = m['labs'][lab_idx - 1] if lab_idx > 0 else None
-    next_lab = m['labs'][lab_idx + 1] if lab_idx < len(m['labs']) - 1 else None
+    lab_idx = next(i for i, l in enumerate(level_data['labs']) if l['id'] == lab_id)
+    prev_lab = level_data['labs'][lab_idx - 1] if lab_idx > 0 else None
+    next_lab = level_data['labs'][lab_idx + 1] if lab_idx < len(level_data['labs']) - 1 else None
     return render_template(
         'lab.html',
         module=m,
         lab=lab,
+        level=level,
         lab_number=lab_idx + 1,
-        total_labs=len(m['labs']),
+        total_labs=len(level_data['labs']),
         is_completed=is_completed,
         prev_lab=prev_lab,
         next_lab=next_lab,
@@ -206,13 +232,17 @@ def quiz_page(module_id):
     m = get_module(module_id)
     if not m:
         return 'Module not found', 404
+    level = get_level()
+    level_data = m['levels'][level]
     progress = get_progress()
-    quiz_score = progress['quiz_scores'].get(str(module_id))
+    quiz_score = progress['quiz_scores'].get(f"{module_id}_{level}")
     prev_module = get_module(module_id - 1)
     next_module = get_module(module_id + 1)
     return render_template(
         'quiz.html',
         module=m,
+        level=level,
+        level_data=level_data,
         quiz_score=quiz_score,
         prev_module=prev_module,
         next_module=next_module,
@@ -248,10 +278,13 @@ def complete_lab():
     data = request.get_json()
     module_id = data.get('module_id')
     lab_id = data.get('lab_id')
+    level = data.get('level', 'beginner')
+    if level not in VALID_LEVELS:
+        level = 'beginner'
     if not module_id or not lab_id:
         return jsonify({'error': 'Missing module_id or lab_id'}), 400
     user_id = get_user_id()
-    lab_key = f"{module_id}_{lab_id}"
+    lab_key = f"{module_id}_{level}_{lab_id}"
     with sqlite3.connect(get_db_path()) as conn:
         conn.execute(
             'INSERT OR IGNORE INTO labs_completed (user_id, lab_key) VALUES (?, ?)',
@@ -264,11 +297,14 @@ def complete_lab():
 def submit_quiz():
     data = request.get_json()
     module_id = data.get('module_id')
+    level = data.get('level', 'beginner')
+    if level not in VALID_LEVELS:
+        level = 'beginner'
     answers = data.get('answers', {})
     m = get_module(int(module_id))
     if not m:
         return jsonify({'error': 'Module not found'}), 404
-    quiz = m['quiz']
+    quiz = m['levels'][level]['quiz']
     correct = 0
     results = []
     for i, question in enumerate(quiz):
@@ -283,13 +319,13 @@ def submit_quiz():
         })
     score = round((correct / len(quiz)) * 100)
     user_id = get_user_id()
-    mid = str(module_id)
+    score_key = f"{module_id}_{level}"
     with sqlite3.connect(get_db_path()) as conn:
         conn.execute(
             'INSERT INTO quiz_scores (user_id, module_id, score) VALUES (?, ?, ?) '
             'ON CONFLICT(user_id, module_id) DO UPDATE SET score = excluded.score '
             'WHERE excluded.score > quiz_scores.score',
-            (user_id, mid, score)
+            (user_id, score_key, score)
         )
     return jsonify({
         'score': score,

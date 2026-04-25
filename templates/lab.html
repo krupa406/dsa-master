@@ -8,10 +8,20 @@
 <div class="lab-page">
 
   <div class="lab-page-header" style="--accent: {{ module.color }}">
-    <a href="/module/{{ module.id }}" class="back-link">← {{ module.icon }} {{ module.title }}</a>
+    <a href="/module/{{ module.id }}?level={{ level }}" class="back-link">← {{ module.icon }} {{ module.title }}</a>
     <div class="lab-title-row">
       <h1>🧪 Lab {{ lab_number }}: {{ lab.title }}</h1>
       <span class="lab-progress-badge">Lab {{ lab_number }} of {{ total_labs }}</span>
+    </div>
+    <!-- Level indicator -->
+    <div class="level-tabs" style="margin-top:0.5rem">
+      {% for lvl, label, emoji in [('beginner','Beginner','🟢'), ('intermediate','Intermediate','🟡'), ('advanced','Advanced','🔴')] %}
+      <a href="/module/{{ module.id }}?level={{ lvl }}"
+         class="level-tab {% if level == lvl %}active{% endif %}"
+         style="{% if level == lvl %}background: {{ module.color }}; border-color: {{ module.color }};{% endif %}">
+        {{ emoji }} {{ label }}
+      </a>
+      {% endfor %}
     </div>
     {% if is_completed %}
     <div class="completed-banner">✅ You've completed this lab!</div>
@@ -40,14 +50,14 @@
       </div>
 
       <div class="sidebar-section mt-2">
-        <div class="sidebar-label">Module Labs</div>
-        {% for l in module.labs %}
-        <a href="/lab/{{ module.id }}/{{ l.id }}"
+        <div class="sidebar-label">{{ level | capitalize }} Labs</div>
+        {% for l in module.levels[level].labs %}
+        <a href="/lab/{{ module.id }}/{{ l.id }}?level={{ level }}"
            class="sidebar-link {% if l.id == lab.id %}active{% endif %}">
           🧪 Lab {{ loop.index }}: {{ l.title }}
         </a>
         {% endfor %}
-        <a href="/quiz/{{ module.id }}" class="sidebar-link">📝 Take Quiz</a>
+        <a href="/quiz/{{ module.id }}?level={{ level }}" class="sidebar-link">📝 Take Quiz</a>
       </div>
     </aside>
 
@@ -79,12 +89,12 @@
           ▶ Run &amp; Test
         </button>
         {% if prev_lab %}
-        <a href="/lab/{{ module.id }}/{{ prev_lab.id }}" class="btn btn-outline">← Prev Lab</a>
+        <a href="/lab/{{ module.id }}/{{ prev_lab.id }}?level={{ level }}" class="btn btn-outline">← Prev Lab</a>
         {% endif %}
         {% if next_lab %}
-        <a href="/lab/{{ module.id }}/{{ next_lab.id }}" class="btn btn-outline">Next Lab →</a>
+        <a href="/lab/{{ module.id }}/{{ next_lab.id }}?level={{ level }}" class="btn btn-outline">Next Lab →</a>
         {% else %}
-        <a href="/quiz/{{ module.id }}" class="btn btn-outline">Take Quiz →</a>
+        <a href="/quiz/{{ module.id }}?level={{ level }}" class="btn btn-outline">Take Quiz →</a>
         {% endif %}
       </div>
 
@@ -97,6 +107,7 @@ const STARTER_CODE = {{ lab.starter_code | tojson }};
 const TEST_CODE    = {{ lab.test_code    | tojson }};
 const MODULE_ID    = {{ module.id }};
 const LAB_ID       = {{ lab.id }};
+const LEVEL        = {{ level | tojson }};
 
 function resetCode() {
   if (confirm('Reset to starter code? Your changes will be lost.')) {
@@ -161,7 +172,7 @@ function markComplete() {
   fetch('/complete_lab', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ module_id: MODULE_ID, lab_id: LAB_ID })
+    body: JSON.stringify({ module_id: MODULE_ID, lab_id: LAB_ID, level: LEVEL })
   });
 }
 

@@ -585,3 +585,38 @@ h1,h2,h3,h4 { font-weight: 700; line-height: 1.3; }
   .module-grid { grid-template-columns: 1fr; }
   .quiz-page { max-width: 100%; }
 }
+
+/* ===== LEVEL TABS ===== */
+.level-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.level-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  border: 2px solid #cbd5e1;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+  text-decoration: none;
+  background: #f8fafc;
+  transition: all 0.15s ease;
+}
+
+.level-tab:hover {
+  border-color: var(--accent, #4f46e5);
+  color: var(--accent, #4f46e5);
+  background: #f0f4ff;
+}
+
+.level-tab.active {
+  color: #fff !important;
+  border-color: transparent !important;
+}
+

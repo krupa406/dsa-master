@@ -18,29 +18,33 @@ class TestQuizTemplate(unittest.TestCase):
         app.config['SECRET_KEY'] = 'test-secret'
         self.client = app.test_client()
 
-    def _quiz_html(self, module_id=1):
-        resp = self.client.get(f'/quiz/{module_id}')
+    def _quiz_html(self, module_id=1, level='beginner'):
+        resp = self.client.get(f'/quiz/{module_id}?level={level}')
         return resp.data.decode()
+
+    def _quiz(self, module_id=1, level='beginner'):
+        module = next(m for m in MODULES if m['id'] == module_id)
+        return module['levels'][level]['quiz']
 
     def test_each_question_has_unique_radio_group(self):
         """All 4 options within a question must share the same name (q0, q1, ...)."""
         html = self._quiz_html(1)
-        module = next(m for m in MODULES if m['id'] == 1)
-        for q_idx in range(len(module['quiz'])):
+        quiz = self._quiz(1)
+        for q_idx in range(len(quiz)):
             # Every option for question q_idx should have name="q{q_idx}"
             count = html.count(f'name="q{q_idx}"')
             self.assertEqual(
-                count, len(module['quiz'][q_idx]['options']),
-                f"Question {q_idx}: expected {len(module['quiz'][q_idx]['options'])} "
+                count, len(quiz[q_idx]['options']),
+                f"Question {q_idx}: expected {len(quiz[q_idx]['options'])} "
                 f"radio inputs with name='q{q_idx}', found {count}"
             )
 
     def test_option_values_are_sequential_per_question(self):
         """Options within each question must have values 0, 1, 2, 3 (not mixed up)."""
         html = self._quiz_html(1)
-        module = next(m for m in MODULES if m['id'] == 1)
-        for q_idx in range(len(module['quiz'])):
-            for opt_idx in range(len(module['quiz'][q_idx]['options'])):
+        quiz = self._quiz(1)
+        for q_idx in range(len(quiz)):
+            for opt_idx in range(len(quiz[q_idx]['options'])):
                 self.assertIn(
                     f'name="q{q_idx}" value="{opt_idx}"', html,
                     f"Missing: name='q{q_idx}' value='{opt_idx}'"
@@ -49,9 +53,9 @@ class TestQuizTemplate(unittest.TestCase):
     def test_selectOption_args_match_question_and_option_index(self):
         """onchange must call selectOption(q_idx, opt_idx) — not (opt_idx-1, opt_idx)."""
         html = self._quiz_html(1)
-        module = next(m for m in MODULES if m['id'] == 1)
-        for q_idx in range(len(module['quiz'])):
-            for opt_idx in range(len(module['quiz'][q_idx]['options'])):
+        quiz = self._quiz(1)
+        for q_idx in range(len(quiz)):
+            for opt_idx in range(len(quiz[q_idx]['options'])):
                 expected = f'selectOption({q_idx}, {opt_idx})'
                 self.assertIn(
                     expected, html,
@@ -69,8 +73,29 @@ class TestQuizTemplate(unittest.TestCase):
     def test_all_modules_quiz_pages_render(self):
         """Every module's quiz page must return HTTP 200."""
         for m in MODULES:
-            resp = self.client.get(f'/quiz/{m["id"]}')
+            resp = self.client.get(f'/quiz/{m["id"]}?level=beginner')
             self.assertEqual(resp.status_code, 200, f"Module {m['id']} quiz page failed")
+
+    def test_level_tabs_present_in_quiz(self):
+        """Quiz page must contain beginner/intermediate/advanced level tabs."""
+        html = self._quiz_html(1)
+        self.assertIn('Beginner', html)
+        self.assertIn('Intermediate', html)
+        self.assertIn('Advanced', html)
+
+    def test_intermediate_quiz_renders(self):
+        """Intermediate quiz page must return HTTP 200 for all modules."""
+        for m in MODULES:
+            resp = self.client.get(f'/quiz/{m["id"]}?level=intermediate')
+            self.assertEqual(resp.status_code, 200,
+                             f"Module {m['id']} intermediate quiz page failed")
+
+    def test_advanced_quiz_renders(self):
+        """Advanced quiz page must return HTTP 200 for all modules."""
+        for m in MODULES:
+            resp = self.client.get(f'/quiz/{m["id"]}?level=advanced')
+            self.assertEqual(resp.status_code, 200,
+                             f"Module {m['id']} advanced quiz page failed")
 
 
 class TestQuizSubmission(unittest.TestCase):
@@ -81,68 +106,97 @@ class TestQuizSubmission(unittest.TestCase):
         app.config['SECRET_KEY'] = 'test-secret'
         self.client = app.test_client()
 
-    def _submit(self, module_id, answers):
+    def _submit(self, module_id, answers, level='beginner'):
         return self.client.post(
             '/submit_quiz',
-            data=json.dumps({'module_id': module_id, 'answers': answers}),
+            data=json.dumps({'module_id': module_id, 'level': level, 'answers': answers}),
             content_type='application/json'
         )
 
+    def _quiz(self, module_id=1, level='beginner'):
+        module = next(m for m in MODULES if m['id'] == module_id)
+        return module['levels'][level]['quiz']
+
     def test_all_correct_gives_100(self):
-        module = MODULES[0]
-        correct = {str(i): q['answer'] for i, q in enumerate(module['quiz'])}
-        resp = self._submit(module['id'], correct)
+        quiz = self._quiz(1)
+        correct = {str(i): q['answer'] for i, q in enumerate(quiz)}
+        resp = self._submit(1, correct)
         data = json.loads(resp.data)
         self.assertEqual(data['score'], 100)
-        self.assertEqual(data['correct'], len(module['quiz']))
+        self.assertEqual(data['correct'], len(quiz))
 
     def test_all_wrong_gives_0(self):
-        module = MODULES[0]
-        wrong = {str(i): (q['answer'] + 1) % 4 for i, q in enumerate(module['quiz'])}
-        resp = self._submit(module['id'], wrong)
+        quiz = self._quiz(1)
+        wrong = {str(i): (q['answer'] + 1) % 4 for i, q in enumerate(quiz)}
+        resp = self._submit(1, wrong)
         data = json.loads(resp.data)
         self.assertEqual(data['score'], 0)
         self.assertEqual(data['correct'], 0)
 
     def test_partial_score_rounds_correctly(self):
-        module = MODULES[0]  # 5 questions
+        quiz = self._quiz(1)  # 5 questions
         # Answer only first 2 correctly
         answers = {str(i): q['answer'] if i < 2 else (q['answer'] + 1) % 4
-                   for i, q in enumerate(module['quiz'])}
-        resp = self._submit(module['id'], answers)
+                   for i, q in enumerate(quiz)}
+        resp = self._submit(1, answers)
         data = json.loads(resp.data)
         self.assertEqual(data['correct'], 2)
         self.assertEqual(data['score'], 40)  # 2/5 = 40%
 
     def test_response_has_per_question_results(self):
-        module = MODULES[0]
-        answers = {str(i): q['answer'] for i, q in enumerate(module['quiz'])}
-        resp = self._submit(module['id'], answers)
+        quiz = self._quiz(1)
+        answers = {str(i): q['answer'] for i, q in enumerate(quiz)}
+        resp = self._submit(1, answers)
         data = json.loads(resp.data)
         self.assertIn('results', data)
-        self.assertEqual(len(data['results']), len(module['quiz']))
+        self.assertEqual(len(data['results']), len(quiz))
         for r in data['results']:
             self.assertIn('correct', r)
             self.assertIn('explanation', r)
             self.assertIn('correct_answer', r)
 
     def test_correct_flag_per_question(self):
-        module = MODULES[0]
+        quiz = self._quiz(1)
         # Answer all correctly
-        answers = {str(i): q['answer'] for i, q in enumerate(module['quiz'])}
-        resp = self._submit(module['id'], answers)
+        answers = {str(i): q['answer'] for i, q in enumerate(quiz)}
+        resp = self._submit(1, answers)
         data = json.loads(resp.data)
         self.assertTrue(all(r['correct'] for r in data['results']))
 
     def test_all_modules_scoreable(self):
-        """Submit all-correct answers for every module; each must score 100."""
+        """Submit all-correct answers for every module at beginner level; each must score 100."""
         for module in MODULES:
-            correct = {str(i): q['answer'] for i, q in enumerate(module['quiz'])}
-            resp = self._submit(module['id'], correct)
+            quiz = module['levels']['beginner']['quiz']
+            correct = {str(i): q['answer'] for i, q in enumerate(quiz)}
+            resp = self._submit(module['id'], correct, level='beginner')
             data = json.loads(resp.data)
             self.assertEqual(
                 data['score'], 100,
                 f"Module {module['id']} ({module['title']}) failed all-correct test"
+            )
+
+    def test_intermediate_quiz_scoreable(self):
+        """Submit all-correct answers for every module at intermediate level."""
+        for module in MODULES:
+            quiz = module['levels']['intermediate']['quiz']
+            correct = {str(i): q['answer'] for i, q in enumerate(quiz)}
+            resp = self._submit(module['id'], correct, level='intermediate')
+            data = json.loads(resp.data)
+            self.assertEqual(
+                data['score'], 100,
+                f"Module {module['id']} intermediate quiz failed"
+            )
+
+    def test_advanced_quiz_scoreable(self):
+        """Submit all-correct answers for every module at advanced level."""
+        for module in MODULES:
+            quiz = module['levels']['advanced']['quiz']
+            correct = {str(i): q['answer'] for i, q in enumerate(quiz)}
+            resp = self._submit(module['id'], correct, level='advanced')
+            data = json.loads(resp.data)
+            self.assertEqual(
+                data['score'], 100,
+                f"Module {module['id']} advanced quiz failed"
             )
 
 
@@ -164,11 +218,29 @@ class TestRoutes(unittest.TestCase):
 
     def test_all_lab_pages(self):
         for m in MODULES:
-            for lab in m['labs']:
-                resp = self.client.get(f'/lab/{m["id"]}/{lab["id"]}')
+            for lab in m['levels']['beginner']['labs']:
+                resp = self.client.get(f'/lab/{m["id"]}/{lab["id"]}?level=beginner')
                 self.assertEqual(
                     resp.status_code, 200,
-                    f"Lab {m['id']}/{lab['id']} page failed"
+                    f"Lab {m['id']}/{lab['id']} (beginner) page failed"
+                )
+
+    def test_all_intermediate_lab_pages(self):
+        for m in MODULES:
+            for lab in m['levels']['intermediate']['labs']:
+                resp = self.client.get(f'/lab/{m["id"]}/{lab["id"]}?level=intermediate')
+                self.assertEqual(
+                    resp.status_code, 200,
+                    f"Lab {m['id']}/{lab['id']} (intermediate) page failed"
+                )
+
+    def test_all_advanced_lab_pages(self):
+        for m in MODULES:
+            for lab in m['levels']['advanced']['labs']:
+                resp = self.client.get(f'/lab/{m["id"]}/{lab["id"]}?level=advanced')
+                self.assertEqual(
+                    resp.status_code, 200,
+                    f"Lab {m['id']}/{lab['id']} (advanced) page failed"
                 )
 
     def test_invalid_module_returns_404(self):
@@ -184,6 +256,29 @@ class TestRoutes(unittest.TestCase):
         self.assertIn('modules_visited', data)
         self.assertIn('labs_completed', data)
         self.assertIn('quiz_scores', data)
+
+    def test_invalid_level_defaults_to_beginner(self):
+        """An unknown ?level= value should silently fall back to beginner."""
+        resp = self.client.get('/module/1?level=expert')
+        self.assertEqual(resp.status_code, 200)
+        html = resp.data.decode()
+        # The active tab should be beginner
+        self.assertIn('Beginner', html)
+
+    def test_level_tabs_present_in_module(self):
+        """Module page must contain level tabs for all 3 levels."""
+        html = self.client.get('/module/1?level=beginner').data.decode()
+        self.assertIn('Beginner', html)
+        self.assertIn('Intermediate', html)
+        self.assertIn('Advanced', html)
+
+    def test_level_tabs_present_in_lab(self):
+        """Lab page must contain level tabs for all 3 levels."""
+        lab_id = MODULES[0]['levels']['beginner']['labs'][0]['id']
+        html = self.client.get(f'/lab/1/{lab_id}?level=beginner').data.decode()
+        self.assertIn('Beginner', html)
+        self.assertIn('Intermediate', html)
+        self.assertIn('Advanced', html)
 
 
 class TestCodeExecution(unittest.TestCase):
@@ -272,31 +367,100 @@ class TestProgressTracking(unittest.TestCase):
     def test_completing_lab_persists(self):
         self.client.post(
             '/complete_lab',
-            data=json.dumps({'module_id': 1, 'lab_id': 1}),
+            data=json.dumps({'module_id': 1, 'lab_id': 1, 'level': 'beginner'}),
             content_type='application/json'
         )
         resp = self.client.get('/api/progress')
         data = json.loads(resp.data)
-        self.assertIn('1_1', data['labs_completed'])
+        self.assertIn('1_beginner_1', data['labs_completed'])
+
+    def test_completing_intermediate_lab_persists(self):
+        self.client.post(
+            '/complete_lab',
+            data=json.dumps({'module_id': 1, 'lab_id': 1, 'level': 'intermediate'}),
+            content_type='application/json'
+        )
+        resp = self.client.get('/api/progress')
+        data = json.loads(resp.data)
+        self.assertIn('1_intermediate_1', data['labs_completed'])
+
+    def test_completing_advanced_lab_persists(self):
+        self.client.post(
+            '/complete_lab',
+            data=json.dumps({'module_id': 1, 'lab_id': 1, 'level': 'advanced'}),
+            content_type='application/json'
+        )
+        resp = self.client.get('/api/progress')
+        data = json.loads(resp.data)
+        self.assertIn('1_advanced_1', data['labs_completed'])
+
+    def test_different_levels_tracked_separately(self):
+        """Completing a lab at beginner and intermediate stores two separate keys."""
+        self.client.post(
+            '/complete_lab',
+            data=json.dumps({'module_id': 1, 'lab_id': 1, 'level': 'beginner'}),
+            content_type='application/json'
+        )
+        self.client.post(
+            '/complete_lab',
+            data=json.dumps({'module_id': 1, 'lab_id': 1, 'level': 'intermediate'}),
+            content_type='application/json'
+        )
+        resp = self.client.get('/api/progress')
+        data = json.loads(resp.data)
+        self.assertIn('1_beginner_1', data['labs_completed'])
+        self.assertIn('1_intermediate_1', data['labs_completed'])
 
     def test_quiz_score_persists(self):
         module = MODULES[0]
-        answers = {str(i): q['answer'] for i, q in enumerate(module['quiz'])}
+        quiz = module['levels']['beginner']['quiz']
+        answers = {str(i): q['answer'] for i, q in enumerate(quiz)}
         self.client.post(
             '/submit_quiz',
-            data=json.dumps({'module_id': 1, 'answers': answers}),
+            data=json.dumps({'module_id': 1, 'level': 'beginner', 'answers': answers}),
             content_type='application/json'
         )
         resp = self.client.get('/api/progress')
         data = json.loads(resp.data)
-        self.assertEqual(data['quiz_scores']['1'], 100)
+        self.assertEqual(data['quiz_scores']['1_beginner'], 100)
+
+    def test_intermediate_quiz_score_persists(self):
+        module = MODULES[0]
+        quiz = module['levels']['intermediate']['quiz']
+        answers = {str(i): q['answer'] for i, q in enumerate(quiz)}
+        self.client.post(
+            '/submit_quiz',
+            data=json.dumps({'module_id': 1, 'level': 'intermediate', 'answers': answers}),
+            content_type='application/json'
+        )
+        resp = self.client.get('/api/progress')
+        data = json.loads(resp.data)
+        self.assertEqual(data['quiz_scores']['1_intermediate'], 100)
+
+    def test_quiz_scores_per_level_independent(self):
+        """Beginner and intermediate quiz scores are stored under separate keys."""
+        module = MODULES[0]
+        bq = module['levels']['beginner']['quiz']
+        iq = module['levels']['intermediate']['quiz']
+        self.client.post('/submit_quiz',
+            data=json.dumps({'module_id': 1, 'level': 'beginner',
+                             'answers': {str(i): q['answer'] for i, q in enumerate(bq)}}),
+            content_type='application/json')
+        self.client.post('/submit_quiz',
+            data=json.dumps({'module_id': 1, 'level': 'intermediate',
+                             'answers': {str(i): (q['answer']+1)%4 for i, q in enumerate(iq)}}),
+            content_type='application/json')
+        resp = self.client.get('/api/progress')
+        data = json.loads(resp.data)
+        self.assertEqual(data['quiz_scores']['1_beginner'], 100)
+        self.assertEqual(data['quiz_scores']['1_intermediate'], 0)
 
     def test_reset_clears_all_progress(self):
         # Build up some progress first
         self.client.get('/module/1')
         self.client.post(
             '/complete_lab',
-            data=json.dumps({'module_id': 1, 'lab_id': 1}),
+            data=json.dumps({'module_id': 1, 'lab_id': 1, 'level': 'beginner'}),
             content_type='application/json'
         )
         # Reset
@@ -309,19 +473,20 @@ class TestProgressTracking(unittest.TestCase):
 
     def test_quiz_score_only_updates_if_higher(self):
         module = MODULES[0]
+        quiz = module['levels']['beginner']['quiz']
         # Score 100 first
-        all_correct = {str(i): q['answer'] for i, q in enumerate(module['quiz'])}
+        all_correct = {str(i): q['answer'] for i, q in enumerate(quiz)}
         self.client.post('/submit_quiz',
-            data=json.dumps({'module_id': 1, 'answers': all_correct}),
+            data=json.dumps({'module_id': 1, 'level': 'beginner', 'answers': all_correct}),
             content_type='application/json')
         # Score 0 next — should NOT overwrite 100
-        all_wrong = {str(i): (q['answer']+1) % 4 for i, q in enumerate(module['quiz'])}
+        all_wrong = {str(i): (q['answer']+1) % 4 for i, q in enumerate(quiz)}
         self.client.post('/submit_quiz',
-            data=json.dumps({'module_id': 1, 'answers': all_wrong}),
+            data=json.dumps({'module_id': 1, 'level': 'beginner', 'answers': all_wrong}),
             content_type='application/json')
         resp = self.client.get('/api/progress')
         data = json.loads(resp.data)
-        self.assertEqual(data['quiz_scores']['1'], 100)
+        self.assertEqual(data['quiz_scores']['1_beginner'], 100)
 
 
 if __name__ == '__main__':

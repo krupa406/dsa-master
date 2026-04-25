@@ -2,18 +2,30 @@
 {% set active_module = module.id %}
 {% extends "base.html" %}
 
-{% block title %}Quiz: {{ module.title }} — DSA Master{% endblock %}
+{% block title %}Quiz: {{ module.title }} ({{ level | capitalize }}) — DSA Master{% endblock %}
 
 {% block content %}
 <div class="quiz-page">
 
   <div class="quiz-page-header" style="--accent: {{ module.color }}">
-    <a href="/module/{{ module.id }}" class="back-link">← {{ module.icon }} {{ module.title }}</a>
+    <a href="/module/{{ module.id }}?level={{ level }}" class="back-link">← {{ module.icon }} {{ module.title }}</a>
     <h1>📝 {{ module.title }} Quiz</h1>
-    <p>{{ module.quiz | length }} questions · Select one answer per question</p>
+    <p>{{ level_data.quiz | length }} questions · Select one answer per question</p>
+
+    <!-- Level Tabs -->
+    <div class="level-tabs" style="margin-top:0.75rem">
+      {% for lvl, label, emoji in [('beginner','Beginner','🟢'), ('intermediate','Intermediate','🟡'), ('advanced','Advanced','🔴')] %}
+      <a href="/quiz/{{ module.id }}?level={{ lvl }}"
+         class="level-tab {% if level == lvl %}active{% endif %}"
+         style="{% if level == lvl %}background: {{ module.color }}; border-color: {{ module.color }};{% endif %}">
+        {{ emoji }} {{ label }}
+      </a>
+      {% endfor %}
+    </div>
+
     {% if quiz_score is not none %}
     <div class="prev-score">
-      Previous best: <strong>{{ quiz_score }}%</strong>
+      Previous best ({{ level }}): <strong>{{ quiz_score }}%</strong>
       {% if quiz_score >= 80 %}🏆{% elif quiz_score >= 60 %}👍{% else %}💪{% endif %}
     </div>
     {% endif %}
@@ -21,10 +33,10 @@
 
   <!-- Quiz form -->
   <div class="quiz-form" id="quiz-form">
-    {% for q in module.quiz %}
+    {% for q in level_data.quiz %}
     {% set q_idx = loop.index0 %}
     <div class="question-card" id="q{{ q_idx }}">
-      <div class="question-num">Question {{ loop.index }} of {{ module.quiz | length }}</div>
+      <div class="question-num">Question {{ loop.index }} of {{ level_data.quiz | length }}</div>
       <div class="question-text">{{ q.question }}</div>
       <div class="options-list">
         {% for opt in q.options %}
@@ -41,7 +53,7 @@
     {% endfor %}
 
     <div class="quiz-submit-row">
-      <div id="submit-hint" class="submit-hint">Answer all {{ module.quiz | length }} questions to submit</div>
+      <div id="submit-hint" class="submit-hint">Answer all {{ level_data.quiz | length }} questions to submit</div>
       <button class="btn btn-primary btn-large" id="submit-btn"
               onclick="submitQuiz()" disabled
               style="background: {{ module.color }}">
@@ -61,7 +73,7 @@
     <div class="results-actions">
       <button class="btn btn-outline" onclick="retakeQuiz()">↺ Retake Quiz</button>
       {% if next_module %}
-      <a href="/module/{{ next_module.id }}" class="btn btn-primary" style="background: {{ module.color }}">
+      <a href="/module/{{ next_module.id }}?level={{ level }}" class="btn btn-primary" style="background: {{ module.color }}">
         Next: {{ next_module.icon }} {{ next_module.title }} →
       </a>
       {% else %}
@@ -73,14 +85,14 @@
 </div>
 
 <script>
-const QUESTIONS = {{ module.quiz | tojson }};
+const QUESTIONS = {{ level_data.quiz | tojson }};
 const MODULE_ID = {{ module.id }};
+const LEVEL     = {{ level | tojson }};
 const TOTAL     = QUESTIONS.length;
-const answers   = {};  // { questionIndex: selectedOptionIndex }
+const answers   = {};
 
 function selectOption(qIdx, optIdx) {
   answers[qIdx] = optIdx;
-  // Highlight selected
   document.querySelectorAll(`#q${qIdx} .option-label`).forEach((el, i) => {
     el.classList.toggle('selected', i === optIdx);
   });
@@ -104,7 +116,7 @@ function submitQuiz() {
   fetch('/submit_quiz', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ module_id: MODULE_ID, answers })
+    body: JSON.stringify({ module_id: MODULE_ID, level: LEVEL, answers })
   })
   .then(r => r.json())
   .then(data => showResults(data));
@@ -115,7 +127,6 @@ function showResults(data) {
   const resultsEl = document.getElementById('quiz-results');
   resultsEl.style.display = 'block';
 
-  // Score circle
   const pct = data.score;
   const circle = document.getElementById('score-circle');
   document.getElementById('score-number').textContent = pct + '%';
@@ -125,7 +136,7 @@ function showResults(data) {
   if (pct >= 80) {
     circle.classList.add('score-great');
     document.getElementById('results-summary').innerHTML =
-      `<h2>🏆 Excellent! You scored ${pct}%</h2><p>Outstanding work! You've mastered this module.</p>`;
+      `<h2>🏆 Excellent! You scored ${pct}%</h2><p>Outstanding work! You've mastered this module at the ${LEVEL} level.</p>`;
   } else if (pct >= 60) {
     circle.classList.add('score-ok');
     document.getElementById('results-summary').innerHTML =
@@ -136,7 +147,6 @@ function showResults(data) {
       `<h2>💪 Keep going! You scored ${pct}%</h2><p>Review the theory and labs, then retake. You've got this!</p>`;
   }
 
-  // Breakdown
   let html = '<div class="breakdown-list">';
   QUESTIONS.forEach((q, i) => {
     const r = data.results[i];
@@ -164,7 +174,6 @@ function retakeQuiz() {
   Object.keys(answers).forEach(k => delete answers[k]);
   document.getElementById('quiz-form').style.display = 'block';
   document.getElementById('quiz-results').style.display = 'none';
-  // Reset all radio buttons and styles
   document.querySelectorAll('input[type=radio]').forEach(r => r.checked = false);
   document.querySelectorAll('.option-label').forEach(l => l.classList.remove('selected','correct','wrong'));
   document.getElementById('submit-btn').textContent = 'Submit Quiz';

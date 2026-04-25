@@ -1,3 +1,5 @@
+from levels_data import LEVELS_DATA
+
 MODULES = [
     {
         'id': 1,
@@ -4065,3 +4067,19 @@ if _fail == 0:
         ]
     },
 ]
+
+# Attach levels to each module.
+# Beginner = the existing flat content/labs/quiz keys.
+# Intermediate & Advanced = from LEVELS_DATA.
+for _m in MODULES:
+    _mid = _m['id']
+    _m['levels'] = {
+        'beginner': {
+            'content': _m['content'],
+            'labs':    _m['labs'],
+            'quiz':    _m['quiz'],
+        },
+        'intermediate': LEVELS_DATA[_mid]['intermediate'],
+        'advanced':     LEVELS_DATA[_mid]['advanced'],
+    }
+
