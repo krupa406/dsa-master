@@ -1,0 +1,59 @@
+{
+  "id": "lab-git-intermediate-03",
+  "moduleId": "module-03-hooks-config",
+  "title": "Write a commit-msg Hook",
+  "description": "Write a commit-msg hook script that enforces conventional commit format, and configure a useful Git alias.",
+  "language": "shell",
+  "monacoLanguage": "shell",
+  "starterCode": "#!/bin/sh\n# (1) Write a commit-msg hook that rejects commits not matching Conventional Commits format\n# The hook receives the commit message file path as $1\n# Pattern to match: type(scope): description\n# Types: feat, fix, docs, chore, refactor, test, style\n# Exit 1 to reject; exit 0 to allow\n\n# YOUR HOOK SCRIPT HERE\n\n# (2) Create a global git alias for a pretty graph log\n# YOUR GIT CONFIG COMMAND HERE\n\n# (3) Set VS Code as the global git editor\n# YOUR GIT CONFIG COMMAND HERE\n",
+  "solutionCode": "#!/bin/sh\n# .git/hooks/commit-msg\n# Enforce conventional commit format\nCOMMIT_MSG=$(cat \"$1\")\nPATTERN=\"^(feat|fix|docs|chore|refactor|test|style)(\\(.+\\))?: .+\"\nif ! echo \"$COMMIT_MSG\" | grep -qE \"$PATTERN\"; then\n  echo \"ERROR: Commit message does not follow Conventional Commits format.\"\n  echo \"Expected: type(scope): description\"\n  echo \"Example:  feat(auth): add OAuth2 login\"\n  exit 1\nfi\nexit 0\n\n# Set global alias for pretty log\ngit config --global alias.lg \"log --oneline --graph --decorate --all\"\n\n# Set VS Code as git editor\ngit config --global core.editor \"code --wait\"\n",
+  "hints": [
+    "Start the hook script with #!/bin/sh as the shebang line",
+    "Read the commit message using: COMMIT_MSG=$(cat \"$1\") — the hook receives the file path as $1",
+    "Use grep -qE with your pattern to test the message silently; combine with ! to detect a mismatch",
+    "A non-zero exit (exit 1) aborts the commit with your error message; exit 0 allows it",
+    "Use git config --global alias.<name> \"<command>\" to create aliases"
+  ],
+  "validationRules": [
+    {
+      "id": "has-shebang",
+      "type": "contains",
+      "pattern": "#!/bin/sh",
+      "errorMessage": "Start the hook script with a shebang (#!/bin/sh or #!/bin/bash)",
+      "points": 20
+    },
+    {
+      "id": "has-conventional-types",
+      "type": "regex",
+      "pattern": "feat|fix|docs|chore",
+      "errorMessage": "Include conventional commit type keywords in the validation pattern",
+      "points": 20
+    },
+    {
+      "id": "has-exit-1",
+      "type": "contains",
+      "pattern": "exit 1",
+      "errorMessage": "Exit with code 1 to reject invalid commits",
+      "points": 20
+    },
+    {
+      "id": "has-global-alias",
+      "type": "contains",
+      "pattern": "git config --global alias",
+      "errorMessage": "Create a global git alias",
+      "points": 20
+    },
+    {
+      "id": "has-editor-config",
+      "type": "contains",
+      "pattern": "git config --global core.editor",
+      "errorMessage": "Configure the global git editor",
+      "points": 20
+    }
+  ],
+  "simulatedOutput": {
+    "success": "Hook script validated successfully!\n\nTesting hook with valid message 'feat(auth): add login'... PASSED ✓\nTesting hook with invalid message 'added stuff'... REJECTED ✓ (exit 1)\n\nAlias 'lg' created: git lg now shows pretty graph log\nEditor set to VS Code\n\nHook is ready at .git/hooks/commit-msg (remember: chmod +x .git/hooks/commit-msg)",
+    "failure": "ERROR: Validation failed. Make sure your script has a shebang (#!/bin/sh), includes conventional commit type keywords, exits with 1 on failure, creates a global alias, and sets the global editor."
+  },
+  "maxScore": 100
+}

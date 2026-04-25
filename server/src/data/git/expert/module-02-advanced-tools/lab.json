@@ -1,0 +1,61 @@
+{
+  "id": "lab-git-expert-02",
+  "moduleId": "module-02-advanced-tools",
+  "title": "Find a Bug with git bisect",
+  "description": "Run a git bisect session to identify the commit that introduced a regression, then recover a lost commit using reflog.",
+  "language": "shell",
+  "monacoLanguage": "shell",
+  "starterCode": "# Task: Use git bisect to find a regression, then use reflog to recover\n#\n# Part 1 — Bisect:\n# 1. Start a bisect session\n# 2. Mark HEAD as bad (broken)\n# 3. Mark commit abc1234 as the known-good commit\n# 4. Simulate marking the next checkout as bad\n# 5. End the bisect session\n#\n# Part 2 — Reflog recovery:\n# 6. Show the reflog\n# 7. Reset hard to HEAD@{2} to recover the pre-bisect state\n\n# Write your commands below:\n",
+  "solutionCode": "# Part 1 — Bisect session\ngit bisect start\ngit bisect bad\ngit bisect good abc1234\n# Git checks out midpoint — simulate testing and marking bad\ngit bisect bad\n# End the bisect and restore HEAD\ngit bisect reset\n\n# Part 2 — Reflog recovery\ngit reflog\ngit reset --hard HEAD@{2}\n",
+  "hints": [
+    "git bisect start initializes the bisect session — always the first command",
+    "git bisect bad with no argument marks the currently checked-out commit as broken",
+    "Provide the known-good SHA or ref: git bisect good abc1234",
+    "After each Git-chosen midpoint, test and mark good or bad; Git will narrow down",
+    "git bisect reset returns you to the original branch and ends the session",
+    "git reflog shows HEAD@{0}, HEAD@{1}, HEAD@{2} etc. — recent positions of HEAD",
+    "git reset --hard HEAD@{N} moves HEAD and the working tree to that reflog entry"
+  ],
+  "validationRules": [
+    {
+      "id": "has-bisect-start",
+      "type": "contains",
+      "pattern": "git bisect start",
+      "errorMessage": "Start the bisect session with git bisect start",
+      "points": 20
+    },
+    {
+      "id": "has-bisect-bad",
+      "type": "contains",
+      "pattern": "git bisect bad",
+      "errorMessage": "Mark a commit as bad with git bisect bad",
+      "points": 20
+    },
+    {
+      "id": "has-bisect-good-sha",
+      "type": "contains",
+      "pattern": "git bisect good abc1234",
+      "errorMessage": "Mark the known good commit abc1234 with: git bisect good abc1234",
+      "points": 20
+    },
+    {
+      "id": "has-bisect-reset",
+      "type": "contains",
+      "pattern": "git bisect reset",
+      "errorMessage": "End the bisect session with git bisect reset",
+      "points": 20
+    },
+    {
+      "id": "has-reflog-recovery",
+      "type": "regex",
+      "pattern": "git (reflog|reset --hard HEAD@)",
+      "errorMessage": "Use git reflog and git reset --hard HEAD@{N} to recover",
+      "points": 20
+    }
+  ],
+  "simulatedOutput": {
+    "success": "Bisecting: 511 revisions left to test after this (roughly 9 steps)\n[m3n4o5p6] Checkpoint: halfway through history\n\nBisecting: 255 revisions left to test\n[q7r8s9t0] Earlier checkpoint\n\ngit bisect reset: HEAD is now at a1b2c3d4 Latest commit\n\nreflog output:\nHEAD@{0} a1b2c3d reset: moving to HEAD@{2}\nHEAD@{1} e5f6g7h8 bisect: checkout midpoint\nHEAD@{2} a1b2c3d commit: Add login feature\nHEAD@{3} 9i0j1k2l commit: Fix tests\n\nReset complete. HEAD is now at a1b2c3d Add login feature",
+    "failure": "ERROR: Make sure to run git bisect start, git bisect bad, git bisect good abc1234, git bisect reset, and use git reflog with git reset --hard HEAD@{N}."
+  },
+  "maxScore": 100
+}

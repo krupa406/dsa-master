@@ -1,0 +1,188 @@
+{
+  "quizId": "quiz-git-intermediate-02",
+  "moduleId": "module-02-stash-tags",
+  "passingScore": 70,
+  "questions": [
+    {
+      "id": "q1",
+      "order": 1,
+      "text": "What is the key difference between `git stash pop` and `git stash apply`?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "pop applies the stash and removes the entry from the stack; apply applies it but leaves the entry on the stack"},
+        {"id": "b", "text": "apply applies the stash and removes it; pop just previews the changes"},
+        {"id": "c", "text": "pop only works on the newest stash; apply works on any stash entry"},
+        {"id": "d", "text": "They are identical — there is no difference"}
+      ],
+      "correctOptionId": "a",
+      "explanation": "git stash pop applies the top stash entry (stash@{0}) and then drops it from the stash stack in one operation. git stash apply also applies the entry but intentionally leaves it in the stack, which is useful when you want to apply the same stash to multiple branches or keep it as a backup.",
+      "citations": [
+        {"label": "git-stash documentation", "url": "https://git-scm.com/docs/git-stash"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "order": 2,
+      "text": "What does `git stash list` show?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "The diff of all stashed changes"},
+        {"id": "b", "text": "All stash entries with their index, branch, and message"},
+        {"id": "c", "text": "Only the most recently stashed entry"},
+        {"id": "d", "text": "The filenames changed in each stash entry"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "git stash list displays all entries in the stash stack. Each line shows the entry's reference (stash@{0}, stash@{1}, etc.), the branch it was stashed on, and the stash message. This lets you identify which entry to apply or drop when you have multiple stashed changes.",
+      "citations": [
+        {"label": "git-stash documentation", "url": "https://git-scm.com/docs/git-stash"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "order": 3,
+      "text": "What happens to the original commit's SHA when you cherry-pick it onto another branch?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "The SHA is preserved exactly — cherry-pick is a no-op on the original"},
+        {"id": "b", "text": "The original commit is moved to the new branch and its SHA changes"},
+        {"id": "c", "text": "A new commit with a new SHA is created on the current branch; the original commit is unchanged"},
+        {"id": "d", "text": "The SHA changes only if there are merge conflicts during cherry-pick"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "Cherry-pick applies the diff of the selected commit as a new commit on your current branch. The new commit gets a new SHA because it has a different parent. The original commit on its original branch is completely untouched. You end up with two commits that have the same code change but different SHAs and different parents.",
+      "citations": [
+        {"label": "git-cherry-pick documentation", "url": "https://git-scm.com/docs/git-cherry-pick"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q4",
+      "order": 4,
+      "text": "A critical security fix was merged to `main`. You need to apply it to the `release/2.x` branch without merging all of main. What is the right approach?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "git merge main while on release/2.x"},
+        {"id": "b", "text": "git rebase main while on release/2.x"},
+        {"id": "c", "text": "git cherry-pick <fix-commit-SHA> while on release/2.x"},
+        {"id": "d", "text": "git stash the fix, switch branches, then git stash pop"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "This is the canonical backporting scenario for cherry-pick. By cherry-picking just the specific fix commit onto the release branch, you apply exactly that change without bringing in all the other unreleased features from main. Merging main would bring in all unreleased work, and rebase would rewrite the release branch history.",
+      "citations": [
+        {"label": "git-cherry-pick documentation", "url": "https://git-scm.com/docs/git-cherry-pick"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "order": 5,
+      "text": "What is the fundamental difference between a lightweight tag and an annotated tag?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Lightweight tags can be pushed to a remote; annotated tags cannot"},
+        {"id": "b", "text": "Lightweight tags are just pointers to a commit; annotated tags are full Git objects with tagger, date, and message metadata"},
+        {"id": "c", "text": "Annotated tags use less disk space than lightweight tags"},
+        {"id": "d", "text": "Lightweight tags are permanent; annotated tags can be deleted"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "A lightweight tag is simply a named ref (pointer) to a specific commit — nothing more than a branch that never moves. An annotated tag is a full Git object stored in the database with its own SHA. It contains the tagger's name, email, date, a message, and can optionally be GPG-signed. Annotated tags are the recommended choice for public releases.",
+      "citations": [
+        {"label": "git-tag documentation", "url": "https://git-scm.com/docs/git-tag"},
+        {"label": "Pro Git: Tagging", "url": "https://git-scm.com/book/en/v2/Git-Basics-Tagging"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q6",
+      "order": 6,
+      "text": "Why is `git tag -a` preferred over `git tag` for marking software releases?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Annotated tags are automatically pushed to the remote"},
+        {"id": "b", "text": "Annotated tags store extra metadata (tagger, date, message) and can be GPG-signed, making them auditable and suitable for formal releases"},
+        {"id": "c", "text": "Annotated tags prevent other developers from checking out the tagged commit"},
+        {"id": "d", "text": "Lightweight tags are not visible in GitHub or GitLab"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Annotated tags record who created the tag, when, and why — critical information for a release audit trail. They can also be signed with GPG to cryptographically verify authenticity. Lightweight tags lack all this metadata. The Git documentation explicitly recommends annotated tags for releases.",
+      "citations": [
+        {"label": "Pro Git: Tagging", "url": "https://git-scm.com/book/en/v2/Git-Basics-Tagging"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q7",
+      "order": 7,
+      "text": "Which command pushes all local tags to the remote named `origin`?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "git push origin"},
+        {"id": "b", "text": "git push --all origin"},
+        {"id": "c", "text": "git push origin --tags"},
+        {"id": "d", "text": "git tag --push origin"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "By default, git push does not transfer tags. You must explicitly push them. git push origin --tags pushes all tags that are not yet on the remote. To push a single tag, use git push origin <tagname>. Note that --all pushes all branches, not tags.",
+      "citations": [
+        {"label": "git-push documentation", "url": "https://git-scm.com/docs/git-push"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q8",
+      "order": 8,
+      "text": "What does `git describe --tags` output?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "A list of all tags in the repository"},
+        {"id": "b", "text": "The message of the nearest annotated tag"},
+        {"id": "c", "text": "A version string like v1.2.0-5-gabcdef1 showing the nearest tag, number of commits since, and current SHA"},
+        {"id": "d", "text": "The date the nearest tag was created"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "git describe --tags walks back through history to find the nearest reachable tag and outputs a human-readable version string: <tag>-<commits-since-tag>-g<abbreviated-SHA>. For example, v1.2.0-5-gabcdef1 means you are 5 commits after the v1.2.0 tag at commit abcdef1. If you are exactly on a tagged commit, only the tag name is printed.",
+      "citations": [
+        {"label": "git-describe documentation", "url": "https://git-scm.com/docs/git-describe"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q9",
+      "order": 9,
+      "text": "What does the `--include-untracked` (or `-u`) flag do when running `git stash`?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "It also stashes files listed in .gitignore"},
+        {"id": "b", "text": "It also stashes new files that are not yet tracked by Git"},
+        {"id": "c", "text": "It creates a separate stash entry for untracked files only"},
+        {"id": "d", "text": "It converts untracked files to tracked before stashing"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "By default, git stash only saves changes to files that are already tracked by Git. With --include-untracked or -u, it also saves new, untracked files. There is also --all / -a which additionally includes files matching .gitignore patterns. Use -u when you have created new files that are part of your WIP but haven't been staged yet.",
+      "citations": [
+        {"label": "git-stash documentation", "url": "https://git-scm.com/docs/git-stash"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q10",
+      "order": 10,
+      "text": "What happens if you cherry-pick a merge commit without specifying the `-m` flag?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Git cherry-picks both parents of the merge commit simultaneously"},
+        {"id": "b", "text": "Git refuses and reports an error — you must specify a parent number with -m"},
+        {"id": "c", "text": "Git automatically picks the first parent and succeeds without any message"},
+        {"id": "d", "text": "Git opens an interactive prompt to choose which parent to use"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "A merge commit has two (or more) parents. Git does not know which parent to diff against to compute the change to apply, so cherry-picking a merge commit without -m fails with the message 'is a merge but no -m option was given'. You must specify -m 1 (usually) to tell Git to use the first parent as the mainline and apply the diff of the merge relative to it.",
+      "citations": [
+        {"label": "git-cherry-pick -m option", "url": "https://git-scm.com/docs/git-cherry-pick#Documentation/git-cherry-pick.txt--mltparent-numbergt"}
+      ],
+      "points": 10
+    }
+  ]
+}

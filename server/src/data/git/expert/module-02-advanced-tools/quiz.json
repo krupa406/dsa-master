@@ -1,0 +1,187 @@
+{
+  "quizId": "quiz-git-expert-02",
+  "moduleId": "module-02-advanced-tools",
+  "passingScore": 70,
+  "questions": [
+    {
+      "id": "q1",
+      "order": 1,
+      "text": "What is the time complexity of git bisect for finding a bad commit among N commits?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "O(n) — must test every commit in the worst case"},
+        {"id": "b", "text": "O(n²) — comparisons grow quadratically"},
+        {"id": "c", "text": "O(log n) — each step halves the remaining search space"},
+        {"id": "d", "text": "O(1) — Git can identify the bad commit without any testing"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "git bisect uses binary search: it picks the midpoint commit between the known-good and known-bad boundaries, then halves the remaining range after each test. For 1,024 commits, the maximum number of steps is log₂(1024) = 10. This makes bisect extremely efficient even for repos with thousands of commits.",
+      "citations": [
+        {"label": "git-bisect reference", "url": "https://git-scm.com/docs/git-bisect"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "order": 2,
+      "text": "How do you automate git bisect so it runs without manual good/bad input?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "git bisect auto --script=./test.sh"},
+        {"id": "b", "text": "git bisect run ./test-script.sh — the script exit code (0=good, non-zero=bad) marks each commit automatically"},
+        {"id": "c", "text": "git bisect --no-interactive ./test-script.sh"},
+        {"id": "d", "text": "Set the BISECT_SCRIPT environment variable before starting"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "git bisect run <script> automates the process. After each checkout, Git runs the provided script. An exit code of 0 means the commit is good; exit code 1–127 (except 125) means bad; 125 means the commit cannot be tested (skip). Git continues automatically until the culprit is identified.",
+      "citations": [
+        {"label": "git-bisect — Bisect run", "url": "https://git-scm.com/docs/git-bisect#_bisect_run"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "order": 3,
+      "text": "What does git reflog record that `git log` does not show?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "The full diff of every file changed in each commit"},
+        {"id": "b", "text": "Every position HEAD has occupied, including checkouts, resets, rebases, and merges — not just commits"},
+        {"id": "c", "text": "Remote push and fetch operations to origin"},
+        {"id": "d", "text": "The author's email address for every commit in the history"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "git log only shows commits reachable from the current branch. git reflog records every movement of HEAD, including: commits, merges, rebases (each step), resets, and checkouts. This makes it possible to recover commits that are no longer reachable from any branch, such as commits made during a rebase that was later aborted or a branch that was deleted.",
+      "citations": [
+        {"label": "git-reflog reference", "url": "https://git-scm.com/docs/git-reflog"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q4",
+      "order": 4,
+      "text": "How long are reflog entries retained by default before Git expires them?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "7 days"},
+        {"id": "b", "text": "30 days"},
+        {"id": "c", "text": "90 days"},
+        {"id": "d", "text": "365 days"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "By default, git gc expires reflog entries that are older than 90 days (gc.reflogExpire = 90 days). Unreachable commits (commits not pointed to by any ref) expire after 30 days by default (gc.reflogExpireUnreachable = 30 days). These values can be adjusted in git config.",
+      "citations": [
+        {"label": "git-gc — Configuration", "url": "https://git-scm.com/docs/git-gc#_configuration"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "order": 5,
+      "text": "Why is the reflog not available after cloning a repository?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "git clone requires the --include-reflog flag to transfer reflog data"},
+        {"id": "b", "text": "Reflog is a local-only record of HEAD movements; it is never pushed to remotes or included in clones"},
+        {"id": "c", "text": "The reflog is stored in the remote's .git/reflog directory which clone ignores"},
+        {"id": "d", "text": "Reflog is disabled by default and must be enabled with git config core.reflog true"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "The reflog is strictly local. It records what happened in your working copy of the repository — operations you personally performed. When you clone, you get a fresh copy with no history of local operations, so the reflog starts empty. It is not part of the transfer protocol and cannot be pushed or fetched.",
+      "citations": [
+        {"label": "git-reflog reference", "url": "https://git-scm.com/docs/git-reflog"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q6",
+      "order": 6,
+      "text": "What is the key advantage of `git worktree` over cloning a repository for working on multiple branches?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Worktrees allow branches to share the same staging area (index)"},
+        {"id": "b", "text": "Worktrees share the same .git object store, so no history or objects are duplicated — faster and uses far less disk space"},
+        {"id": "c", "text": "Worktrees automatically sync commits between branches in real time"},
+        {"id": "d", "text": "Worktrees can check out branches from multiple different remote repositories simultaneously"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "A git worktree adds a new working directory linked to the same .git directory. All worktrees share the same object store, refs, and config — no duplication of the repository history. In contrast, cloning creates a completely separate copy of all objects. For large repos, a worktree is significantly faster to create and uses much less disk space.",
+      "citations": [
+        {"label": "git-worktree reference", "url": "https://git-scm.com/docs/git-worktree"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q7",
+      "order": 7,
+      "text": "What does the `.gitmodules` file in a repository contain?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "The list of ignored paths for all submodule directories"},
+        {"id": "b", "text": "The mapping of submodule paths to their remote URLs, along with optional config like branch and shallow settings"},
+        {"id": "c", "text": "The pinned SHA-1 of each submodule's checked-out commit"},
+        {"id": "d", "text": "The Git version required by each submodule"}
+      ],
+      "correctOptionId": "b",
+      "explanation": ".gitmodules is a text configuration file that records the path and URL of each submodule. Example entry: [submodule \"vendor/lib\"] path = vendor/lib, url = https://github.com/org/lib.git. The pinned commit SHA is stored in the parent repo's tree/index as a special 'gitlink' entry, not in .gitmodules.",
+      "citations": [
+        {"label": "git-submodule reference", "url": "https://git-scm.com/docs/git-submodule"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q8",
+      "order": 8,
+      "text": "How do you clone a repository and immediately get all submodule content populated?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "git clone --with-submodules URL"},
+        {"id": "b", "text": "git clone URL && git submodule fetch --all"},
+        {"id": "c", "text": "git clone --recurse-submodules URL"},
+        {"id": "d", "text": "git clone URL && git submodule sync"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "git clone --recurse-submodules URL clones the parent repository and immediately initializes and clones all submodules (recursively, including nested submodules). Without this flag, submodule directories exist but are empty after cloning. You can achieve the same result on an already-cloned repo with: git submodule update --init --recursive.",
+      "citations": [
+        {"label": "git-submodule reference", "url": "https://git-scm.com/docs/git-submodule"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q9",
+      "order": 9,
+      "text": "What does `git bundle verify` check?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "That all commits in the bundle have valid GPG signatures"},
+        {"id": "b", "text": "That the bundle file is not corrupted and that the receiving repository has the prerequisite commits the bundle depends on"},
+        {"id": "c", "text": "That the bundle was created from the same repository as the target"},
+        {"id": "d", "text": "That no large binary files are included in the bundle"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "git bundle verify confirms that: (1) the bundle file header and data are structurally valid and not corrupted, and (2) if the bundle is incremental (created with a prerequisite like ^v2.0.0), the target repository already contains the prerequisite objects. If prerequisites are missing, applying the bundle would fail — verify catches this upfront.",
+      "citations": [
+        {"label": "git-bundle reference", "url": "https://git-scm.com/docs/git-bundle"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q10",
+      "order": 10,
+      "text": "You accidentally deleted a branch with `git branch -D feature/login`. How do you recover it using the reflog?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "git checkout feature/login — Git automatically restores deleted branches"},
+        {"id": "b", "text": "git branch feature/login origin/feature/login — fetch from the remote"},
+        {"id": "c", "text": "Run git reflog to find the tip SHA of the deleted branch, then git checkout -b feature/login SHA to recreate it"},
+        {"id": "d", "text": "git branch --restore feature/login — the built-in restore command"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "When a branch is deleted, its commits remain in the object store (until garbage collected). Run git reflog to see past HEAD positions — you'll find the SHA of the last commit on the deleted branch (look for 'commit: <message>' entries or 'checkout: moving to feature/login'). Then git checkout -b feature/login SHA recreates the branch pointer at that commit.",
+      "citations": [
+        {"label": "git-reflog reference", "url": "https://git-scm.com/docs/git-reflog"}
+      ],
+      "points": 10
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "id": "lab-git-expert-03",
+  "moduleId": "module-03-workflows",
+  "title": "Conventional Commits and GitHub Actions Workflow",
+  "description": "Write a proper conventional commit message with a breaking change, and create a GitHub Actions workflow that runs tests on push.",
+  "language": "yaml",
+  "monacoLanguage": "yaml",
+  "starterCode": "# Task 1: Write a GitHub Actions workflow (.github/workflows/ci.yml)\n# Requirements:\n#   - Trigger on push to main AND on pull_request targeting main\n#   - Check out the repository code\n#   - Set up Node.js version 20 with npm cache\n#   - Install dependencies with npm ci\n#   - Run the test suite with npm test\n#\n# Task 2 (as a YAML comment below the workflow):\n#   Show an example conventional commit message that includes:\n#   - A breaking change using the ! suffix on the type\n#   - A BREAKING CHANGE footer explaining what changed\n#   - A closes/issue reference\n\n# Write your workflow YAML below:\n",
+  "solutionCode": "# .github/workflows/ci.yml\nname: CI\n\non:\n  push:\n    branches: [main]\n  pull_request:\n    branches: [main]\n\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - name: Checkout code\n        uses: actions/checkout@v4\n      - name: Set up Node.js\n        uses: actions/setup-node@v4\n        with:\n          node-version: '20'\n          cache: 'npm'\n      - name: Install dependencies\n        run: npm ci\n      - name: Run tests\n        run: npm test\n\n# Example conventional commit with breaking change:\n# feat(api)!: remove deprecated /v1/users endpoint\n#\n# BREAKING CHANGE: The /v1/users endpoint has been removed.\n# Migrate to /v2/users which supports pagination and filtering.\n#\n# Closes #142\n",
+  "hints": [
+    "The 'on:' key defines triggers — use 'push:' and 'pull_request:' as sub-keys, each with 'branches: [main]'",
+    "Use actions/checkout@v4 (not v3) — always pin to the latest major version",
+    "actions/setup-node@v4 accepts 'node-version' and 'cache' parameters under 'with:'",
+    "npm ci is preferred over npm install in CI — it's faster and uses package-lock.json exactly",
+    "For breaking changes use the ! suffix: feat(scope)!: description, AND add a BREAKING CHANGE: footer"
+  ],
+  "validationRules": [
+    {
+      "id": "valid-yaml-syntax",
+      "type": "yamlParse",
+      "errorMessage": "The YAML must be valid syntax — check indentation, colons, and list formatting",
+      "points": 20
+    },
+    {
+      "id": "has-checkout-action",
+      "type": "contains",
+      "pattern": "actions/checkout@v4",
+      "errorMessage": "Use actions/checkout@v4 to check out the repository code",
+      "points": 20
+    },
+    {
+      "id": "has-setup-node",
+      "type": "contains",
+      "pattern": "actions/setup-node",
+      "errorMessage": "Set up Node.js with actions/setup-node",
+      "points": 20
+    },
+    {
+      "id": "has-push-trigger",
+      "type": "regex",
+      "pattern": "on:\\s*\\n\\s*push:|on:\\s*\\{\\s*push",
+      "errorMessage": "Trigger the workflow on push events using the 'on: push:' syntax",
+      "points": 20
+    },
+    {
+      "id": "has-breaking-change",
+      "type": "regex",
+      "pattern": "BREAKING CHANGE|feat.*!:",
+      "errorMessage": "Include an example conventional commit comment with a breaking change — use feat(scope)!: or a BREAKING CHANGE: footer",
+      "points": 20
+    }
+  ],
+  "simulatedOutput": {
+    "success": "YAML syntax valid \u2713\n\nWorkflow analysis:\n  Trigger: push to main, pull_request to main \u2713\n  Jobs: test (ubuntu-latest) \u2713\n  Steps:\n    \u2713 actions/checkout@v4\n    \u2713 actions/setup-node@v4 (Node 20, npm cache)\n    \u2713 npm ci\n    \u2713 npm test\n\nConventional commit example validated:\n  Type: feat  Scope: api\n  Breaking change: \u2713 (! suffix + BREAKING CHANGE footer)\n  Semantic version bump: MAJOR (1.x.x \u2192 2.0.0)\n\nThis workflow will appear under GitHub Actions \u2192 CI tab.",
+    "failure": "ERROR: Check that your YAML is valid, includes actions/checkout@v4, actions/setup-node, a push trigger, and a conventional commit example with a breaking change notation."
+  },
+  "maxScore": 100
+}

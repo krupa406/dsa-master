@@ -1,0 +1,187 @@
+{
+  "quizId": "quiz-git-beginner-01",
+  "moduleId": "module-01-basics",
+  "passingScore": 70,
+  "questions": [
+    {
+      "id": "q1",
+      "order": 1,
+      "text": "What is the purpose of the Staging Area (Index) in Git?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "It is a remote server where commits are uploaded before being finalised"},
+        {"id": "b", "text": "It is a preparation zone where you mark specific changes to be included in the next commit"},
+        {"id": "c", "text": "It is the .git directory that permanently stores all snapshots"},
+        {"id": "d", "text": "It is a temporary branch created automatically by git add"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "The Staging Area (also called the Index) is an intermediate area between your working directory and the repository. Running 'git add' copies the current state of a file into the index. When you run 'git commit', Git creates a snapshot from exactly what is in the index — letting you craft precise commits even when many files have changed.",
+      "citations": [
+        {"label": "Pro Git — What is Git? Recording Changes", "url": "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "order": 2,
+      "text": "What does `git init` create inside the target directory?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "A .git directory containing the object store, config, and refs"},
+        {"id": "b", "text": "A README.md file and an initial commit"},
+        {"id": "c", "text": "A remote repository on GitHub"},
+        {"id": "d", "text": "A staging server connection"}
+      ],
+      "correctOptionId": "a",
+      "explanation": "'git init' creates a .git subdirectory that contains everything Git needs: the object database (objects/), reference files (refs/), the HEAD pointer, configuration (config), and more. The working directory itself is left untouched.",
+      "citations": [
+        {"label": "git-init documentation", "url": "https://git-scm.com/docs/git-init"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "order": 3,
+      "text": "What is the difference between `git add` and `git commit`?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "git add saves a snapshot; git commit uploads it to a remote"},
+        {"id": "b", "text": "git add stages changes into the index; git commit creates a permanent snapshot from the index"},
+        {"id": "c", "text": "git add creates a new branch; git commit merges it"},
+        {"id": "d", "text": "They are aliases that perform the same operation"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "'git add' moves changes from the working directory into the staging area (index). 'git commit' takes everything currently in the index and writes an immutable commit object into the repository's object store. You must stage files with git add before they can be committed.",
+      "citations": [
+        {"label": "Pro Git — Recording Changes", "url": "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q4",
+      "order": 4,
+      "text": "What does HEAD point to in a normal (non-detached) Git repository?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "The first commit ever made in the repository"},
+        {"id": "b", "text": "The remote origin URL"},
+        {"id": "c", "text": "The current branch reference, which in turn points to the latest commit on that branch"},
+        {"id": "d", "text": "The staging area contents"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "HEAD is a special symbolic reference that normally points to the current branch (e.g., 'ref: refs/heads/main'). The branch pointer then points to the latest commit on that branch. When you make a new commit, the branch pointer advances and HEAD follows it. In 'detached HEAD' state, HEAD points directly to a commit SHA rather than a branch.",
+      "citations": [
+        {"label": "git-symbolic-ref and HEAD", "url": "https://git-scm.com/docs/git-symbolic-ref"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "order": 5,
+      "text": "What does the `-m` flag do in the command `git commit -m \"Initial commit\"`?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "It creates a merge commit"},
+        {"id": "b", "text": "It marks the commit as a milestone"},
+        {"id": "c", "text": "It provides the commit message inline, bypassing the text editor"},
+        {"id": "d", "text": "It amends the most recent commit"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "The -m flag (short for --message) allows you to specify the commit message directly on the command line. Without -m, Git opens your configured text editor (e.g., vim, nano) so you can write a multi-line message. Using -m is convenient for short, single-line messages.",
+      "citations": [
+        {"label": "git-commit documentation", "url": "https://git-scm.com/docs/git-commit"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q6",
+      "order": 6,
+      "text": "What information does `git status` display?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "The full commit history with SHA-1 hashes and timestamps"},
+        {"id": "b", "text": "The current branch name, staged changes, unstaged changes, and untracked files"},
+        {"id": "c", "text": "The diff of all uncommitted changes in unified format"},
+        {"id": "d", "text": "The list of configured remote repositories"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "'git status' reports the current branch, what is staged for the next commit (changes to be committed), what is modified but not staged (changes not staged for commit), and any untracked files. It is the primary command for understanding the current state of your working tree and index.",
+      "citations": [
+        {"label": "git-status documentation", "url": "https://git-scm.com/docs/git-status"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q7",
+      "order": 7,
+      "text": "What is the difference between `git diff` and `git diff --staged`?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "`git diff` shows all changes including staged; `git diff --staged` shows only committed changes"},
+        {"id": "b", "text": "`git diff` shows unstaged changes (working directory vs index); `git diff --staged` shows staged changes (index vs last commit)"},
+        {"id": "c", "text": "They are identical — both compare the working directory to the last commit"},
+        {"id": "d", "text": "`git diff` compares two branches; `git diff --staged` compares two commits"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "'git diff' (with no extra arguments) compares your working directory against the staging area (index) — showing changes you have made but not yet staged. 'git diff --staged' (also aliased as --cached) compares the staging area against the most recent commit — showing what would be included in the next commit.",
+      "citations": [
+        {"label": "git-diff documentation", "url": "https://git-scm.com/docs/git-diff"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q8",
+      "order": 8,
+      "text": "What does the `.git` directory contain?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Only the current branch's working files as a backup"},
+        {"id": "b", "text": "The complete object database (blobs, trees, commits, tags), refs, HEAD, and repository configuration"},
+        {"id": "c", "text": "A log of terminal commands run in the project folder"},
+        {"id": "d", "text": "SSH keys used for authentication with the remote"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "The .git directory is the Git repository itself. It contains: objects/ (the content-addressed store for blobs, trees, commits, and tags), refs/ (branch and tag pointers), HEAD (the current branch reference), config (local repository configuration), index (the staging area), and COMMIT_EDITMSG (the last commit message), among others.",
+      "citations": [
+        {"label": "Pro Git — Git Internals", "url": "https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q9",
+      "order": 9,
+      "text": "What does a SHA-1 hash identify in Git?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "The username of the person who last edited a file"},
+        {"id": "b", "text": "A unique content-addressed object (blob, tree, commit, or tag) in the object store"},
+        {"id": "c", "text": "The line number where a conflict occurred"},
+        {"id": "d", "text": "The remote server address"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Git uses SHA-1 hashes (40 hexadecimal characters) as content-addressed identifiers for every object in its store: blobs (file contents), trees (directory listings), commits, and annotated tags. The hash is computed from the object's content and type, so the same content always maps to the same hash — and any change produces a completely different hash.",
+      "citations": [
+        {"label": "Pro Git — Git Objects", "url": "https://git-scm.com/book/en/v2/Git-Internals-Git-Objects"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q10",
+      "order": 10,
+      "text": "Which command shows the full commit history with author name, committer, and dates for each commit?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "git log --oneline"},
+        {"id": "b", "text": "git status --verbose"},
+        {"id": "c", "text": "git diff HEAD"},
+        {"id": "d", "text": "git log --pretty=fuller"}
+      ],
+      "correctOptionId": "d",
+      "explanation": "'git log --pretty=fuller' displays the full commit hash, Author (name + email + date), Committer (name + email + date), and the full commit message for every commit. '--oneline' only shows the abbreviated hash and subject line. '--pretty=fuller' is the most detailed built-in format for inspecting commit metadata.",
+      "citations": [
+        {"label": "git-log documentation", "url": "https://git-scm.com/docs/git-log"}
+      ],
+      "points": 10
+    }
+  ]
+}

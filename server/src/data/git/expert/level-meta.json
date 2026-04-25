@@ -1,0 +1,9 @@
+{
+  "id": "git-expert",
+  "tech": "git",
+  "level": "expert",
+  "title": "Git Expert",
+  "description": "Git object model and internals, advanced tooling (bisect, reflog, worktrees, submodules), and professional workflows including trunk-based development, conventional commits, signed commits, and CI/CD integration.",
+  "estimatedHours": 4,
+  "moduleOrder": ["module-01-internals", "module-02-advanced-tools", "module-03-workflows"]
+}

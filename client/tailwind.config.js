@@ -7,6 +7,7 @@ export default {
         ansible: { DEFAULT: '#EE0000', light: '#FF4444', dark: '#CC0000' },
         terraform: { DEFAULT: '#7B42BC', light: '#9B62DC', dark: '#5B22AC' },
         kubernetes: { DEFAULT: '#326CE5', light: '#5288FF', dark: '#2255CC' },
+        git: { DEFAULT: '#F05032' },
       },
       fontFamily: {
         mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],

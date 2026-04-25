@@ -1,0 +1,188 @@
+{
+  "quizId": "quiz-git-intermediate-01",
+  "moduleId": "module-01-rebase",
+  "passingScore": 70,
+  "questions": [
+    {
+      "id": "q1",
+      "order": 1,
+      "text": "What does git rebase do to the SHA hashes of the replayed commits?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "It keeps the SHA hashes identical to the originals"},
+        {"id": "b", "text": "It rewrites each replayed commit with a new SHA hash"},
+        {"id": "c", "text": "It appends a suffix to each existing SHA hash"},
+        {"id": "d", "text": "SHA hashes are only rewritten if there are merge conflicts"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Rebase replays each commit as a brand-new commit object on top of the target branch. Because the parent commit changes, the commit content differs, and Git computes a completely new SHA hash for every replayed commit. This is why rebasing published/shared commits is dangerous — others who have the old SHAs will have diverged histories.",
+      "citations": [
+        {"label": "git-rebase documentation", "url": "https://git-scm.com/docs/git-rebase"},
+        {"label": "Pro Git: Rebasing", "url": "https://git-scm.com/book/en/v2/Git-Branching-Rebasing"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "order": 2,
+      "text": "What is the 'golden rule' of rebasing?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Always use rebase instead of merge for a cleaner history"},
+        {"id": "b", "text": "Never rebase commits that have been pushed to a remote shared branch"},
+        {"id": "c", "text": "Always squash WIP commits before rebasing"},
+        {"id": "d", "text": "Only rebase branches that have more than three commits"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "The golden rule of rebasing is never to rebase commits that others may have based work on. When you rebase shared commits, you rewrite history and force everyone else to reconcile their diverged histories. Reserve rebase for local, unpublished commits.",
+      "citations": [
+        {"label": "Pro Git: The Perils of Rebasing", "url": "https://git-scm.com/book/en/v2/Git-Branching-Rebasing#_rebase_peril"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "order": 3,
+      "text": "In interactive rebase, what is the difference between 'squash' and 'fixup'?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "squash discards the commit message; fixup keeps both messages"},
+        {"id": "b", "text": "squash keeps both commit messages for editing; fixup silently discards this commit's message"},
+        {"id": "c", "text": "squash and fixup behave identically"},
+        {"id": "d", "text": "fixup opens an editor; squash does not"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Both squash and fixup fold the marked commit into the previous one. The difference is in message handling: squash opens your editor with both commit messages combined so you can craft a final message; fixup silently discards the marked commit's message and keeps only the previous commit's message. Use fixup for truly trivial WIP commits where the message isn't worth keeping.",
+      "citations": [
+        {"label": "git-rebase: interactive mode", "url": "https://git-scm.com/docs/git-rebase#_interactive_mode"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q4",
+      "order": 4,
+      "text": "What does `git rebase -i HEAD~4` operate on?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "The 4 commits on the main branch"},
+        {"id": "b", "text": "All commits since the branch was created"},
+        {"id": "c", "text": "The last 4 commits on the current branch"},
+        {"id": "d", "text": "Commits 4 through 8 counting from HEAD"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "HEAD~4 refers to the commit four steps back from HEAD. git rebase -i HEAD~4 presents the last four commits on the current branch in the interactive to-do list, letting you reorder, squash, reword, or drop any of them.",
+      "citations": [
+        {"label": "git-rebase documentation", "url": "https://git-scm.com/docs/git-rebase"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "order": 5,
+      "text": "Which command flag enables autosquash behavior when running interactive rebase?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "git rebase -i --squash-all"},
+        {"id": "b", "text": "git rebase -i --autosquash"},
+        {"id": "c", "text": "git rebase --auto -i"},
+        {"id": "d", "text": "git rebase -i --fixup-all"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "git rebase -i --autosquash automatically reorders and marks commits created with git commit --fixup <SHA> or git commit --squash <SHA>. The fixup/squash commits are moved directly after their target commit in the to-do list and given the appropriate command, saving you the manual rearranging step.",
+      "citations": [
+        {"label": "git-rebase --autosquash", "url": "https://git-scm.com/docs/git-rebase#Documentation/git-rebase.txt---autosquash"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q6",
+      "order": 6,
+      "text": "How do you safely abort a rebase that is currently in progress?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "git rebase --quit"},
+        {"id": "b", "text": "git reset --hard HEAD"},
+        {"id": "c", "text": "git rebase --abort"},
+        {"id": "d", "text": "git checkout --detach"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "git rebase --abort stops the in-progress rebase and returns the branch to the state it was in before the rebase started. It is the safe way to bail out when you encounter unexpected conflicts or realize you started the rebase incorrectly.",
+      "citations": [
+        {"label": "git-rebase --abort", "url": "https://git-scm.com/docs/git-rebase#Documentation/git-rebase.txt---abort"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q7",
+      "order": 7,
+      "text": "What does the 'edit' command do in an interactive rebase to-do list?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Opens a text editor to change only the commit message"},
+        {"id": "b", "text": "Pauses the rebase at that commit so you can amend it, add files, or split it"},
+        {"id": "c", "text": "Marks the commit to be deleted"},
+        {"id": "d", "text": "Combines the commit with the next commit"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "The 'edit' command causes rebase to pause after applying that commit, dropping you back to the command line with the commit already applied. From there you can run git commit --amend to change the message or content, git add to stage more changes, or even git reset HEAD^ to split the commit into multiple commits. Run git rebase --continue when done.",
+      "citations": [
+        {"label": "git-rebase: interactive mode", "url": "https://git-scm.com/docs/git-rebase#_interactive_mode"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q8",
+      "order": 8,
+      "text": "When does a rebase create a merge conflict?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Only when the branch being rebased is more than 10 commits ahead"},
+        {"id": "b", "text": "Whenever any files were modified in the rebased commits"},
+        {"id": "c", "text": "When a replayed commit changes lines that were also changed by a commit on the target branch"},
+        {"id": "d", "text": "Never — rebase always resolves conflicts automatically"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "A conflict occurs when a commit being replayed modifies the same lines that were already changed by a commit on the target branch, just as with a merge. The key difference is that with rebase you may encounter conflicts once per replayed commit, whereas merge consolidates all conflicts into a single resolution step.",
+      "citations": [
+        {"label": "git-rebase: resolving conflicts", "url": "https://git-scm.com/docs/git-rebase#_resolving_conflicts"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q9",
+      "order": 9,
+      "text": "What is the primary advantage of a linear history (produced by rebase) over a history with merge commits?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Linear history stores files more efficiently on disk"},
+        {"id": "b", "text": "Linear history is easier to read, bisect, and reason about — git log and git bisect work cleanly without branch topology"},
+        {"id": "c", "text": "Linear history prevents all future merge conflicts"},
+        {"id": "d", "text": "Linear history allows reverting individual commits without side effects"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "A linear history makes git log much more readable since commits flow in a single sequence with no branch forks or merge commits. It also makes git bisect more reliable and git blame output cleaner. The trade-off is the loss of branch topology information that merge commits would have preserved.",
+      "citations": [
+        {"label": "Pro Git: Rebasing", "url": "https://git-scm.com/book/en/v2/Git-Branching-Rebasing"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q10",
+      "order": 10,
+      "text": "What does `git rebase --onto` allow you to do?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Rebase only the staged changes without committing"},
+        {"id": "b", "text": "Transplant a range of commits from one base to a completely different base branch"},
+        {"id": "c", "text": "Force a rebase even when the golden rule would be violated"},
+        {"id": "d", "text": "Create a new branch at the rebase target"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "git rebase --onto newbase upstream [branch] lets you precisely specify which commits to replay and where to put them. For example, if a topic branch was mistakenly branched from a feature branch, you can use --onto to transplant only the topic commits directly onto main, leaving the feature branch commits behind. It is the most surgical form of rebase.",
+      "citations": [
+        {"label": "git-rebase --onto", "url": "https://git-scm.com/docs/git-rebase#Documentation/git-rebase.txt---ontoltnewbasegt"}
+      ],
+      "points": 10
+    }
+  ]
+}

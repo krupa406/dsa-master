@@ -1,0 +1,187 @@
+{
+  "quizId": "quiz-git-beginner-03",
+  "moduleId": "module-03-remotes",
+  "passingScore": 70,
+  "questions": [
+    {
+      "id": "q1",
+      "order": 1,
+      "text": "What is `origin` in Git?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "The first branch created in a repository, equivalent to main"},
+        {"id": "b", "text": "The conventional name for the primary remote — a named alias for a remote repository URL"},
+        {"id": "c", "text": "A special tag automatically placed on the initial commit"},
+        {"id": "d", "text": "The local .git directory"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "'origin' is simply the default name Git gives to the remote when you run 'git clone'. It is an alias for the remote repository URL. You can have remotes with any name, but 'origin' is the strong convention for the primary one. Having multiple remotes (e.g., 'origin' for your fork and 'upstream' for the source project) is common in open-source workflows.",
+      "citations": [
+        {"label": "Pro Git — Working with Remotes", "url": "https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "order": 2,
+      "text": "What does `git clone` automatically set up in terms of remote configuration?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "It creates a remote named 'clone' pointing to the source URL"},
+        {"id": "b", "text": "It sets up a remote named 'origin' pointing to the cloned URL, with remote-tracking branches for every remote branch"},
+        {"id": "c", "text": "It only downloads the latest commit, not the full history"},
+        {"id": "d", "text": "It requires you to manually add the remote with git remote add after cloning"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "'git clone <url>' downloads the full repository, creates a local copy, and automatically configures a remote named 'origin' pointing to the source URL. It also creates remote-tracking branches (e.g., origin/main) for every branch on the remote, and checks out the default branch.",
+      "citations": [
+        {"label": "git-clone documentation", "url": "https://git-scm.com/docs/git-clone"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "order": 3,
+      "text": "What is the key difference between `git fetch` and `git pull`?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "git fetch downloads only the latest commit; git pull downloads full history"},
+        {"id": "b", "text": "git fetch downloads new objects and updates remote-tracking refs but does NOT modify your working directory or local branches; git pull performs fetch AND merges the result into your current branch"},
+        {"id": "c", "text": "git fetch is for downloading tags; git pull is for downloading commits"},
+        {"id": "d", "text": "They are identical — git fetch is just an older alias for git pull"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "'git fetch origin' downloads all new objects from the remote and updates remote-tracking branches (e.g., origin/main) without touching your local branches or working directory — it is always safe to run. 'git pull' is shorthand for 'git fetch' followed by 'git merge' (or rebase), integrating the remote changes immediately into your current branch.",
+      "citations": [
+        {"label": "git-fetch documentation", "url": "https://git-scm.com/docs/git-fetch"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q4",
+      "order": 4,
+      "text": "What does the `-u` flag do in `git push -u origin main`?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "It forces the push, overwriting the remote branch even if there are conflicts"},
+        {"id": "b", "text": "It sets up a tracking relationship so that future git push and git pull commands can be run without specifying the remote or branch name"},
+        {"id": "c", "text": "It updates the remote URL stored in .git/config"},
+        {"id": "d", "text": "It uploads only uncommitted changes"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "The -u flag (--set-upstream) records in .git/config that the local branch 'main' tracks 'origin/main'. After this initial push, you can run just 'git push' or 'git pull' with no arguments — Git knows which remote branch to interact with. Without -u, you must always specify 'git push origin main'.",
+      "citations": [
+        {"label": "git-push documentation", "url": "https://git-scm.com/docs/git-push"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "order": 5,
+      "text": "What does a remote-tracking branch like `origin/main` represent?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "A local writable branch that automatically syncs with the remote"},
+        {"id": "b", "text": "A read-only local reference that reflects the last known state of the 'main' branch on the 'origin' remote"},
+        {"id": "c", "text": "A backup copy of the main branch stored on the remote server"},
+        {"id": "d", "text": "An alias for HEAD on the remote server"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Remote-tracking branches (refs/remotes/origin/*) are read-only local references. They record the last state you fetched from the remote — they are not automatically updated as you work. Running 'git fetch origin' brings them up to date. You cannot check out and commit directly on a remote-tracking branch; you must check out a local branch first.",
+      "citations": [
+        {"label": "Pro Git — Remote Branches", "url": "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q6",
+      "order": 6,
+      "text": "What does `git remote -v` display?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "A verbose log of all push and fetch operations performed"},
+        {"id": "b", "text": "Each configured remote name alongside its fetch URL and push URL"},
+        {"id": "c", "text": "The version of the remote Git server"},
+        {"id": "d", "text": "The list of remote-tracking branches"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "'git remote -v' (--verbose) lists each remote name twice — once with its fetch URL (used by git fetch/pull) and once with its push URL (used by git push). By default these are the same URL, but they can differ if configured separately (e.g., to use SSH for push and HTTPS for fetch).",
+      "citations": [
+        {"label": "git-remote documentation", "url": "https://git-scm.com/docs/git-remote"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q7",
+      "order": 7,
+      "text": "Which command changes the URL of an existing remote named `origin`?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "git remote update origin <new-url>"},
+        {"id": "b", "text": "git remote set-url origin <new-url>"},
+        {"id": "c", "text": "git remote change origin <new-url>"},
+        {"id": "d", "text": "git config remote.origin.url <new-url> only works in .gitconfig"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "'git remote set-url origin <new-url>' is the standard command to change an existing remote's URL — for example, after a repository is renamed or when switching from HTTPS to SSH. Alternatively, you can manually edit the [remote \"origin\"] section in .git/config, but 'git remote set-url' is the safe, recommended approach.",
+      "citations": [
+        {"label": "git-remote documentation", "url": "https://git-scm.com/docs/git-remote"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q8",
+      "order": 8,
+      "text": "What does `FETCH_HEAD` store after running `git fetch`?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "The SHA-1 of the most recently fetched branch tip from the remote"},
+        {"id": "b", "text": "The authentication token used during the last fetch"},
+        {"id": "c", "text": "A log of all objects fetched in the last 30 days"},
+        {"id": "d", "text": "The name of the remote that was fetched"}
+      ],
+      "correctOptionId": "a",
+      "explanation": "FETCH_HEAD is a special ref file (.git/FETCH_HEAD) that records the SHA-1 hash of the tip of the branch that was most recently fetched. You can use it to merge fetched content immediately: 'git merge FETCH_HEAD'. When multiple refs are fetched, FETCH_HEAD contains one line per branch with its SHA-1, name, and remote.",
+      "citations": [
+        {"label": "git-fetch documentation", "url": "https://git-scm.com/docs/git-fetch"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q9",
+      "order": 9,
+      "text": "Why is `git fetch` considered safer than `git pull` in a collaborative workflow?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "git fetch verifies commit signatures; git pull does not"},
+        {"id": "b", "text": "git fetch only downloads to remote-tracking refs and does not modify your local branch or working directory, giving you a chance to review before integrating"},
+        {"id": "c", "text": "git fetch is atomic; git pull can be interrupted mid-operation"},
+        {"id": "d", "text": "git fetch works over SSH only, which is more secure than HTTPS"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Because 'git fetch' only updates remote-tracking refs (e.g., origin/main) without touching your local branches or working directory, you can inspect what arrived ('git log origin/main', 'git diff main origin/main') before deciding how to integrate. 'git pull' skips that review step by immediately merging, which can cause unexpected conflicts or history changes in your current branch.",
+      "citations": [
+        {"label": "Pro Git — Fetching and Pulling", "url": "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches#_fetching"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q10",
+      "order": 10,
+      "text": "What happens when your local branch and the remote branch have diverged and you try to push without first integrating the remote changes?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Git automatically merges the remote changes into your local branch and then pushes"},
+        {"id": "b", "text": "Git rejects the push with a 'non-fast-forward' error, requiring you to fetch and integrate the remote changes before pushing"},
+        {"id": "c", "text": "Git silently drops your local commits and replaces them with the remote version"},
+        {"id": "d", "text": "Git creates a new remote branch to avoid the conflict"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "When local and remote branches have diverged (each has commits the other lacks), a plain 'git push' fails with a rejection message such as 'Updates were rejected because the remote contains work that you do not have locally.' You must first integrate the remote changes with 'git fetch' + 'git merge' (or 'git pull'), resolve any conflicts, and then push. Use 'git push --force' only when you intentionally want to overwrite the remote — be very cautious with this.",
+      "citations": [
+        {"label": "Pro Git — Pushing", "url": "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches#_pushing"}
+      ],
+      "points": 10
+    }
+  ]
+}

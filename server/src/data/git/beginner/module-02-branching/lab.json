@@ -1,0 +1,59 @@
+{
+  "id": "lab-git-beginner-02",
+  "moduleId": "module-02-branching",
+  "title": "Feature Branch Workflow",
+  "description": "Create a feature branch, make commits on it, switch back to main, and merge the feature in.",
+  "language": "shell",
+  "monacoLanguage": "shell",
+  "starterCode": "# Write shell commands to:\n# 1. Create and switch to a branch called feature/add-login\n#    (use git switch -c or git checkout -b)\n# 2. Make two commits on the feature branch\n#    (you can echo files and commit them)\n# 3. Switch back to the main branch\n# 4. Merge the feature/add-login branch into main\n# 5. Delete the feature/add-login branch\n\n",
+  "solutionCode": "git switch -c feature/add-login\necho \"<form>Login</form>\" > login.html\ngit add login.html\ngit commit -m \"Add login form\"\necho \"function validate() {}\" > validate.js\ngit add validate.js\ngit commit -m \"Add form validation\"\ngit switch main\ngit merge feature/add-login\ngit branch -d feature/add-login\n",
+  "hints": [
+    "git switch -c <branch-name> creates and switches to the branch in one step",
+    "Make two separate commits — each with git add then git commit -m",
+    "git switch main (or git checkout main) returns you to the main branch",
+    "git merge feature/add-login merges the feature into your current branch",
+    "git branch -d deletes a branch safely (only if it is already merged)"
+  ],
+  "validationRules": [
+    {
+      "id": "has-create-switch",
+      "type": "regex",
+      "pattern": "git (switch -c|checkout -b) feature/add-login",
+      "errorMessage": "Create and switch to feature/add-login using git switch -c or git checkout -b",
+      "points": 20
+    },
+    {
+      "id": "has-commit",
+      "type": "contains",
+      "pattern": "git commit",
+      "errorMessage": "Make at least one commit on the feature branch",
+      "points": 20
+    },
+    {
+      "id": "has-switch-main",
+      "type": "regex",
+      "pattern": "git (switch main|checkout main)",
+      "errorMessage": "Switch back to main branch using git switch main or git checkout main",
+      "points": 20
+    },
+    {
+      "id": "has-merge",
+      "type": "contains",
+      "pattern": "git merge feature/add-login",
+      "errorMessage": "Merge the feature branch into main with git merge feature/add-login",
+      "points": 20
+    },
+    {
+      "id": "has-delete",
+      "type": "regex",
+      "pattern": "git branch -[dD] feature/add-login",
+      "errorMessage": "Delete the feature branch after merging with git branch -d feature/add-login",
+      "points": 20
+    }
+  ],
+  "simulatedOutput": {
+    "success": "Switched to a new branch 'feature/add-login'\n[feature/add-login 2c4e6f8] Add login form\n 1 file changed, 1 insertion(+)\n create mode 100644 login.html\n[feature/add-login 9a1b3d5] Add form validation\n 1 file changed, 1 insertion(+)\n create mode 100644 validate.js\nSwitched to branch 'main'\nUpdating a1b2c3d..9a1b3d5\nFast-forward\n login.html   | 1 +\n validate.js  | 1 +\n 2 files changed, 2 insertions(+)\nDeleted branch feature/add-login (was 9a1b3d5).",
+    "failure": "Some required steps are missing. Make sure you create the feature/add-login branch, commit on it, switch back to main, merge, and delete the branch."
+  },
+  "maxScore": 100
+}

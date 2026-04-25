@@ -11,8 +11,8 @@ import TheoryPanel from '../components/module/TheoryPanel'
 import ModuleOutline from '../components/module/ModuleOutline'
 import { BookOpen, FlaskConical, ChevronLeft, ChevronRight, Award } from 'lucide-react'
 
-const TECH_ACCENT = { ansible: 'border-red-500', terraform: 'border-purple-500', kubernetes: 'border-blue-500' }
-const TECH_TAB_ACTIVE = { ansible: 'border-red-400 text-red-400', terraform: 'border-purple-400 text-purple-400', kubernetes: 'border-blue-400 text-blue-400' }
+const TECH_ACCENT = { ansible: 'border-red-500', terraform: 'border-purple-500', kubernetes: 'border-blue-500', git: 'border-orange-500' }
+const TECH_TAB_ACTIVE = { ansible: 'border-red-400 text-red-400', terraform: 'border-purple-400 text-purple-400', kubernetes: 'border-blue-400 text-blue-400', git: 'border-orange-400 text-orange-400' }
 
 export default function ModulePage() {
   const { tech, level, moduleId } = useParams()

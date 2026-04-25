@@ -1,0 +1,59 @@
+{
+  "id": "lab-git-beginner-01",
+  "moduleId": "module-01-basics",
+  "title": "Your First Git Repository",
+  "description": "Write the shell commands to initialise a repository, configure your identity, stage a file, and make your first commit.",
+  "language": "shell",
+  "monacoLanguage": "shell",
+  "starterCode": "# Write shell commands to:\n# 1. Initialise a new git repo in a folder called my-project\n#    (assume you have already cd'd into my-project)\n# 2. Set your global user.name to \"Alice Dev\"\n# 3. Set your global user.email to \"alice@example.com\"\n# 4. Create a README.md file: echo \"# My Project\" > README.md\n# 5. Stage README.md\n# 6. Commit with message \"Initial commit\"\n# 7. Show the log in one-line format\n\n",
+  "solutionCode": "git init\ngit config --global user.name \"Alice Dev\"\ngit config --global user.email \"alice@example.com\"\necho \"# My Project\" > README.md\ngit add README.md\ngit commit -m \"Initial commit\"\ngit log --oneline\n",
+  "hints": [
+    "Use git init in the target directory",
+    "git config --global sets values in ~/.gitconfig",
+    "git add <filename> stages a specific file",
+    "git commit -m \"message\" commits with an inline message",
+    "git log --oneline shows compact history"
+  ],
+  "validationRules": [
+    {
+      "id": "has-init",
+      "type": "contains",
+      "pattern": "git init",
+      "errorMessage": "Initialise the repository with git init",
+      "points": 20
+    },
+    {
+      "id": "has-config",
+      "type": "contains",
+      "pattern": "git config",
+      "errorMessage": "Configure your user identity with git config",
+      "points": 20
+    },
+    {
+      "id": "has-add",
+      "type": "contains",
+      "pattern": "git add",
+      "errorMessage": "Stage the file with git add",
+      "points": 20
+    },
+    {
+      "id": "has-commit",
+      "type": "contains",
+      "pattern": "git commit",
+      "errorMessage": "Commit the staged file with git commit",
+      "points": 20
+    },
+    {
+      "id": "has-log",
+      "type": "contains",
+      "pattern": "git log",
+      "errorMessage": "View the history with git log",
+      "points": 20
+    }
+  ],
+  "simulatedOutput": {
+    "success": "Initialized empty Git repository in /home/alice/my-project/.git/\n\n[main (root-commit) a1b2c3d] Initial commit\n 1 file changed, 1 insertion(+)\n create mode 100644 README.md\n\na1b2c3d (HEAD -> main) Initial commit",
+    "failure": "Some required commands are missing. Make sure you run git init, git config, git add, git commit, and git log."
+  },
+  "maxScore": 100
+}

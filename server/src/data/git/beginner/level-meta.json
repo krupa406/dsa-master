@@ -1,0 +1,9 @@
+{
+  "id": "git-beginner",
+  "tech": "git",
+  "level": "beginner",
+  "title": "Git Beginner",
+  "description": "Master the foundations of Git version control: initialising repositories, staging and committing changes, branching, merging, and remote collaboration.",
+  "estimatedHours": 2,
+  "moduleOrder": ["module-01-basics", "module-02-branching", "module-03-remotes"]
+}

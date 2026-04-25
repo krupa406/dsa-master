@@ -1,0 +1,59 @@
+{
+  "id": "lab-git-beginner-03",
+  "moduleId": "module-03-remotes",
+  "title": "Push to a Remote Repository",
+  "description": "Write the shell commands to add a remote, verify it, push with upstream tracking, fetch, and pull.",
+  "language": "shell",
+  "monacoLanguage": "shell",
+  "starterCode": "# Write shell commands to:\n# 1. Add a remote named origin pointing to\n#    https://github.com/alice/my-project.git\n# 2. Verify the remotes are set up correctly (list with URLs)\n# 3. Push the main branch to origin and set upstream tracking (-u)\n# 4. Fetch updates from origin\n# 5. Pull the latest changes\n\n",
+  "solutionCode": "git remote add origin https://github.com/alice/my-project.git\ngit remote -v\ngit push -u origin main\ngit fetch origin\ngit pull\n",
+  "hints": [
+    "git remote add <name> <url> registers a new remote",
+    "git remote -v lists all remotes with their fetch and push URLs",
+    "git push -u origin main pushes and sets the upstream tracking branch",
+    "git fetch origin downloads new data without modifying your local branches",
+    "git pull integrates the fetched remote changes into your current branch"
+  ],
+  "validationRules": [
+    {
+      "id": "has-remote-add",
+      "type": "contains",
+      "pattern": "git remote add origin",
+      "errorMessage": "Add the remote with: git remote add origin <url>",
+      "points": 20
+    },
+    {
+      "id": "has-remote-v",
+      "type": "contains",
+      "pattern": "git remote -v",
+      "errorMessage": "Verify your remotes with git remote -v",
+      "points": 20
+    },
+    {
+      "id": "has-push-upstream",
+      "type": "regex",
+      "pattern": "git push -u origin|git push --set-upstream origin",
+      "errorMessage": "Push with -u to set upstream tracking: git push -u origin main",
+      "points": 20
+    },
+    {
+      "id": "has-fetch",
+      "type": "contains",
+      "pattern": "git fetch",
+      "errorMessage": "Download remote updates with git fetch",
+      "points": 20
+    },
+    {
+      "id": "has-pull",
+      "type": "contains",
+      "pattern": "git pull",
+      "errorMessage": "Integrate remote changes with git pull",
+      "points": 20
+    }
+  ],
+  "simulatedOutput": {
+    "success": "remote: origin\nremote: https://github.com/alice/my-project.git (fetch)\nremote: https://github.com/alice/my-project.git (push)\n\nBranch 'main' set up to track remote branch 'main' from 'origin'.\nTo https://github.com/alice/my-project.git\n * [new branch]      main -> main\n\nFetching origin\nAlready up to date.",
+    "failure": "Some required steps are missing. Make sure you run git remote add origin, git remote -v, git push -u origin, git fetch, and git pull."
+  },
+  "maxScore": 100
+}

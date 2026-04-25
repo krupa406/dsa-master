@@ -1,0 +1,187 @@
+{
+  "quizId": "quiz-git-intermediate-03",
+  "moduleId": "module-03-hooks-config",
+  "passingScore": 70,
+  "questions": [
+    {
+      "id": "q1",
+      "order": 1,
+      "text": "Which Git configuration scope takes the highest precedence?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "System (/etc/gitconfig)"},
+        {"id": "b", "text": "Global (~/.gitconfig)"},
+        {"id": "c", "text": "Local (.git/config)"},
+        {"id": "d", "text": "All scopes have equal precedence"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "Git configuration precedence from highest to lowest is: local (.git/config inside the repo) → global (~/.gitconfig for the current user) → system (/etc/gitconfig for all users). A local setting always overrides a global one, which in turn overrides a system one. This allows per-project overrides without affecting your global defaults.",
+      "citations": [
+        {"label": "git-config documentation", "url": "https://git-scm.com/docs/git-config"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "order": 2,
+      "text": "Where are client-side Git hooks stored?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "In the repository root alongside .gitignore"},
+        {"id": "b", "text": "In the .git/hooks/ directory inside the repository"},
+        {"id": "c", "text": "In ~/.git/hooks/ in your home directory"},
+        {"id": "d", "text": "In /etc/git/hooks/ as system-wide scripts"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Client-side hooks live in the .git/hooks/ directory of each repository. Git ships sample hooks there with a .sample extension (which disables them). To activate a hook, remove the .sample suffix and make the file executable with chmod +x. Because .git/ is not committed, hooks are local-only by default.",
+      "citations": [
+        {"label": "githooks documentation", "url": "https://git-scm.com/docs/githooks"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "order": 3,
+      "text": "What happens when a pre-commit hook exits with code 1?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Git shows a warning but continues creating the commit"},
+        {"id": "b", "text": "Git aborts the commit and nothing is recorded"},
+        {"id": "c", "text": "Git pauses and prompts you to fix the issue before continuing"},
+        {"id": "d", "text": "Git skips all subsequent hooks but still creates the commit"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Any client-side hook that exits with a non-zero exit code causes Git to abort the current operation. For pre-commit, this means the commit is cancelled — no commit object is created. The developer sees the hook's output (usually an error message) and must fix the issue and re-run git commit.",
+      "citations": [
+        {"label": "githooks: pre-commit", "url": "https://git-scm.com/docs/githooks#_pre_commit"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q4",
+      "order": 4,
+      "text": "How can a team share Git hooks across all developers without requiring manual setup?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Commit the .git/hooks/ directory to the repository"},
+        {"id": "b", "text": "Use a tool like Husky or the pre-commit framework, which installs hooks from a committed configuration file"},
+        {"id": "c", "text": "Set core.hooksPath to a public URL in the global config"},
+        {"id": "d", "text": "Hooks are automatically shared when you git push to a remote"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "The .git/ directory is never pushed, so hooks cannot be shared by committing them there. Tools like Husky (for Node.js projects) and the pre-commit framework (Python-based) solve this by reading a committed config file (.husky/ directory or .pre-commit-config.yaml) and automatically installing the hooks into each developer's .git/hooks/ when they set up the project.",
+      "citations": [
+        {"label": "githooks documentation", "url": "https://git-scm.com/docs/githooks"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "order": 5,
+      "text": "What does `git config --list --show-origin` do?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Lists all remote URLs configured for the current repository"},
+        {"id": "b", "text": "Shows all configuration key=value pairs along with the file path each setting comes from"},
+        {"id": "c", "text": "Prints the origin remote's configuration only"},
+        {"id": "d", "text": "Shows only global configuration settings and ignores local overrides"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "git config --list outputs all effective configuration values. Adding --show-origin prefixes each line with the file path (or URL) that the setting originates from, e.g., file:/home/alice/.gitconfig  user.name=Alice. This is the fastest way to audit which config file is defining a particular setting and diagnose override issues.",
+      "citations": [
+        {"label": "git-config --show-origin", "url": "https://git-scm.com/docs/git-config#Documentation/git-config.txt---show-origin"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q6",
+      "order": 6,
+      "text": "Which `.gitignore` pattern ignores a directory named `build` at any depth in the repository tree?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "build"},
+        {"id": "b", "text": "build/"},
+        {"id": "c", "text": "**/build/"},
+        {"id": "d", "text": "/**/build"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "The ** glob matches any number of directories. **/build/ matches a directory named build at any level (root, src/build/, packages/foo/build/, etc.). build/ alone matches only in the root of the repository (or whichever .gitignore file it appears in). Using **/ makes the pattern truly recursive.",
+      "citations": [
+        {"label": "gitignore documentation", "url": "https://git-scm.com/docs/gitignore"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q7",
+      "order": 7,
+      "text": "What does `git check-ignore -v <filename>` do?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Temporarily removes the file from .gitignore"},
+        {"id": "b", "text": "Shows which .gitignore file and pattern is causing the file to be ignored"},
+        {"id": "c", "text": "Adds the file to the nearest .gitignore file"},
+        {"id": "d", "text": "Checks whether the file has been committed before"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "git check-ignore -v outputs the exact .gitignore file path, line number, and pattern that matches a given file. This is the go-to debugging tool when a file is unexpectedly being ignored — it tells you precisely which rule is responsible, so you can negate it or move the file.",
+      "citations": [
+        {"label": "git-check-ignore documentation", "url": "https://git-scm.com/docs/git-check-ignore"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q8",
+      "order": 8,
+      "text": "What does the `prepare-commit-msg` hook receive as its argument?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "The branch name of the current branch"},
+        {"id": "b", "text": "The path to a temporary file containing the default commit message"},
+        {"id": "c", "text": "The SHA of the previous commit"},
+        {"id": "d", "text": "The list of staged files to be committed"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "The prepare-commit-msg hook is invoked with the path to the file that holds the current commit message (the same file that will be opened in the editor). The hook can read and modify this file before the editor is shown to the user. It also receives a second argument indicating the type of commit (e.g., message, template, merge, squash, commit) and optionally a third argument with the commit SHA if amending.",
+      "citations": [
+        {"label": "githooks: prepare-commit-msg", "url": "https://git-scm.com/docs/githooks#_prepare_commit_msg"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q9",
+      "order": 9,
+      "text": "What is the key difference between the `pre-commit` hook and the `commit-msg` hook?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "pre-commit runs after the editor; commit-msg runs before"},
+        {"id": "b", "text": "pre-commit runs before the commit message is even requested (checks code quality); commit-msg runs after the message is written (validates message format)"},
+        {"id": "c", "text": "They are identical hooks that run at the same time"},
+        {"id": "d", "text": "pre-commit validates the message; commit-msg validates the staged files"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "The pre-commit hook fires first — before the commit message editor opens. It is ideal for fast checks on the staged code: linting, formatting, running unit tests. The commit-msg hook runs later, after the developer has written the commit message. It receives the message file and is the right place to validate message format (e.g., enforcing Conventional Commits).",
+      "citations": [
+        {"label": "githooks documentation", "url": "https://git-scm.com/docs/githooks"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q10",
+      "order": 10,
+      "text": "How can you temporarily bypass a pre-commit hook for a single commit?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Delete the .git/hooks/pre-commit file before committing"},
+        {"id": "b", "text": "Set GIT_SKIP_HOOKS=1 as an environment variable"},
+        {"id": "c", "text": "Use git commit --no-verify to skip all client-side hooks"},
+        {"id": "d", "text": "Rename the hook file to pre-commit.disabled"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "git commit --no-verify (also written as -n) skips both the pre-commit and commit-msg hooks. It should be used sparingly and only when you have a legitimate reason to bypass the checks — for example, to save a draft that you know is broken. Overuse defeats the purpose of having hooks. Be aware that --no-verify does not bypass server-side hooks.",
+      "citations": [
+        {"label": "git-commit --no-verify", "url": "https://git-scm.com/docs/git-commit#Documentation/git-commit.txt---no-verify"}
+      ],
+      "points": 10
+    }
+  ]
+}

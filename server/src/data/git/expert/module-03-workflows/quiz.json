@@ -1,0 +1,187 @@
+{
+  "quizId": "quiz-git-expert-03",
+  "moduleId": "module-03-workflows",
+  "passingScore": 70,
+  "questions": [
+    {
+      "id": "q1",
+      "order": 1,
+      "text": "In the Conventional Commits specification, which commit type (or notation) triggers a MAJOR semantic version bump?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "feat — any new feature always bumps the major version"},
+        {"id": "b", "text": "A commit with a BREAKING CHANGE footer or the ! suffix on the type (e.g., feat! or fix!)"},
+        {"id": "c", "text": "refactor — because refactors often change public APIs"},
+        {"id": "d", "text": "chore(release) — the dedicated release commit type"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "A MAJOR version bump (e.g., 1.2.3 → 2.0.0) is triggered by either: (1) appending ! to the type, e.g. feat(api)!: remove endpoint, or (2) including a footer line that starts with 'BREAKING CHANGE:'. Both forms communicate that the change is incompatible with the previous API. feat alone triggers only a minor bump; fix triggers a patch bump.",
+      "citations": [
+        {"label": "Conventional Commits — Specification", "url": "https://www.conventionalcommits.org/en/v1.0.0/"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "order": 2,
+      "text": "What is the key difference in release model between GitFlow and trunk-based development?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "GitFlow deploys every commit; trunk-based uses quarterly releases"},
+        {"id": "b", "text": "GitFlow uses a develop branch and release branches to batch changes into versioned releases; trunk-based deploys continuously from main using feature flags"},
+        {"id": "c", "text": "GitFlow requires signed commits; trunk-based development does not"},
+        {"id": "d", "text": "They are identical — the only difference is the number of developers"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "GitFlow batches changes on a develop branch, stabilises them on a release branch, then merges to main for a versioned release — suitable for scheduled releases. Trunk-based development merges directly to main (or via very short-lived branches) and deploys continuously. Feature flags allow incomplete features to be deployed but not yet exposed to users.",
+      "citations": [
+        {"label": "Git-scm — Branching Workflows", "url": "https://git-scm.com/book/en/v2/Git-Branching-Branching-Workflows"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "order": 3,
+      "text": "What do feature flags enable in trunk-based development?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "They enforce that branches stay shorter than 24 hours by expiring them automatically"},
+        {"id": "b", "text": "They decouple deployment from release — code is deployed to production but only activated for users when the flag is enabled"},
+        {"id": "c", "text": "They replace Git tags by embedding version numbers in the source code"},
+        {"id": "d", "text": "They prevent developers from pushing directly to main without a PR"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Feature flags (also called feature toggles) let you deploy code that contains a new, potentially incomplete feature while keeping it hidden from users. You merge to main and deploy immediately, but the feature only becomes visible when you flip the flag on — for all users or a percentage. This decouples the deployment decision from the release decision and eliminates long-lived feature branches.",
+      "citations": [
+        {"label": "Git-scm — Branching Workflows", "url": "https://git-scm.com/book/en/v2/Git-Branching-Branching-Workflows"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q4",
+      "order": 4,
+      "text": "How do you configure Git to automatically GPG-sign every commit without passing -S manually?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "git config --global core.sign always"},
+        {"id": "b", "text": "git config --global commit.gpgsign true"},
+        {"id": "c", "text": "Set the GPG_AUTO_SIGN=1 environment variable in your shell profile"},
+        {"id": "d", "text": "Add sign = true to the [commit] section of .gitattributes"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Setting commit.gpgsign = true in Git config (--global applies it to all repos for your user) tells Git to automatically invoke GPG to sign every commit, without needing the -S flag each time. You must also set user.signingkey to your GPG key ID. SSH signing uses the same commit.gpgsign = true setting alongside gpg.format = ssh.",
+      "citations": [
+        {"label": "Git Tools — Signing Your Work", "url": "https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "order": 5,
+      "text": "What does `git maintenance start` register on the operating system?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "A background Git daemon process listening for push events"},
+        {"id": "b", "text": "A system-level timer (systemd on Linux, launchd on macOS, Task Scheduler on Windows) that runs maintenance tasks on a schedule"},
+        {"id": "c", "text": "A cron job in the current user's crontab that runs git gc every hour"},
+        {"id": "d", "text": "A file system watcher that triggers maintenance whenever a new commit is created"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "git maintenance start registers the repository with the OS scheduling daemon appropriate for the platform: systemd timers on Linux, launchd plists on macOS, and Task Scheduler XML on Windows. This allows maintenance tasks (prefetch, commit-graph, loose-objects, etc.) to run in the background without blocking interactive Git operations.",
+      "citations": [
+        {"label": "git-maintenance reference", "url": "https://git-scm.com/docs/git-maintenance"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q6",
+      "order": 6,
+      "text": "Which GitHub Actions action checks out the repository code into the workflow runner?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "actions/git-checkout@v4"},
+        {"id": "b", "text": "github/fetch-repo@v2"},
+        {"id": "c", "text": "actions/checkout@v4"},
+        {"id": "d", "text": "actions/clone@v4"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "actions/checkout@v4 is the official GitHub action that clones the repository and checks out the ref that triggered the workflow. Without this step, the runner's workspace is empty. Always pin to the latest major version (v4) rather than a floating 'latest' tag for reproducibility and security.",
+      "citations": [
+        {"label": "actions/checkout on GitHub Marketplace", "url": "https://github.com/marketplace/actions/checkout"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q7",
+      "order": 7,
+      "text": "What does semantic-release read to determine the next version number?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "The version field in package.json"},
+        {"id": "b", "text": "The commit messages since the last Git tag, parsed according to the Conventional Commits specification"},
+        {"id": "c", "text": "The CHANGELOG.md file to find the most recently documented version"},
+        {"id": "d", "text": "A .semver file committed to the repository"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "semantic-release analyzes commit messages since the last release tag using the Conventional Commits parser. feat commits trigger a minor bump, fix triggers patch, and any commit with BREAKING CHANGE or ! triggers a major bump. It does not read from package.json's version field — that field is updated by semantic-release as part of the release process.",
+      "citations": [
+        {"label": "Conventional Commits — Specification", "url": "https://www.conventionalcommits.org/en/v1.0.0/"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q8",
+      "order": 8,
+      "text": "How does SSH commit signing (Git 2.34+) differ from GPG signing in terms of setup simplicity?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "SSH signing requires a hardware token; GPG does not"},
+        {"id": "b", "text": "SSH signing reuses the SSH key you already have for push access — no separate gpg binary, key generation, or keyserver interaction required"},
+        {"id": "c", "text": "SSH signing produces weaker signatures that GitHub does not verify"},
+        {"id": "d", "text": "SSH signing is only available on Linux; GPG works cross-platform"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "SSH signing (enabled with git config gpg.format ssh) reuses your existing SSH key pair. Most developers already have an SSH key for authenticating pushes to GitHub, so there is no additional key generation, no gpg binary needed, and no keyserver to upload to. You simply tell Git which public key file to use and add the same key to GitHub as a 'signing key'.",
+      "citations": [
+        {"label": "Git Tools — Signing Your Work", "url": "https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q9",
+      "order": 9,
+      "text": "What do protected branches in GitHub enforce on a repository?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "They encrypt the branch so only repository owners can read it"},
+        {"id": "b", "text": "They prevent any commits from being pushed, making the branch read-only permanently"},
+        {"id": "c", "text": "They require conditions to be met before merging — such as passing status checks, required reviewers, and/or signed commits"},
+        {"id": "d", "text": "They automatically rebase all PRs onto main before merging"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "Protected branch rules on GitHub (Settings → Branches → Branch protection rules) can require: passing CI status checks before merge, a minimum number of approving code reviews, no unresolved conversations, up-to-date branches, and/or signed commits. This prevents accidental direct pushes to main and enforces quality gates on every change.",
+      "citations": [
+        {"label": "GitHub Docs — Protected branches", "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q10",
+      "order": 10,
+      "text": "Which git maintenance task speeds up `git log` and merge-base calculations on large repositories?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "prefetch — keeps remote refs up to date in the background"},
+        {"id": "b", "text": "loose-objects — packs individual object files into packfiles"},
+        {"id": "c", "text": "commit-graph — writes a .git/objects/info/commit-graph file that caches commit ancestry data"},
+        {"id": "d", "text": "incremental-repack — consolidates small packfiles into fewer larger ones"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "The commit-graph task writes a binary commit-graph file at .git/objects/info/commit-graph that stores pre-computed commit metadata including parent SHAs, commit dates, and reachability bitmaps. Operations that need to traverse commit history — git log, git merge-base, git branch --contains — can read from this cached structure rather than parsing raw commit objects, providing 10-100x speedups on repos with millions of commits.",
+      "citations": [
+        {"label": "git-maintenance reference", "url": "https://git-scm.com/docs/git-maintenance"}
+      ],
+      "points": 10
+    }
+  ]
+}

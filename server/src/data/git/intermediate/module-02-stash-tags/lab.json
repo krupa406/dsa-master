@@ -1,0 +1,59 @@
+{
+  "id": "lab-git-intermediate-02",
+  "moduleId": "module-02-stash-tags",
+  "title": "Stash, Cherry-pick, and Release Tag",
+  "description": "Save work-in-progress with stash, cherry-pick a bug fix commit, and create an annotated release tag.",
+  "language": "shell",
+  "monacoLanguage": "shell",
+  "starterCode": "# (1) Stash your current changes with a descriptive message\n# YOUR COMMAND HERE\n\n# (2) Cherry-pick the commit with SHA abc1234 onto the current branch\n# YOUR COMMAND HERE\n\n# (3) Pop the stash to restore your work-in-progress\n# YOUR COMMAND HERE\n\n# (4) Create an annotated tag v2.1.0 with message \"Release v2.1.0\"\n# YOUR COMMAND HERE\n\n# (5) Push the tag to origin\n# YOUR COMMAND HERE\n",
+  "solutionCode": "# (1) Stash current changes with a message\ngit stash push -m \"WIP: feature improvements\"\n\n# (2) Cherry-pick the bug fix commit onto current branch\ngit cherry-pick abc1234\n\n# (3) Restore the stashed work-in-progress\ngit stash pop\n\n# (4) Create an annotated release tag\ngit tag -a v2.1.0 -m \"Release v2.1.0\"\n\n# (5) Push the tag to origin\ngit push origin v2.1.0\n",
+  "hints": [
+    "Use git stash push -m \"message\" to save changes with a helpful description",
+    "git cherry-pick followed by the exact SHA applies that commit's diff onto your current branch",
+    "git stash pop both applies and removes the top stash entry — use git stash apply if you want to keep the entry on the stack",
+    "Annotated tags require the -a flag and a -m message; they store full metadata and are the best practice for releases",
+    "You can push a single tag with git push origin <tagname> or push all tags with git push origin --tags"
+  ],
+  "validationRules": [
+    {
+      "id": "has-stash-push",
+      "type": "regex",
+      "pattern": "git stash (push|)",
+      "errorMessage": "Stash your work-in-progress changes",
+      "points": 20
+    },
+    {
+      "id": "has-cherry-pick",
+      "type": "contains",
+      "pattern": "git cherry-pick abc1234",
+      "errorMessage": "Cherry-pick the commit abc1234",
+      "points": 20
+    },
+    {
+      "id": "has-stash-pop",
+      "type": "contains",
+      "pattern": "git stash pop",
+      "errorMessage": "Restore stashed changes with git stash pop",
+      "points": 20
+    },
+    {
+      "id": "has-annotated-tag",
+      "type": "contains",
+      "pattern": "git tag -a v2.1.0",
+      "errorMessage": "Create an annotated tag with git tag -a",
+      "points": 20
+    },
+    {
+      "id": "has-push-tag",
+      "type": "regex",
+      "pattern": "git push origin (--tags|v2\\.1\\.0)",
+      "errorMessage": "Push the tag to origin",
+      "points": 20
+    }
+  ],
+  "simulatedOutput": {
+    "success": "[Stash] Saved working directory and index state On main: WIP: feature improvements\n\n[main 7d4f2a1] Fix critical null pointer bug (cherry-picked)\n\nOn branch main: restored stashed changes\n\nTag v2.1.0 created\nTo https://github.com/alice/my-project.git\n * [new tag]         v2.1.0 -> v2.1.0",
+    "failure": "ERROR: Validation failed. Ensure you stash your changes, cherry-pick abc1234, pop the stash, create an annotated tag v2.1.0, and push it to origin."
+  },
+  "maxScore": 100
+}

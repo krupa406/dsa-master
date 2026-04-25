@@ -10,7 +10,7 @@ function loadJson(filePath) {
 }
 
 function getTechnologies() {
-  return ['ansible', 'terraform', 'kubernetes']
+  return ['ansible', 'terraform', 'kubernetes', 'git']
     .map(t => loadJson(`${t}/meta.json`))
     .filter(Boolean);
 }

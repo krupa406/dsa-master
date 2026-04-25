@@ -1,0 +1,187 @@
+{
+  "quizId": "quiz-git-expert-01",
+  "moduleId": "module-01-internals",
+  "passingScore": 70,
+  "questions": [
+    {
+      "id": "q1",
+      "order": 1,
+      "text": "Which four object types make up the Git object model?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "file, directory, commit, branch"},
+        {"id": "b", "text": "blob, tree, commit, tag"},
+        {"id": "c", "text": "blob, index, commit, ref"},
+        {"id": "d", "text": "file, snapshot, pointer, tag"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Git's object model has exactly four types: blob (raw file content), tree (directory listing of blobs and sub-trees), commit (snapshot with tree pointer, parent SHAs, author, and message), and tag (annotated tag pointing to any object). Everything stored in .git/objects/ is one of these four types.",
+      "citations": [
+        {"label": "Git Internals — Git Objects", "url": "https://git-scm.com/book/en/v2/Git-Internals-Git-Objects"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "order": 2,
+      "text": "How does Git determine the identity (address) of an object in the object store?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Incrementing integer IDs assigned at write time"},
+        {"id": "b", "text": "The filename of the original file on disk"},
+        {"id": "c", "text": "SHA-1 hash of the object's content (including a type/length header)"},
+        {"id": "d", "text": "A UUID generated when the repository is initialized"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "Git computes a SHA-1 hash of the object header (type + space + length + null byte) concatenated with the object content. This makes Git a content-addressable store: identical content always produces the same SHA, enabling deduplication, and any tampering changes the SHA.",
+      "citations": [
+        {"label": "Git Internals — Git Objects", "url": "https://git-scm.com/book/en/v2/Git-Internals-Git-Objects"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "order": 3,
+      "text": "What does `git cat-file -t SHA` return?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "The full content of the object"},
+        {"id": "b", "text": "The type of the object (blob, tree, commit, or tag)"},
+        {"id": "c", "text": "The size of the object in bytes"},
+        {"id": "d", "text": "A list of all objects that reference this SHA"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "The -t flag makes git cat-file print the type of the object identified by the given SHA. It will output one of: blob, tree, commit, or tag. Use -p to pretty-print the content, and -s to get the size in bytes.",
+      "citations": [
+        {"label": "git-cat-file reference", "url": "https://git-scm.com/docs/git-cat-file"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q4",
+      "order": 4,
+      "text": "Where are loose Git objects stored on disk?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": ".git/index"},
+        {"id": "b", "text": ".git/objects/ — first 2 hex chars of SHA = directory, remaining 38 = filename"},
+        {"id": "c", "text": ".git/objects/loose/ — stored flat with full SHA as filename"},
+        {"id": "d", "text": ".git/store/ — one file per commit"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Loose objects live under .git/objects/. Git splits the 40-character SHA-1 hex string: the first 2 characters become the subdirectory name, and the remaining 38 become the filename. So SHA a1b2c3... is stored at .git/objects/a1/b2c3.... Objects are zlib-compressed before storage.",
+      "citations": [
+        {"label": "Git Internals — Git Objects", "url": "https://git-scm.com/book/en/v2/Git-Internals-Git-Objects"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "order": 5,
+      "text": "What does a Git tree object contain?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "The raw content of all files in a directory"},
+        {"id": "b", "text": "A list of entries with file mode, object type, SHA, and name for each blob or sub-tree"},
+        {"id": "c", "text": "Author, committer, date, and parent SHA of the commit"},
+        {"id": "d", "text": "A binary diff (delta) against the parent tree"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "A tree object contains an ordered list of entries. Each entry has: an octal file mode (e.g., 100644 for a regular file, 040000 for a directory), the object type (blob or tree), the SHA-1 of the referenced object, and the entry's name. Trees do not store file content — they just point to blobs and sub-trees.",
+      "citations": [
+        {"label": "Git Internals — Git Objects", "url": "https://git-scm.com/book/en/v2/Git-Internals-Git-Objects"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q6",
+      "order": 6,
+      "text": "What key improvement does the reftable backend offer over the traditional packed-refs file?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Stores refs in JSON format for easier debugging"},
+        {"id": "b", "text": "O(log n) lookups via binary search vs O(n) sequential scan, plus atomic updates and a built-in transaction log"},
+        {"id": "c", "text": "Compresses ref names using LZ4 to reduce disk usage"},
+        {"id": "d", "text": "Automatically pushes ref updates to the remote on every commit"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Reftable, production-ready in Git 2.47+, stores refs in a sorted binary table enabling O(log n) binary-search lookups rather than the O(n) sequential scan needed for packed-refs. It also provides atomic multi-ref updates and a built-in transaction log that replaces the separate reflog files.",
+      "citations": [
+        {"label": "Git Internals — Packfiles", "url": "https://git-scm.com/book/en/v2/Git-Internals-Packfiles"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q7",
+      "order": 7,
+      "text": "What does `git gc` do?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Removes untracked files from the working directory"},
+        {"id": "b", "text": "Packs loose objects into packfiles, prunes unreachable objects, and compacts refs into packed-refs"},
+        {"id": "c", "text": "Runs git clean -fd to delete ignored files"},
+        {"id": "d", "text": "Resets the index to match the last commit"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "git gc (garbage collection) performs several maintenance tasks: it packs loose objects into packfiles using delta compression, prunes objects that are no longer reachable from any ref (after the configured grace period), consolidates loose refs into packed-refs, and compresses the commit graph for faster traversal.",
+      "citations": [
+        {"label": "git-gc reference", "url": "https://git-scm.com/docs/git-gc"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q8",
+      "order": 8,
+      "text": "What is the purpose of the `.idx` file that is paired with a `.pack` file?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "It stores the delta-compressed file content that the .pack file indexes"},
+        {"id": "b", "text": "It is a sorted index of SHA-1 hashes with offsets into the .pack file, enabling O(log n) object lookup"},
+        {"id": "c", "text": "It tracks which branches reference objects in the .pack file"},
+        {"id": "d", "text": "It is a human-readable manifest of all commits included in the packfile"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "The .idx (index) file contains a sorted list of SHA-1 hashes along with their byte offsets within the corresponding .pack file. This allows Git to quickly locate any object by SHA with a binary search, without scanning the entire pack. The .pack file holds the actual (delta-compressed) object data.",
+      "citations": [
+        {"label": "Git Internals — Packfiles", "url": "https://git-scm.com/book/en/v2/Git-Internals-Packfiles"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q9",
+      "order": 9,
+      "text": "What does it mean for Git to be in 'detached HEAD' state, in terms of the `.git/HEAD` file?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": ".git/HEAD is empty — no commit is checked out"},
+        {"id": "b", "text": ".git/HEAD contains a raw SHA-1 instead of a symbolic ref like 'ref: refs/heads/main'"},
+        {"id": "c", "text": ".git/HEAD points to a branch that has been deleted"},
+        {"id": "d", "text": ".git/HEAD contains the word 'detached' followed by a branch name"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Normally .git/HEAD holds a symbolic ref: the text 'ref: refs/heads/main' (or whatever branch is checked out). In detached HEAD state — triggered by checking out a specific commit, tag, or remote-tracking ref directly — .git/HEAD holds the raw 40-character SHA-1 of the commit instead. New commits made in this state are not reachable from any branch.",
+      "citations": [
+        {"label": "Git Internals — Git References", "url": "https://git-scm.com/book/en/v2/Git-Internals-Git-References"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q10",
+      "order": 10,
+      "text": "What does `git rev-parse HEAD~2` resolve to?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "The SHA of the commit 2 merges before HEAD"},
+        {"id": "b", "text": "The SHA of the commit that is 2 first-parent ancestors before HEAD"},
+        {"id": "c", "text": "The second branch listed in git branch output"},
+        {"id": "d", "text": "The SHA of the second-to-last tag created in the repository"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "The tilde (~) syntax traverses first-parent ancestors. HEAD~2 means: start at HEAD, go to its first parent, then go to that commit's first parent — i.e., two hops back along the main lineage. git rev-parse resolves this ancestry expression to the raw SHA-1 of that ancestor commit.",
+      "citations": [
+        {"label": "git-rev-parse — Specifying Revisions", "url": "https://git-scm.com/docs/git-rev-parse#_specifying_revisions"}
+      ],
+      "points": 10
+    }
+  ]
+}

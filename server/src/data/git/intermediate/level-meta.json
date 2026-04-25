@@ -1,0 +1,9 @@
+{
+  "id": "git-intermediate",
+  "tech": "git",
+  "level": "intermediate",
+  "title": "Git Intermediate",
+  "description": "Go beyond the basics: rebasing and interactive history editing, stash, cherry-pick, tags, client-side hooks, .gitconfig aliases, and .gitignore mastery.",
+  "estimatedHours": 3,
+  "moduleOrder": ["module-01-rebase", "module-02-stash-tags", "module-03-hooks-config"]
+}

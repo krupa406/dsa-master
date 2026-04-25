@@ -1,0 +1,58 @@
+{
+  "id": "lab-git-intermediate-01",
+  "moduleId": "module-01-rebase",
+  "title": "Interactive Rebase — Squash and Reword",
+  "description": "Use interactive rebase to squash three WIP commits into one clean commit, then rebase your feature branch onto main.",
+  "language": "shell",
+  "monacoLanguage": "shell",
+  "starterCode": "# (1) Start interactive rebase on the last 3 commits\n# YOUR COMMAND HERE\n\n# (2) In the rebase-todo editor, change picks to squash:\n# pick a1b2c3 Add login form\n# squash d4e5f6 WIP: fix validation\n# squash 7g8h9i WIP: fix edge case\n\n# (3) After squashing, rebase the feature branch onto main\n# YOUR COMMAND HERE\n",
+  "solutionCode": "# Squash last 3 commits into one interactively\ngit rebase -i HEAD~3\n# In the editor, change 2nd and 3rd 'pick' to 'squash' (or 's')\n# pick a1b2c3 Add login form\n# squash d4e5f6 WIP: fix validation\n# squash 7g8h9i WIP: fix edge case\n\n# After squashing, rebase feature branch onto main\ngit rebase main\n",
+  "hints": [
+    "Use git rebase -i followed by a commit range like HEAD~3 to target the last 3 commits",
+    "In the rebase-todo file, replace 'pick' with 'squash' or 's' on the commits you want to fold into the previous one",
+    "After squashing, run git rebase main while on your feature branch to replay it on top of the latest main"
+  ],
+  "validationRules": [
+    {
+      "id": "has-rebase-interactive",
+      "type": "contains",
+      "pattern": "git rebase -i",
+      "errorMessage": "Use git rebase -i for interactive rebase",
+      "points": 20
+    },
+    {
+      "id": "has-head-tilde-3",
+      "type": "contains",
+      "pattern": "HEAD~3",
+      "errorMessage": "Target the last 3 commits with HEAD~3",
+      "points": 20
+    },
+    {
+      "id": "has-squash-or-fixup",
+      "type": "regex",
+      "pattern": "squash|fixup",
+      "flags": "i",
+      "errorMessage": "Use squash or fixup to combine commits",
+      "points": 20
+    },
+    {
+      "id": "has-rebase-main",
+      "type": "contains",
+      "pattern": "git rebase main",
+      "errorMessage": "Rebase the feature branch onto main",
+      "points": 20
+    },
+    {
+      "id": "no-merge",
+      "type": "not-contains",
+      "pattern": "git merge",
+      "errorMessage": "Use rebase, not merge, for this exercise",
+      "points": 20
+    }
+  ],
+  "simulatedOutput": {
+    "success": "Successfully rebased and updated refs/heads/feature/login.\nInteractive rebase complete. 3 commits squashed into 1.\n\nCurrent branch feature/login is up to date with main.\n\n[feature/login 3c5e7a2] Add complete login feature\n Date: Thu Apr 24 2026\n 3 files changed, 87 insertions(+)",
+    "failure": "ERROR: Validation failed. Make sure you use git rebase -i HEAD~3 and include squash or fixup to combine commits, then git rebase main to update your branch."
+  },
+  "maxScore": 100
+}

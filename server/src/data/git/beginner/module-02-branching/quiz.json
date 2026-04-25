@@ -1,0 +1,187 @@
+{
+  "quizId": "quiz-git-beginner-02",
+  "moduleId": "module-02-branching",
+  "passingScore": 70,
+  "questions": [
+    {
+      "id": "q1",
+      "order": 1,
+      "text": "In a normal (non-detached) repository, what does HEAD point to?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "The first commit made in the repository (the root commit)"},
+        {"id": "b", "text": "The current branch reference, which in turn points to the tip commit of that branch"},
+        {"id": "c", "text": "The staging area (index)"},
+        {"id": "d", "text": "The remote origin URL"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "HEAD is a symbolic reference stored in .git/HEAD. Normally it contains 'ref: refs/heads/<branch-name>', pointing to the current branch. The branch pointer then points to the latest commit on that branch. Making a new commit advances both the branch pointer and HEAD together.",
+      "citations": [
+        {"label": "Pro Git — Branches in a Nutshell", "url": "https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q2",
+      "order": 2,
+      "text": "What makes branches so lightweight in Git compared to other version control systems?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Git compresses branch data using zlib so it takes almost no disk space"},
+        {"id": "b", "text": "A branch is just a small file containing a 40-character SHA-1 hash — no file copying occurs when creating a branch"},
+        {"id": "c", "text": "Git only stores the diff between branches, not full snapshots"},
+        {"id": "d", "text": "Branches share a single index file, reducing duplication"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "In Git, a branch is stored as a 41-byte file (SHA-1 hash + newline) inside .git/refs/heads/. Creating a branch is an O(1) operation — it only writes that small file. No files are copied, and no full snapshot is duplicated. This is fundamentally different from systems like SVN where branching copies entire directory trees.",
+      "citations": [
+        {"label": "Pro Git — Branches in a Nutshell", "url": "https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q3",
+      "order": 3,
+      "text": "When does a fast-forward merge occur?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "When both branches have new commits that the other branch lacks"},
+        {"id": "b", "text": "When the target branch (e.g., main) has not received any new commits since the feature branch was created"},
+        {"id": "c", "text": "When a merge conflict is detected and automatically resolved"},
+        {"id": "d", "text": "When you use the --no-ff flag"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "A fast-forward merge is possible when the current branch is a direct ancestor of the branch being merged in — meaning the current branch has received no new commits since the divergence point. Git simply moves the branch pointer forward to the tip of the incoming branch. No merge commit is created and history remains linear.",
+      "citations": [
+        {"label": "Pro Git — Basic Branching and Merging", "url": "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q4",
+      "order": 4,
+      "text": "What do the conflict markers `<<<<<<<` and `>>>>>>>` delimit in a conflicted file?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "The beginning and end of a file that Git cannot read"},
+        {"id": "b", "text": "<<<<<<< marks the start of the current branch's version; >>>>>>> marks the end of the incoming branch's version; ======= separates the two"},
+        {"id": "c", "text": "The lines that were added vs the lines that were deleted"},
+        {"id": "d", "text": "The start and end of a staged hunk"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "When a merge conflict occurs, Git annotates the conflicting file with markers: '<<<<<<< HEAD' marks the start of your current branch's content; '=======' is the divider; '>>>>>>> branch-name' marks the end of the incoming branch's content. You must edit the file to remove the markers and keep the desired content, then stage and commit.",
+      "citations": [
+        {"label": "Pro Git — Basic Branching and Merging (Conflicts)", "url": "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging#_basic_merge_conflicts"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q5",
+      "order": 5,
+      "text": "What is the key difference between `git switch` and `git checkout` for branch operations?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "git switch is faster because it skips index updates"},
+        {"id": "b", "text": "git switch (introduced in Git 2.23) is focused solely on branch and commit switching, while git checkout also handles restoring files — making intent clearer"},
+        {"id": "c", "text": "git checkout creates a new branch; git switch only moves between existing branches"},
+        {"id": "d", "text": "git switch requires the -b flag to switch to an existing branch"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Git 2.23 split the overloaded 'git checkout' into two more focused commands: 'git switch' for switching branches/commits and 'git restore' for restoring files. Using 'git switch' makes it explicit that you are navigating between branches, reducing confusion. 'git checkout' remains valid but 'git switch' is now preferred for branch operations.",
+      "citations": [
+        {"label": "git-switch documentation", "url": "https://git-scm.com/docs/git-switch"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q6",
+      "order": 6,
+      "text": "What is the difference between `git branch -d` and `git branch -D`?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "-d deletes a local branch; -D deletes a remote branch"},
+        {"id": "b", "text": "-d (safe delete) only deletes if the branch has been fully merged into the current branch; -D force-deletes regardless of merge status"},
+        {"id": "c", "text": "-d deletes the branch and its commits; -D only deletes the branch pointer"},
+        {"id": "d", "text": "They are identical — both flags safely delete merged branches only"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "'git branch -d' is the safe variant: it checks whether the branch tip is reachable from the current HEAD (i.e., fully merged) and refuses to delete if not. 'git branch -D' is a force-delete that bypasses the merge check — use it with caution as any unmerged commits become unreachable and may be garbage collected.",
+      "citations": [
+        {"label": "git-branch documentation", "url": "https://git-scm.com/docs/git-branch"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q7",
+      "order": 7,
+      "text": "What is 'detached HEAD' state in Git?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "A state where the HEAD file has been accidentally deleted"},
+        {"id": "b", "text": "A state where HEAD points directly to a commit SHA rather than to a branch reference"},
+        {"id": "c", "text": "A state where the current branch has no commits yet"},
+        {"id": "d", "text": "A state where HEAD and the remote origin are out of sync"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "Detached HEAD occurs when HEAD contains a raw commit SHA (e.g., after running 'git checkout a1b2c3d' or 'git checkout v1.0.0'). Any commits made in this state are not attached to a branch and can be lost once you switch away. To preserve work made in detached HEAD, create a new branch with 'git switch -c new-branch'.",
+      "citations": [
+        {"label": "Pro Git — Detached HEAD", "url": "https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell#_detached_head"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q8",
+      "order": 8,
+      "text": "What does `git branch -a` display?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "All commits made by all authors in the repository"},
+        {"id": "b", "text": "All local branches and all remote-tracking branches (e.g., remotes/origin/main)"},
+        {"id": "c", "text": "All branches that have not been merged into main"},
+        {"id": "d", "text": "All annotated tags alongside branches"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "'git branch -a' (--all) lists both local branches (refs/heads/*) and remote-tracking branches (refs/remotes/*), such as 'remotes/origin/main'. Remote-tracking branches are local read-only references that reflect the last known state of the remote — they are updated by 'git fetch'.",
+      "citations": [
+        {"label": "git-branch documentation", "url": "https://git-scm.com/docs/git-branch"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q9",
+      "order": 9,
+      "text": "What effect does the `--no-ff` flag have on `git merge`?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "It prevents the merge if any conflicts are detected"},
+        {"id": "b", "text": "It forces a merge commit to be created even when a fast-forward merge would be possible"},
+        {"id": "c", "text": "It merges without updating the working directory"},
+        {"id": "d", "text": "It skips the merge and only updates remote-tracking refs"}
+      ],
+      "correctOptionId": "b",
+      "explanation": "By default, Git performs a fast-forward merge when possible (no merge commit). Using '--no-ff' (no fast-forward) always creates a merge commit, even when the history is linear. This preserves the context that a feature branch existed and was integrated, which is useful for team workflows that want an explicit record in the log.",
+      "citations": [
+        {"label": "git-merge documentation", "url": "https://git-scm.com/docs/git-merge"}
+      ],
+      "points": 10
+    },
+    {
+      "id": "q10",
+      "order": 10,
+      "text": "What are the correct steps to complete a merge after manually resolving a conflict?",
+      "type": "single-choice",
+      "options": [
+        {"id": "a", "text": "Run git merge --continue, then git push"},
+        {"id": "b", "text": "Run git reset HEAD, then re-run git merge"},
+        {"id": "c", "text": "Edit the conflicted file to remove markers and keep desired content, then git add <file>, then git commit"},
+        {"id": "d", "text": "Delete the conflicted file and run git merge again"}
+      ],
+      "correctOptionId": "c",
+      "explanation": "After a conflict, Git pauses the merge. You resolve it by: (1) editing the conflicted file(s) to remove the <<<<<<< / ======= / >>>>>>> markers and retain the correct content; (2) running 'git add <file>' to mark the conflict as resolved (staging the file); (3) running 'git commit' to finalise the merge commit. If you abort instead, use 'git merge --abort'.",
+      "citations": [
+        {"label": "Pro Git — Basic Merge Conflicts", "url": "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging#_basic_merge_conflicts"}
+      ],
+      "points": 10
+    }
+  ]
+}
