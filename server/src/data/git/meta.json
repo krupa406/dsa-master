@@ -1,8 +1,8 @@
 {
   "id": "git",
-  "name": "Git",
-  "slug": "git",
+  "displayName": "Git",
   "version": "2.49",
+  "tagline": "Distributed version control",
   "description": "Git 2.49 — the world's most widely used distributed version control system. N-1 release (latest is 2.50+). Tracks file history, enables team collaboration, and manages code across branches and remotes.",
   "officialDocsBaseUrl": "https://git-scm.com/docs",
   "color": "#F05032",
