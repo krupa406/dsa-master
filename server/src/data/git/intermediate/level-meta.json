@@ -1,5 +1,6 @@
 {
-  "id": "git-intermediate",
+  "id": "intermediate",
+  "displayName": "Intermediate",
   "tech": "git",
   "level": "intermediate",
   "title": "Git Intermediate",

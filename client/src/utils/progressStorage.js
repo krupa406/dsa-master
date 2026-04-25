@@ -32,21 +32,19 @@ function load() {
   try {
     const raw = localStorage.getItem(KEY)
     if (!raw) return initDefault()
-    return JSON.parse(raw)
+    return migrate(JSON.parse(raw))
   } catch {
     return initDefault()
   }
 }
 
+const ALL_TECHS = ['ansible', 'terraform', 'kubernetes', 'git']
+
 function initDefault() {
   const data = {
     schemaVersion: 1,
     lastUpdated: new Date().toISOString(),
-    technologies: {
-      ansible: defaultTechProgress(),
-      terraform: defaultTechProgress(),
-      kubernetes: defaultTechProgress(),
-    },
+    technologies: Object.fromEntries(ALL_TECHS.map(t => [t, defaultTechProgress()])),
     globalStats: {
       totalModulesCompleted: 0,
       totalQuizzesTaken: 0,
@@ -54,18 +52,20 @@ function initDefault() {
       lastActivityAt: new Date().toISOString(),
     },
   }
-  // Make first module of each tech/level available
-  const techs = ['ansible', 'terraform', 'kubernetes']
-  const levels = ['beginner', 'intermediate', 'expert']
-  for (const tech of techs) {
-    for (const level of levels) {
-      // Only beginner is initially unlocked
-      if (level === 'beginner') {
-        data.technologies[tech].levels[level].modules['module-01'] = { ...defaultModuleProgress(), status: 'available' }
-      }
+  save(data)
+  return data
+}
+
+// Migrate existing localStorage that pre-dates a new technology being added
+function migrate(data) {
+  let changed = false
+  for (const tech of ALL_TECHS) {
+    if (!data.technologies[tech]) {
+      data.technologies[tech] = defaultTechProgress()
+      changed = true
     }
   }
-  save(data)
+  if (changed) save(data)
   return data
 }
 

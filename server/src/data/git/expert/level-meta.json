@@ -1,5 +1,6 @@
 {
-  "id": "git-expert",
+  "id": "expert",
+  "displayName": "Expert",
   "tech": "git",
   "level": "expert",
   "title": "Git Expert",

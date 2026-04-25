@@ -1,5 +1,6 @@
 {
-  "id": "git-beginner",
+  "id": "beginner",
+  "displayName": "Beginner",
   "tech": "git",
   "level": "beginner",
   "title": "Git Beginner",
