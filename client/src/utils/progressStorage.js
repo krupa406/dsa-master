@@ -123,9 +123,17 @@ export function markModuleStarted(tech, level, moduleId) {
 export function saveLabScore(tech, level, moduleId, score, code) {
   const data = load()
   const mod = data.technologies[tech].levels[level].modules[moduleId] || defaultModuleProgress()
-  mod.labScore = score
+  // Only update labScore if this attempt is better (or first attempt)
+  if (mod.labScore === null || score > mod.labScore) {
+    mod.labScore = score
+  }
   mod.labAttempts = (mod.labAttempts || 0) + 1
   mod.labLastCode = code
+  // Mark module as completed when lab is fully passed (100%)
+  if (score === 100 && mod.status !== 'completed') {
+    mod.status = 'completed'
+    mod.completedAt = new Date().toISOString()
+  }
   data.technologies[tech].levels[level].modules[moduleId] = mod
   save(data)
 }

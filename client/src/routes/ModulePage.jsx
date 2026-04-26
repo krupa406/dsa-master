@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { useApi } from '../hooks/useApi'
 import { api } from '../services/api'
 import { markModuleStarted, saveLabScore } from '../utils/progressStorage'
+import { useModuleProgress } from '../hooks/useProgress'
 import { useProgressContext } from '../context/ProgressContext'
 import LoadingSpinner from '../components/shared/LoadingSpinner'
 import ErrorMessage from '../components/shared/ErrorMessage'
@@ -23,6 +24,7 @@ export default function ModulePage() {
   const { data: mod, loading: mLoading, error: mError } = useApi(() => api.getModule(tech, level, moduleId), [tech, level, moduleId])
   const { data: lab, loading: lLoading } = useApi(() => api.getLab(tech, level, moduleId), [tech, level, moduleId])
   const { data: modules } = useApi(() => api.getModules(tech, level), [tech, level])
+  const modProg = useModuleProgress(tech, level, moduleId)
 
   useEffect(() => {
     if (mod) { markModuleStarted(tech, level, moduleId); refresh() }
@@ -103,7 +105,12 @@ export default function ModulePage() {
             </div>
           )}
           {tab === 'lab' && !lLoading && lab && (
-            <LabPanel lab={lab} onRun={handleLabRun} />
+            <LabPanel
+              lab={lab}
+              onRun={handleLabRun}
+              savedCode={modProg?.labLastCode ?? null}
+              savedScore={modProg?.labScore ?? null}
+            />
           )}
           {tab === 'lab' && lLoading && <LoadingSpinner message="Loading lab..." />}
         </div>

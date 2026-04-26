@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import CodeEditor from './CodeEditor'
-import { Play, Lightbulb, CheckCircle2, XCircle, RefreshCw } from 'lucide-react'
+import { Play, Lightbulb, CheckCircle2, XCircle, RefreshCw, History } from 'lucide-react'
 
-export default function LabPanel({ lab, onRun }) {
-  const [code, setCode] = useState(lab.starterCode || '')
+export default function LabPanel({ lab, onRun, savedCode = null, savedScore = null }) {
+  const [code, setCode] = useState(savedCode ?? lab.starterCode ?? '')
   const [result, setResult] = useState(null)
   const [running, setRunning] = useState(false)
   const [showHints, setShowHints] = useState(false)
@@ -48,13 +48,40 @@ export default function LabPanel({ lab, onRun }) {
         <CodeEditor value={code} onChange={setCode} language={lab.monacoLanguage || 'yaml'} height="380px" />
       </div>
 
+      {/* Previous attempt banner */}
+      {savedScore !== null && result === null && (
+        <div className={`flex items-center gap-2 text-sm px-3 py-2 rounded-lg border ${
+          savedScore >= 100
+            ? 'bg-green-950/40 border-green-900/50 text-green-400'
+            : savedScore >= 60
+            ? 'bg-yellow-950/40 border-yellow-900/50 text-yellow-400'
+            : 'bg-gray-900 border-gray-800 text-gray-400'
+        }`}>
+          <History className="w-4 h-4 shrink-0" />
+          <span>
+            Last attempt: <strong>{savedScore}%</strong>
+            {savedScore === 100 ? ' — Lab passed ✓' : ' — run again to improve'}
+          </span>
+          {savedCode && savedCode !== (lab.starterCode || '') && (
+            <button
+              onClick={() => setCode(lab.starterCode || '')}
+              className="ml-auto text-xs underline opacity-70 hover:opacity-100"
+            >
+              Reset to starter
+            </button>
+          )}
+        </div>
+      )}
+
       <div className="flex items-center gap-3">
         <button onClick={handleRun} disabled={running}
           className="btn-primary flex items-center gap-2">
           {running ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
           {running ? 'Running…' : 'Run Lab'}
         </button>
-        <button onClick={() => setCode(lab.starterCode || '')} className="btn-secondary text-sm">Reset</button>
+        {!(savedScore !== null && result === null) && (
+          <button onClick={() => setCode(lab.starterCode || '')} className="btn-secondary text-sm">Reset</button>
+        )}
         {result && (
           <span className={`flex items-center gap-1.5 text-sm font-medium ${result.passed ? 'text-green-400' : 'text-red-400'}`}>
             {result.passed ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
