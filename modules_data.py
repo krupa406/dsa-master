@@ -4069,6 +4069,224 @@ if _fail == 0:
             },
         ]
     },
+    {
+        'id': 15,
+        'title': 'Object-Oriented Programming',
+        'icon': '📦',
+        'description': 'Master the principles of OOP: Classes, Objects, Inheritance, and Polymorphism.',
+        'difficulty': 'Intermediate',
+        'estimated_time': '60 min',
+        'color': '#10b981',
+        'content': """
+<h2>What is Object-Oriented Programming (OOP)?</h2>
+<p><strong>Object-Oriented Programming (OOP)</strong> is a programming paradigm based on the concept of "objects", which can contain data (attributes) and code (methods). It helps organize complex software into reusable, manageable pieces.</p>
+
+<div class="concept-box">
+  <h4>🔑 Key Idea</h4>
+  <p>Think of a <strong>Class</strong> as a blueprint (like an architectural drawing of a house), and an <strong>Object</strong> as the actual house built from that blueprint. You can build many houses from one blueprint.</p>
+</div>
+
+<h3>Classes and Objects</h3>
+<pre><code class="language-python">
+class Dog:
+    # Constructor: Initializes the object's attributes
+    def __init__(self, name, age):
+        self.name = name  # Instance attribute
+        self.age = age    # Instance attribute
+
+    # Method: A function belonging to the object
+    def bark(self):
+        return f"{self.name} says Woof!"
+
+# Creating objects (instances) from the Dog class
+dog1 = Dog("Buddy", 3)
+dog2 = Dog("Lucy", 5)
+
+print(dog1.name)      # Buddy
+print(dog2.bark())    # Lucy says Woof!
+</code></pre>
+
+<h3>The Four Pillars of OOP</h3>
+<p>OOP is built on four core principles:</p>
+<ol>
+  <li><strong>Encapsulation:</strong> Bundling data and methods that operate on that data within one unit (a class), and restricting direct access to some of the object's components.</li>
+  <li><strong>Inheritance:</strong> Creating new classes from existing ones, reusing code and forming a hierarchy.</li>
+  <li><strong>Polymorphism:</strong> The ability of different classes to be treated as instances of the same class through a common interface.</li>
+  <li><strong>Abstraction:</strong> Hiding complex implementation details and showing only the essential features of the object.</li>
+</ol>
+
+<h3>Inheritance</h3>
+<pre><code class="language-python">
+# Parent Class (Superclass)
+class Animal:
+    def __init__(self, species):
+        self.species = species
+    
+    def make_sound(self):
+        return "Some generic sound"
+
+# Child Class (Subclass) inherits from Animal
+class Cat(Animal):
+    def __init__(self, name):
+        super().__init__("Feline")  # Call parent's constructor
+        self.name = name
+        
+    # Overriding the parent's method
+    def make_sound(self):
+        return "Meow!"
+
+my_cat = Cat("Whiskers")
+print(my_cat.species)       # Feline (inherited)
+print(my_cat.make_sound())  # Meow! (overridden)
+</code></pre>
+
+<h3>Encapsulation</h3>
+<p>Python doesn't have strict private/public modifiers like Java, but it uses conventions (like a single underscore <code>_</code> for protected, and double underscore <code>__</code> for private).</p>
+<pre><code class="language-python">
+class BankAccount:
+    def __init__(self, owner, balance):
+        self.owner = owner
+        self.__balance = balance  # Private attribute
+
+    def deposit(self, amount):
+        if amount > 0:
+            self.__balance += amount
+
+    def get_balance(self):
+        return self.__balance
+
+account = BankAccount("Alice", 100)
+account.deposit(50)
+print(account.get_balance())  # 150
+# print(account.__balance)    # AttributeError!
+</code></pre>
+
+<h3>Polymorphism</h3>
+<pre><code class="language-python">
+class Bird:
+    def fly(self):
+        return "Flapping wings!"
+
+class Airplane:
+    def fly(self):
+        return "Engines engaged, lifting off!"
+
+def let_it_fly(flying_object):
+    # This function works with ANY object that has a fly() method
+    print(flying_object.fly())
+
+let_it_fly(Bird())      # Flapping wings!
+let_it_fly(Airplane())  # Engines engaged, lifting off!
+</code></pre>
+""",
+        'labs': [
+            {
+                'id': 1,
+                'title': 'Design a Shopping Cart',
+                'description': 'Create an <code>Item</code> class and a <code>ShoppingCart</code> class. The Item should have a name and price. The ShoppingCart should allow adding items, calculating the total price, and listing item names.',
+                'starter_code': '''class Item:
+    def __init__(self, name, price):
+        pass
+
+class ShoppingCart:
+    def __init__(self):
+        # Hint: Initialize an empty list to store items
+        pass
+        
+    def add_item(self, item):
+        pass
+        
+    def get_total(self):
+        # Hint: Loop through items and sum their prices
+        pass
+        
+    def list_items(self):
+        # Return a list of item names
+        pass
+
+# Test your code
+# apple = Item("Apple", 1.5)
+# banana = Item("Banana", 0.5)
+# cart = ShoppingCart()
+# cart.add_item(apple)
+# cart.add_item(banana)
+# print(cart.get_total())   # Expected: 2.0
+# print(cart.list_items())  # Expected: ["Apple", "Banana"]
+''',
+                'test_code': '''
+_pass = 0
+_fail = 0
+
+def _test(name, got, expected):
+    global _pass, _fail
+    if got == expected:
+        print(f"  ✓ {name}")
+        _pass += 1
+    else:
+        print(f"  ✗ {name}: expected {expected}, got {got}")
+        _fail += 1
+
+print("Testing Shopping Cart OOP Design:")
+try:
+    item1 = Item("Laptop", 1000)
+    item2 = Item("Mouse", 50)
+    
+    _test("Item attributes initialized", (item1.name, item1.price), ("Laptop", 1000))
+    
+    cart = ShoppingCart()
+    _test("Cart starts empty", cart.get_total(), 0)
+    _test("Cart list is empty", cart.list_items(), [])
+    
+    cart.add_item(item1)
+    cart.add_item(item2)
+    
+    _test("Cart total is correct", cart.get_total(), 1050)
+    _test("Cart lists item names", cart.list_items(), ["Laptop", "Mouse"])
+    
+except Exception as e:
+    print(f"  ✗ Test crashed: {str(e)}")
+    _fail += 1
+
+print(f"\\n{'='*40}")
+print(f"Results: {_pass}/{_pass+_fail} tests passed")
+if _fail == 0:
+    print("🎉 Excellent! Your classes work perfectly.")
+''',
+                'hints': [
+                    'In Item.__init__, set self.name = name and self.price = price.',
+                    'In ShoppingCart.__init__, set self.items = []',
+                    'In add_item, use self.items.append(item).',
+                    'In get_total, you can use sum(item.price for item in self.items).'
+                ]
+            }
+        ],
+        'quiz': [
+            {
+                'question': 'What is the purpose of the __init__ method in a Python class?',
+                'options': ['To destroy an object', 'To initialize the attributes of an object when it is created', 'To print the object', 'To convert the object to a string'],
+                'answer': 1,
+                'explanation': 'The __init__ method is a constructor. It is called automatically when you create a new instance of a class, and its primary purpose is to initialize the instance variables (attributes).'
+            },
+            {
+                'question': 'Which OOP principle involves hiding the internal state of an object and requiring all interaction to be performed through an object\\'s methods?',
+                'options': ['Inheritance', 'Polymorphism', 'Encapsulation', 'Abstraction'],
+                'answer': 2,
+                'explanation': 'Encapsulation is the bundling of data and methods that operate on that data, restricting direct access to the internal state.'
+            },
+            {
+                'question': 'What keyword is used to call a method from the parent class inside a child class?',
+                'options': ['parent()', 'this()', 'base()', 'super()'],
+                'answer': 3,
+                'explanation': 'The super() built-in returns a proxy object that allows you to refer parent class by \\'super\\', most commonly used as super().__init__() to call the parent\\'s constructor.'
+            },
+            {
+                'question': 'What does "self" refer to in a class method?',
+                'options': ['The class itself', 'The current instance (object) of the class', 'The parent class', 'A global variable'],
+                'answer': 1,
+                'explanation': '"self" represents the specific object (instance) that the method is being called on. It allows the method to access the attributes and other methods of that specific object.'
+            }
+        ]
+    }
 ]
 
 # Attach levels to each module.
