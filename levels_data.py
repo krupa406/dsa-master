@@ -5093,5 +5093,537 @@ print("All tests passed")
             ]
         }
     },
+
+    # =========================================================
+    # MODULE 15: Object-Oriented Programming
+    # =========================================================
+    15: {
+        'intermediate': {
+            'content': '''
+<h2>OOP: Intermediate Techniques</h2>
+<p>You know the basics of classes and inheritance. Now we tackle more powerful OOP tools: abstract classes, class methods, static methods, properties, and dunder (magic) methods.</p>
+
+<div class="concept-box">
+  <h4>🔑 Key Idea</h4>
+  <p>Magic methods let your objects behave like built-in Python types — supporting +, len(), print(), and comparisons naturally.</p>
+</div>
+
+<h3>Magic (Dunder) Methods</h3>
+<pre><code class="language-python">
+class Vector:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __repr__(self):
+        return f"Vector({self.x}, {self.y})"
+
+    def __add__(self, other):
+        return Vector(self.x + other.x, self.y + other.y)
+
+    def __len__(self):
+        return int((self.x**2 + self.y**2) ** 0.5)
+
+v1 = Vector(3, 4)
+v2 = Vector(1, 2)
+print(v1 + v2)   # Vector(4, 6)
+print(len(v1))   # 5
+</code></pre>
+
+<h3>Properties — Controlled Attribute Access</h3>
+<pre><code class="language-python">
+class Temperature:
+    def __init__(self, celsius):
+        self._celsius = celsius
+
+    @property
+    def celsius(self):
+        return self._celsius
+
+    @celsius.setter
+    def celsius(self, value):
+        if value < -273.15:
+            raise ValueError("Temperature below absolute zero!")
+        self._celsius = value
+
+    @property
+    def fahrenheit(self):
+        return self._celsius * 9/5 + 32
+
+t = Temperature(25)
+print(t.fahrenheit)   # 77.0
+t.celsius = 100
+print(t.fahrenheit)   # 212.0
+</code></pre>
+
+<h3>Class Methods and Static Methods</h3>
+<pre><code class="language-python">
+class Date:
+    def __init__(self, year, month, day):
+        self.year, self.month, self.day = year, month, day
+
+    @classmethod
+    def from_string(cls, date_string):
+        year, month, day = map(int, date_string.split("-"))
+        return cls(year, month, day)
+
+    @staticmethod
+    def is_valid(year, month, day):
+        return 1 <= month <= 12 and 1 <= day <= 31
+
+d = Date.from_string("2024-03-15")
+print(d.year, d.month, d.day)       # 2024 3 15
+print(Date.is_valid(2024, 13, 1))   # False
+</code></pre>
+''',
+            'labs': [
+                {
+                    'id': 1,
+                    'title': 'Build a Stack Class with Magic Methods',
+                    'description': '<p>Implement a <code>Stack</code> class that supports push, pop, and peek. It should also support <code>len(stack)</code>, <code>bool(stack)</code> (False if empty), and a clean <code>repr</code>.</p>',
+                    'starter_code': '''class Stack:
+    def __init__(self):
+        self._data = []
+
+    def push(self, item):
+        pass
+
+    def pop(self):
+        # Raise IndexError if empty
+        pass
+
+    def peek(self):
+        # Raise IndexError if empty
+        pass
+
+    def __len__(self):
+        pass
+
+    def __bool__(self):
+        pass
+
+    def __repr__(self):
+        pass
+''',
+                    'test_code': '''
+_pass = _fail = 0
+def _test(name, got, expected):
+    global _pass, _fail
+    if got == expected:
+        print(f"  PASS  {name}")
+        _pass += 1
+    else:
+        print(f"  FAIL  {name}: expected {expected!r}, got {got!r}")
+        _fail += 1
+
+s = Stack()
+_test("empty len", len(s), 0)
+_test("empty bool", bool(s), False)
+s.push(10)
+s.push(20)
+_test("len after push", len(s), 2)
+_test("bool non-empty", bool(s), True)
+_test("peek", s.peek(), 20)
+_test("pop", s.pop(), 20)
+_test("len after pop", len(s), 1)
+
+try:
+    empty = Stack()
+    empty.pop()
+    _fail += 1
+    print("  FAIL  pop on empty should raise IndexError")
+except IndexError:
+    _pass += 1
+    print("  PASS  pop on empty raises IndexError")
+
+print(f"\\n{\'=\'*40}")
+print(f"Results: {_pass}/{_pass+_fail} tests passed")
+if _fail == 0:
+    print("🎉 All tests passed!")
+''',
+                    'hints': [
+                        'push: self._data.append(item)',
+                        'pop: check if empty first (raise IndexError), then return self._data.pop()',
+                        '__len__: return len(self._data)',
+                        '__bool__: return len(self._data) > 0',
+                        '__repr__: return f"Stack({self._data})"',
+                    ]
+                },
+                {
+                    'id': 2,
+                    'title': 'Temperature Class with Properties',
+                    'description': '<p>Create a <code>Temperature</code> class storing temperature in Celsius. Add a <code>fahrenheit</code> property (read-only) and a <code>celsius</code> property with a setter that raises <code>ValueError</code> for temperatures below -273.15°C.</p>',
+                    'starter_code': '''class Temperature:
+    def __init__(self, celsius):
+        # Use the setter so validation runs from the start
+        self.celsius = celsius
+
+    @property
+    def celsius(self):
+        pass
+
+    @celsius.setter
+    def celsius(self, value):
+        # Raise ValueError if value < -273.15
+        pass
+
+    @property
+    def fahrenheit(self):
+        # Formula: C * 9/5 + 32
+        pass
+''',
+                    'test_code': '''
+_pass = _fail = 0
+def _test(name, got, expected):
+    global _pass, _fail
+    if abs(got - expected) < 0.01:
+        print(f"  PASS  {name}")
+        _pass += 1
+    else:
+        print(f"  FAIL  {name}: expected {expected}, got {got}")
+        _fail += 1
+
+t = Temperature(0)
+_test("0C to F", t.fahrenheit, 32.0)
+t.celsius = 100
+_test("100C to F", t.fahrenheit, 212.0)
+t.celsius = -40
+_test("-40C to F", t.fahrenheit, -40.0)
+
+try:
+    t.celsius = -300
+    _fail += 1
+    print("  FAIL  should raise ValueError for < -273.15")
+except ValueError:
+    _pass += 1
+    print("  PASS  ValueError raised for absolute zero violation")
+
+print(f"\\n{\'=\'*40}")
+print(f"Results: {_pass}/{_pass+_fail} tests passed")
+if _fail == 0:
+    print("🎉 All tests passed!")
+''',
+                    'hints': [
+                        'Store the value as self._celsius in the setter.',
+                        'The getter returns self._celsius.',
+                        'The setter checks: if value < -273.15: raise ValueError("...")',
+                        'Fahrenheit: return self._celsius * 9/5 + 32',
+                    ]
+                },
+            ],
+            'quiz': [
+                {
+                    'question': 'Which dunder method is called when you use len() on an object?',
+                    'options': ['__size__', '__count__', '__len__', '__length__'],
+                    'answer': 2,
+                    'explanation': 'Python calls __len__ when len() is used on an object. If defined, it should return an integer.'
+                },
+                {
+                    'question': 'What is the difference between @classmethod and @staticmethod?',
+                    'options': [
+                        'classmethod receives cls as first arg; staticmethod receives no implicit arg',
+                        'They are identical',
+                        'staticmethod receives self; classmethod receives cls',
+                        'classmethod is faster'
+                    ],
+                    'answer': 0,
+                    'explanation': '@classmethod receives the class (cls) as its first argument and can create instances. @staticmethod receives no implicit argument — it\'s just a regular function namespaced to the class.'
+                },
+                {
+                    'question': 'What does the @property decorator do?',
+                    'options': [
+                        'Makes a method private',
+                        'Allows a method to be called like an attribute (without parentheses)',
+                        'Speeds up attribute access',
+                        'Creates a class variable'
+                    ],
+                    'answer': 1,
+                    'explanation': '@property lets you define a method that is accessed like an attribute. This enables computed properties with validation, without changing the external API.'
+                },
+                {
+                    'question': 'Which dunder method enables the + operator between two objects?',
+                    'options': ['__plus__', '__add__', '__sum__', '__combine__'],
+                    'answer': 1,
+                    'explanation': '__add__ is called when the + operator is used. Python calls obj1.__add__(obj2) when you write obj1 + obj2.'
+                },
+                {
+                    'question': 'What does __repr__ control?',
+                    'options': [
+                        'How the object is deleted',
+                        'The official string representation, shown in the REPL and repr()',
+                        'How the object is compared',
+                        'The object\'s hash value'
+                    ],
+                    'answer': 1,
+                    'explanation': '__repr__ returns the "official" string representation of an object. It should ideally be unambiguous enough to recreate the object. It is shown in the REPL and used by repr().'
+                },
+            ]
+        },
+        'advanced': {
+            'content': '''
+<h2>OOP: Advanced Patterns</h2>
+<p>Advanced OOP in Python involves abstract base classes, mixins, metaclasses, and design patterns. These are the tools used to build large, maintainable frameworks.</p>
+
+<div class="concept-box">
+  <h4>🔑 Key Idea</h4>
+  <p>Abstract base classes enforce interface contracts; design patterns like Strategy and Observer decouple components for flexibility.</p>
+</div>
+
+<h3>Abstract Base Classes (ABCs)</h3>
+<pre><code class="language-python">
+from abc import ABC, abstractmethod
+
+class Shape(ABC):
+    @abstractmethod
+    def area(self) -> float:
+        pass
+
+    @abstractmethod
+    def perimeter(self) -> float:
+        pass
+
+    def describe(self):
+        return f"Area: {self.area():.2f}, Perimeter: {self.perimeter():.2f}"
+
+class Circle(Shape):
+    def __init__(self, radius):
+        self.radius = radius
+
+    def area(self):
+        return 3.14159 * self.radius ** 2
+
+    def perimeter(self):
+        return 2 * 3.14159 * self.radius
+
+c = Circle(5)
+print(c.describe())  # Area: 78.54, Perimeter: 31.42
+# Shape()  # TypeError: Can't instantiate abstract class
+</code></pre>
+
+<h3>Mixin Pattern</h3>
+<pre><code class="language-python">
+class SerializeMixin:
+    def to_dict(self):
+        return self.__dict__
+
+    def to_json(self):
+        import json
+        return json.dumps(self.__dict__)
+
+class LogMixin:
+    def log(self, message):
+        print(f"[{self.__class__.__name__}] {message}")
+
+class User(SerializeMixin, LogMixin):
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
+
+u = User("Alice", "alice@example.com")
+print(u.to_dict())         # {"name": "Alice", "email": "alice@example.com"}
+u.log("User created")      # [User] User created
+</code></pre>
+
+<h3>Strategy Pattern</h3>
+<pre><code class="language-python">
+class Sorter:
+    def __init__(self, strategy):
+        self._strategy = strategy
+
+    def sort(self, data):
+        return self._strategy(data)
+
+# Strategies are just callables
+bubble = lambda d: sorted(d)          # simplified
+merge  = lambda d: sorted(d, key=lambda x: x)
+
+s = Sorter(bubble)
+print(s.sort([3, 1, 2]))  # [1, 2, 3]
+s._strategy = merge
+print(s.sort([3, 1, 2]))  # [1, 2, 3]
+</code></pre>
+''',
+            'labs': [
+                {
+                    'id': 1,
+                    'title': 'Abstract Shape Hierarchy',
+                    'description': '<p>Create an abstract <code>Shape</code> class with abstract methods <code>area()</code> and <code>perimeter()</code>. Implement <code>Rectangle</code> and <code>Circle</code> subclasses. Add a <code>describe()</code> method to the base class.</p>',
+                    'starter_code': '''from abc import ABC, abstractmethod
+import math
+
+class Shape(ABC):
+    @abstractmethod
+    def area(self):
+        pass
+
+    @abstractmethod
+    def perimeter(self):
+        pass
+
+    def describe(self):
+        return f"Area={self.area():.2f}, Perimeter={self.perimeter():.2f}"
+
+class Rectangle(Shape):
+    def __init__(self, width, height):
+        pass
+
+    def area(self):
+        pass
+
+    def perimeter(self):
+        pass
+
+class Circle(Shape):
+    def __init__(self, radius):
+        pass
+
+    def area(self):
+        pass
+
+    def perimeter(self):
+        pass
+''',
+                    'test_code': '''
+import math
+_pass = _fail = 0
+def _test(name, got, expected, tol=0.01):
+    global _pass, _fail
+    if abs(got - expected) <= tol:
+        print(f"  PASS  {name}")
+        _pass += 1
+    else:
+        print(f"  FAIL  {name}: expected {expected:.4f}, got {got:.4f}")
+        _fail += 1
+
+r = Rectangle(4, 5)
+_test("Rectangle area", r.area(), 20.0)
+_test("Rectangle perimeter", r.perimeter(), 18.0)
+
+c = Circle(7)
+_test("Circle area", c.area(), math.pi * 49, tol=0.1)
+_test("Circle perimeter", c.perimeter(), 2 * math.pi * 7, tol=0.1)
+
+try:
+    Shape()
+    _fail += 1
+    print("  FAIL  Shape() should raise TypeError")
+except TypeError:
+    _pass += 1
+    print("  PASS  Shape() raises TypeError (abstract)")
+
+print(f"\\n{\'=\'*40}")
+print(f"Results: {_pass}/{_pass+_fail} tests passed")
+if _fail == 0:
+    print("🎉 All tests passed!")
+''',
+                    'hints': [
+                        'Rectangle.area = width * height; perimeter = 2*(width+height)',
+                        'Circle.area = math.pi * radius**2; perimeter = 2*math.pi*radius',
+                        'You cannot instantiate an ABC directly — the test verifies this.',
+                        'The describe() method in Shape calls self.area() and self.perimeter() polymorphically.',
+                    ]
+                },
+                {
+                    'id': 2,
+                    'title': 'Observer Pattern',
+                    'description': '<p>Implement the Observer design pattern. Create an <code>EventEmitter</code> class with <code>subscribe(event, callback)</code> and <code>emit(event, data)</code> methods. Subscribers registered for an event should all be called when that event is emitted.</p>',
+                    'starter_code': '''class EventEmitter:
+    def __init__(self):
+        self._listeners = {}  # event -> list of callbacks
+
+    def subscribe(self, event, callback):
+        """Register callback for the given event."""
+        pass
+
+    def emit(self, event, data=None):
+        """Call all callbacks registered for the event."""
+        pass
+''',
+                    'test_code': '''
+_pass = _fail = 0
+results = []
+
+def _test(name, got, expected):
+    global _pass, _fail
+    if got == expected:
+        print(f"  PASS  {name}")
+        _pass += 1
+    else:
+        print(f"  FAIL  {name}: expected {expected!r}, got {got!r}")
+        _fail += 1
+
+emitter = EventEmitter()
+
+log = []
+emitter.subscribe("click", lambda d: log.append(f"handler1:{d}"))
+emitter.subscribe("click", lambda d: log.append(f"handler2:{d}"))
+emitter.subscribe("hover", lambda d: log.append(f"hover:{d}"))
+
+emitter.emit("click", "btn")
+_test("two click handlers called", log, ["handler1:btn", "handler2:btn"])
+
+emitter.emit("hover", "menu")
+_test("hover handler called", log[-1], "hover:menu")
+
+emitter.emit("unknown")  # no handlers — should not error
+_test("no error on unknown event", True, True)
+
+print(f"\\n{\'=\'*40}")
+print(f"Results: {_pass}/{_pass+_fail} tests passed")
+if _fail == 0:
+    print("🎉 All tests passed!")
+''',
+                    'hints': [
+                        'In __init__, self._listeners = {} maps event names to lists of callbacks.',
+                        'subscribe: if event not in self._listeners, create an empty list, then append callback.',
+                        'emit: get self._listeners.get(event, []) and call each callback with data.',
+                        'Use a defaultdict(list) to simplify subscribe.',
+                    ]
+                },
+            ],
+            'quiz': [
+                {
+                    'question': 'What happens if you try to instantiate an abstract base class directly?',
+                    'options': ['It works fine', 'It raises TypeError', 'It raises ValueError', 'It creates an empty object'],
+                    'answer': 1,
+                    'explanation': 'Python raises TypeError if you try to instantiate a class that has unimplemented abstract methods. This enforces the contract that subclasses must implement all abstract methods.'
+                },
+                {
+                    'question': 'What is a Mixin class used for?',
+                    'options': [
+                        'Replacing inheritance entirely',
+                        'Adding reusable functionality to multiple unrelated classes without forming a strict hierarchy',
+                        'Making classes immutable',
+                        'Speeding up method calls'
+                    ],
+                    'answer': 1,
+                    'explanation': 'Mixins are small classes that add specific capabilities (e.g., serialization, logging) and are meant to be combined with other classes via multiple inheritance. They don\'t represent a standalone concept.'
+                },
+                {
+                    'question': 'In Python\'s MRO (Method Resolution Order), which algorithm is used?',
+                    'options': ['Depth-first search', 'Breadth-first search', 'C3 linearization', 'Topological sort'],
+                    'answer': 2,
+                    'explanation': 'Python uses C3 linearization to compute the MRO, ensuring a consistent and predictable order when resolving method calls in multiple inheritance hierarchies.'
+                },
+                {
+                    'question': 'Which design pattern defines a family of algorithms and makes them interchangeable?',
+                    'options': ['Observer', 'Singleton', 'Strategy', 'Factory'],
+                    'answer': 2,
+                    'explanation': 'The Strategy pattern encapsulates algorithms behind a common interface. Clients can switch strategies at runtime without modifying the context class, following the Open/Closed principle.'
+                },
+                {
+                    'question': 'What is the purpose of @abstractmethod?',
+                    'options': [
+                        'It makes the method run faster',
+                        'It marks a method that subclasses must override, enforcing an interface contract',
+                        'It hides the method from outside the class',
+                        'It makes the method a class method'
+                    ],
+                    'answer': 1,
+                    'explanation': '@abstractmethod marks a method in an ABC that subclasses are required to implement. If a subclass does not override all abstract methods, it also becomes abstract and cannot be instantiated.'
+                },
+            ]
+        }
+    },
 }
 

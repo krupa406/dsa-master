@@ -4248,6 +4248,7 @@ except Exception as e:
     _fail += 1
 
 print(f"\\n{'='*40}")
+print(f"\n{'='*40}")
 print(f"Results: {_pass}/{_pass+_fail} tests passed")
 if _fail == 0:
     print("🎉 Excellent! Your classes work perfectly.")
@@ -4268,7 +4269,7 @@ if _fail == 0:
                 'explanation': 'The __init__ method is a constructor. It is called automatically when you create a new instance of a class, and its primary purpose is to initialize the instance variables (attributes).'
             },
             {
-                'question': 'Which OOP principle involves hiding the internal state of an object and requiring all interaction to be performed through an object\\'s methods?',
+                'question': 'Which OOP principle involves hiding the internal state of an object and requiring all interaction to be performed through an object\'s methods?',
                 'options': ['Inheritance', 'Polymorphism', 'Encapsulation', 'Abstraction'],
                 'answer': 2,
                 'explanation': 'Encapsulation is the bundling of data and methods that operate on that data, restricting direct access to the internal state.'
@@ -4277,7 +4278,7 @@ if _fail == 0:
                 'question': 'What keyword is used to call a method from the parent class inside a child class?',
                 'options': ['parent()', 'this()', 'base()', 'super()'],
                 'answer': 3,
-                'explanation': 'The super() built-in returns a proxy object that allows you to refer parent class by \\'super\\', most commonly used as super().__init__() to call the parent\\'s constructor.'
+                'explanation': 'The super() built-in returns a proxy object that allows you to refer parent class by \'super\', most commonly used as super().__init__() to call the parent\'s constructor.'
             },
             {
                 'question': 'What does "self" refer to in a class method?',
