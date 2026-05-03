@@ -1,5 +1,6 @@
 from levels_data import LEVELS_DATA
 
+# <!-- VIZ-INJECTED -->
 MODULES = [
     {
         'id': 1,
@@ -54,8 +55,11 @@ print(nums[:4])    # [0, 1, 2, 3]  (from start to index 4)
 print(nums[6:])    # [6, 7, 8, 9]  (from index 6 to end)
 print(nums[::2])   # [0, 2, 4, 6, 8]  (every 2nd element)
 print(nums[::-1])  # [9, 8, 7, ..., 0]  (reversed!)
+
 </code></pre>
 
+
+<div class="dsa-viz"><script type="application/json">{"type": "array", "title": "Array Indexing & Slicing", "steps": [{"state": {"arr": [10, 20, 30, 40, 50], "classes": {}, "pointers": {}}, "desc": "A Python list with 5 elements. Each has an index 0-4."}, {"state": {"arr": [10, 20, 30, 40, 50], "classes": {"0": "active"}, "pointers": {"i": 0}}, "desc": "arr[0] = 10. Python uses zero-based indexing."}, {"state": {"arr": [10, 20, 30, 40, 50], "classes": {"2": "active"}, "pointers": {"i": 2}}, "desc": "arr[2] = 30. Access any element in O(1) time."}, {"state": {"arr": [10, 20, 30, 40, 50], "classes": {"1": "highlight", "2": "highlight", "3": "highlight"}, "pointers": {"L": 1, "R": 3}}, "desc": "arr[1:4] = [20, 30, 40]. Slicing creates a new sub-list."}, {"state": {"arr": [10, 20, 30, 40, 50], "classes": {"4": "active"}, "pointers": {"i": 4}}, "desc": "arr[-1] = 50. Negative indices count from the end."}]}</script></div>
 <h3>Common List Operations</h3>
 <pre><code class="language-python">
 fruits = ["apple", "banana"]
@@ -262,6 +266,9 @@ if _fail == 0:
   <p>Strings behave like read-only lists of characters. You can access individual characters, slice them, and iterate over them — but you can't change a character in place.</p>
 </div>
 
+
+
+<div class="dsa-viz"><script type="application/json">{"type": "array", "title": "String Immutability", "steps": [{"state": {"arr": ["H", "E", "L", "L", "O"], "classes": {}, "pointers": {}}, "desc": "String 'HELLO' stored as a sequence of characters."}, {"state": {"arr": ["H", "E", "L", "L", "O"], "classes": {"0": "active"}, "pointers": {"i": 0}}, "desc": "s[0] = 'H'. Strings support indexing like lists."}, {"state": {"arr": ["H", "E", "L", "L", "O"], "classes": {"0": "danger"}, "pointers": {"i": 0}}, "desc": "s[0] = 'J' raises TypeError! Strings are IMMUTABLE."}, {"state": {"arr": ["J", "E", "L", "L", "O"], "classes": {"0": "success"}, "pointers": {}}, "desc": "Instead create a new string: 'J' + s[1:] = 'JELLO'."}]}</script></div>
 <h3>Creating Strings</h3>
 <pre><code class="language-python">
 s1 = 'Hello'         # Single quotes
@@ -574,6 +581,9 @@ ll.append(30)
 ll.display()  # 10 → 20 → 30 → None
 </code></pre>
 
+
+
+<div class="dsa-viz"><script type="application/json">{"type": "linkedlist", "title": "Linked List Traversal", "steps": [{"state": {"nodes": ["A", "B", "C", "D"], "classes": {}}, "desc": "Singly linked list: each node has data + a pointer to the next node."}, {"state": {"nodes": ["A", "B", "C", "D"], "classes": {"0": "active"}}, "desc": "head -> A. Traversal always starts at the head."}, {"state": {"nodes": ["A", "B", "C", "D"], "classes": {"0": "success", "1": "active"}}, "desc": "current = current.next -> B."}, {"state": {"nodes": ["A", "B", "C", "D"], "classes": {"0": "success", "1": "success", "2": "active"}}, "desc": "current = current.next -> C."}, {"state": {"nodes": ["A", "B", "C", "D"], "classes": {"0": "success", "1": "success", "2": "success", "3": "active"}}, "desc": "current = current.next -> D."}, {"state": {"nodes": ["A", "B", "C", "D"], "classes": {"0": "success", "1": "success", "2": "success", "3": "success"}}, "desc": "current.next is None. Traversal complete! O(n) time."}]}</script></div>
 <h3>Prepend (Add to Front)</h3>
 <pre><code class="language-python">
 def prepend(self, data):
@@ -879,6 +889,9 @@ class Stack:
         return len(self._data)
 </code></pre>
 
+
+
+<div class="dsa-viz"><script type="application/json">{"type": "stack", "title": "Stack - Last In, First Out (LIFO)", "steps": [{"state": {"items": [], "classes": {}}, "desc": "Empty stack. push() adds to top, pop() removes from top."}, {"state": {"items": ["A"], "classes": {"0": "new-item"}}, "desc": "push('A') - A is on the stack."}, {"state": {"items": ["A", "B"], "classes": {"1": "new-item"}}, "desc": "push('B') - B is now on top."}, {"state": {"items": ["A", "B", "C"], "classes": {"2": "new-item"}}, "desc": "push('C') - C is the top element."}, {"state": {"items": ["A", "B", "C"], "classes": {"2": "removing"}}, "desc": "pop() returns 'C'. Last pushed = first removed. LIFO!"}, {"state": {"items": ["A", "B"], "classes": {"1": "removing"}}, "desc": "pop() returns 'B'. Stack shrinks from the top."}, {"state": {"items": ["A"], "classes": {}}, "desc": "Only 'A' remains. Like a stack of plates!"}]}</script></div>
 <h3>Classic Stack Application: Bracket Matching</h3>
 <pre><code class="language-python">
 def is_balanced(s):
@@ -914,8 +927,11 @@ print(is_balanced("([)]"))    # False
   </ul>
 </div>
 
+
+<div class="dsa-viz"><script type="application/json">{"type": "queue", "title": "Queue - First In, First Out (FIFO)", "steps": [{"state": {"items": [], "classes": {}}, "desc": "Empty queue. enqueue adds to rear, dequeue removes from front."}, {"state": {"items": ["A"], "classes": {"0": "new-item"}}, "desc": "enqueue('A') - A enters at the rear."}, {"state": {"items": ["A", "B"], "classes": {"1": "new-item"}}, "desc": "enqueue('B') - B joins behind A."}, {"state": {"items": ["A", "B", "C"], "classes": {"2": "new-item"}}, "desc": "enqueue('C') - C is the newest, at the rear."}, {"state": {"items": ["A", "B", "C"], "classes": {"0": "removing"}}, "desc": "dequeue() returns 'A'. First in = first out. FIFO!"}, {"state": {"items": ["B", "C"], "classes": {}}, "desc": "B is now the front. Like a queue at a coffee shop!"}]}</script></div>
 <h3>Queue Implementation</h3>
 <pre><code class="language-python">
+
 from collections import deque  # Efficient double-ended queue
 
 queue = deque()
@@ -1187,8 +1203,12 @@ root.right = TreeNode(15)
 root.left.left = TreeNode(3)
 root.left.right = TreeNode(7)
 root.right.right = TreeNode(20)
+
+
 </code></pre>
 
+
+<div class="dsa-viz"><script type="application/json">{"type": "tree", "title": "Binary Tree Structure", "steps": [{"state": {"nodes": [8, 3, 10, 1, 6, null, 14], "classes": {}, "edgeClasses": {}}, "desc": "A Binary Search Tree. Left child < parent < right child."}, {"state": {"nodes": [8, 3, 10, 1, 6, null, 14], "classes": {"0": "active"}, "edgeClasses": {}}, "desc": "Root node = 8. Every BST operation starts here."}, {"state": {"nodes": [8, 3, 10, 1, 6, null, 14], "classes": {"0": "visited", "1": "active"}, "edgeClasses": {"1": "active"}}, "desc": "3 < 8, so it goes LEFT. All left subtree values < 8."}, {"state": {"nodes": [8, 3, 10, 1, 6, null, 14], "classes": {"0": "visited", "1": "visited", "2": "active"}, "edgeClasses": {"2": "active"}}, "desc": "10 > 8, so it goes RIGHT. All right subtree values > 8."}, {"state": {"nodes": [8, 3, 10, 1, 6, null, 14], "classes": {"0": "visited", "1": "visited", "2": "visited", "3": "active", "4": "active", "6": "active"}, "edgeClasses": {}}, "desc": "Leaf nodes: 1, 6, 14. They have no children."}]}</script></div>
 <h3>Binary Search Tree (BST)</h3>
 <p>A BST has a special property: for every node, <strong>all values in its left subtree are smaller</strong>, and <strong>all values in its right subtree are larger</strong>.</p>
 
@@ -1549,6 +1569,9 @@ print(binary_search(arr, 13))   # 6
 print(binary_search(arr, 4))    # -1
 </code></pre>
 
+
+
+<div class="dsa-viz"><script type="application/json">{"type": "array", "title": "Linear vs Binary Search", "steps": [{"state": {"arr": [4, 2, 7, 1, 9, 3], "classes": {}, "pointers": {}}, "desc": "Unsorted array. Target: 9. Linear search checks one by one."}, {"state": {"arr": [4, 2, 7, 1, 9, 3], "classes": {"0": "danger"}, "pointers": {"i": 0}}, "desc": "arr[0]=4, not 9. Keep going..."}, {"state": {"arr": [4, 2, 7, 1, 9, 3], "classes": {"0": "dimmed", "1": "danger"}, "pointers": {"i": 1}}, "desc": "arr[1]=2, not 9. Keep going..."}, {"state": {"arr": [4, 2, 7, 1, 9, 3], "classes": {"0": "dimmed", "1": "dimmed", "2": "danger"}, "pointers": {"i": 2}}, "desc": "arr[2]=7, not 9. Keep going..."}, {"state": {"arr": [4, 2, 7, 1, 9, 3], "classes": {"0": "dimmed", "1": "dimmed", "2": "dimmed", "3": "danger"}, "pointers": {"i": 3}}, "desc": "arr[3]=1, not 9. Keep going..."}, {"state": {"arr": [4, 2, 7, 1, 9, 3], "classes": {"0": "dimmed", "1": "dimmed", "2": "dimmed", "3": "dimmed", "4": "success"}, "pointers": {"i": 4}}, "desc": "arr[4]=9 FOUND! Took 5 checks. Worst case: O(n)."}, {"state": {"arr": [1, 3, 5, 7, 9, 11, 13], "classes": {}, "pointers": {"L": 0, "R": 6}}, "desc": "Now BINARY SEARCH on sorted array. Target: 9."}, {"state": {"arr": [1, 3, 5, 7, 9, 11, 13], "classes": {"3": "active"}, "pointers": {"L": 0, "mid": 3, "R": 6}}, "desc": "mid=3, arr[3]=7. 9>7, search RIGHT half."}, {"state": {"arr": [1, 3, 5, 7, 9, 11, 13], "classes": {"0": "dimmed", "1": "dimmed", "2": "dimmed", "3": "dimmed", "5": "active"}, "pointers": {"L": 4, "mid": 5, "R": 6}}, "desc": "mid=5, arr[5]=11. 9<11, search LEFT."}, {"state": {"arr": [1, 3, 5, 7, 9, 11, 13], "classes": {"0": "dimmed", "1": "dimmed", "2": "dimmed", "3": "dimmed", "4": "success", "5": "dimmed", "6": "dimmed"}, "pointers": {"L": 4, "mid": 4, "R": 4}}, "desc": "mid=4, arr[4]=9 FOUND! Only 3 steps. O(log n)!"}]}</script></div>
 <h3>Step-by-step example</h3>
 <div class="visual-box">
 <pre>
@@ -1806,6 +1829,9 @@ def insertion_sort(arr):
 # i=3: key=1, shift 8,5,3 right → insert 1 → [1,3,5,8]
 </code></pre>
 
+
+
+<div class="dsa-viz"><script type="application/json">{"type": "array", "title": "Bubble Sort - Compare & Swap Adjacent Pairs", "steps": [{"state": {"arr": [5, 3, 8, 1, 2], "classes": {}, "pointers": {}}, "desc": "Unsorted: [5,3,8,1,2]. Bubble sort compares adjacent pairs."}, {"state": {"arr": [5, 3, 8, 1, 2], "classes": {"0": "active", "1": "active"}, "pointers": {}}, "desc": "Compare 5 and 3. 5 > 3 => SWAP!"}, {"state": {"arr": [3, 5, 8, 1, 2], "classes": {"0": "swap", "1": "swap"}, "pointers": {}}, "desc": "After swap: [3,5,...]. Smaller value bubbles left."}, {"state": {"arr": [3, 5, 8, 1, 2], "classes": {"2": "active", "3": "active"}, "pointers": {}}, "desc": "Compare 8 and 1. 8 > 1 => SWAP!"}, {"state": {"arr": [3, 5, 1, 8, 2], "classes": {"3": "active", "4": "active"}, "pointers": {}}, "desc": "Compare 8 and 2. 8 > 2 => SWAP!"}, {"state": {"arr": [3, 5, 1, 2, 8], "classes": {"4": "sorted"}, "pointers": {}}, "desc": "8 is in final position. Pass 1 complete."}, {"state": {"arr": [1, 2, 3, 5, 8], "classes": {"0": "sorted", "1": "sorted", "2": "sorted", "3": "sorted", "4": "sorted"}, "pointers": {}}, "desc": "After all passes: sorted! O(n^2) worst case."}]}</script></div>
 <h3>Comparison</h3>
 <table class="complexity-table">
   <tr><th>Algorithm</th><th>Best</th><th>Average</th><th>Worst</th><th>Stable?</th></tr>
@@ -1996,6 +2022,9 @@ print(hash("banana"))  # different number
 # So "apple" might end up at index 7 in a 10-slot table
 </code></pre>
 
+
+
+<div class="dsa-viz"><script type="application/json">{"type": "hashtable", "title": "Hash Table - Key to Bucket Mapping", "steps": [{"state": {"buckets": [[], [], [], [], []], "activeIdx": -1}, "desc": "Empty hash table with 5 buckets (indices 0-4)."}, {"state": {"buckets": [[], ["apple:5"], [], [], []], "activeIdx": 1}, "desc": "Insert 'apple': hash('apple') % 5 = 1. Stored in bucket 1."}, {"state": {"buckets": [[], ["apple:5"], [], [], ["cat:3"]], "activeIdx": 4}, "desc": "Insert 'cat': hash('cat') % 5 = 4. Bucket 4."}, {"state": {"buckets": [[], ["apple:5", "egg:12"], [], [], ["cat:3"]], "activeIdx": 1}, "desc": "Insert 'egg': hash('egg') % 5 = 1. COLLISION! Chained in bucket 1."}, {"state": {"buckets": [["dog:7"], ["apple:5", "egg:12"], [], [], ["cat:3"]], "activeIdx": 0}, "desc": "Insert 'dog': bucket 0. Average lookup: O(1)!"}]}</script></div>
 <h3>Python Dictionaries</h3>
 <pre><code class="language-python">
 # Create
@@ -2245,6 +2274,8 @@ if _fail == 0:
   <li><strong>Adjacency</strong> — two nodes are adjacent if directly connected</li>
 </ul>
 
+
+<div class="dsa-viz"><script type="application/json">{"type": "text", "title": "Graph Basics - Nodes & Edges", "steps": [{"state": {"html": "<div style='font-family:var(--mono);font-size:1.1rem'><b>Graph = Nodes + Edges</b><br><br>    (A)---(B)<br>     |   / |<br>     |  /  |<br>    (C)---(D)<br><br>4 nodes, 5 edges</div>"}, "desc": "A graph has NODES (vertices) and EDGES (connections between nodes)."}, {"state": {"html": "<div style='font-family:var(--mono);font-size:1rem'><b>Adjacency List:</b><br><br>A: [B, C]<br>B: [A, C, D]<br>C: [A, B, D]<br>D: [B, C]</div>"}, "desc": "Adjacency List: each node stores a list of its neighbors. Space: O(V + E)."}, {"state": {"html": "<div style='font-family:var(--mono);font-size:0.9rem'><b>Adjacency Matrix:</b><br><br>&nbsp;&nbsp;A B C D<br>A [0,1,1,0]<br>B [1,0,1,1]<br>C [1,1,0,1]<br>D [0,1,1,0]</div>"}, "desc": "Adjacency Matrix: 2D grid. matrix[i][j]=1 if edge exists. Space: O(V^2)."}, {"state": {"html": "<div><b>Directed vs Undirected:</b><br><br>Undirected: A -- B (both ways)<br>Directed: A --> B (one way only)<br><br><b>Weighted:</b> edges have costs<br>A --(5)--> B</div>"}, "desc": "Graphs can be directed/undirected and weighted/unweighted."}]}</script></div>
 <h3>Representing Graphs: Adjacency List</h3>
 <p>The most common representation in Python is an <strong>adjacency list</strong> — a dictionary mapping each node to its neighbors.</p>
 <pre><code class="language-python">
@@ -2550,6 +2581,8 @@ if _fail == 0:
   <li><strong>Overlapping Subproblems</strong> — the same subproblems recur many times</li>
 </ol>
 
+
+<div class="dsa-viz"><script type="application/json">{"type": "array", "title": "Fibonacci - Why DP Matters", "steps": [{"state": {"arr": ["?", "?", "?", "?", "?", "?"], "classes": {}, "pointers": {}}, "desc": "Goal: compute fib(5). Without DP, we recompute the same values many times."}, {"state": {"arr": [0, 1, "?", "?", "?", "?"], "classes": {"0": "success", "1": "success"}, "pointers": {}}, "desc": "Base cases: fib(0)=0, fib(1)=1. These are known."}, {"state": {"arr": [0, 1, 1, "?", "?", "?"], "classes": {"0": "highlight", "1": "highlight", "2": "active"}, "pointers": {}}, "desc": "fib(2) = fib(1) + fib(0) = 1 + 0 = 1. Store it!"}, {"state": {"arr": [0, 1, 1, 2, "?", "?"], "classes": {"1": "highlight", "2": "highlight", "3": "active"}, "pointers": {}}, "desc": "fib(3) = fib(2) + fib(1) = 1 + 1 = 2. Reuse stored values!"}, {"state": {"arr": [0, 1, 1, 2, 3, "?"], "classes": {"2": "highlight", "3": "highlight", "4": "active"}, "pointers": {}}, "desc": "fib(4) = fib(3) + fib(2) = 2 + 1 = 3. No recomputation!"}, {"state": {"arr": [0, 1, 1, 2, 3, 5], "classes": {"3": "highlight", "4": "highlight", "5": "active"}, "pointers": {}}, "desc": "fib(5) = fib(4) + fib(3) = 3 + 2 = 5. DP: O(n) vs naive O(2^n)!"}]}</script></div>
 <h3>Approach 1: Memoization (Top-Down)</h3>
 <p>Write the recursive solution, then cache results in a dictionary.</p>
 <pre><code class="language-python">
@@ -2831,6 +2864,8 @@ if _fail == 0:
   <p>A heap is NOT fully sorted — it only guarantees the root is the min/max. This relaxed property is what makes insert and extract each O(log n) while keeping peek O(1).</p>
 </div>
 
+
+<div class="dsa-viz"><script type="application/json">{"type": "tree", "title": "Min-Heap: Parent <= Children", "steps": [{"state": {"nodes": [1, 3, 5, 7, 9, 6, 8], "classes": {}, "edgeClasses": {}}, "desc": "A min-heap: every parent is smaller than its children. Root = minimum."}, {"state": {"nodes": [1, 3, 5, 7, 9, 6, 8], "classes": {"0": "active"}, "edgeClasses": {}}, "desc": "Root = 1 (the minimum). peek() returns 1 in O(1)."}, {"state": {"nodes": [1, 3, 5, 7, 9, 6, 8], "classes": {"0": "active", "1": "highlight", "2": "highlight"}, "edgeClasses": {"1": "active", "2": "active"}}, "desc": "Children of root: 3 and 5. Both >= 1. Heap property holds!"}, {"state": {"nodes": [3, 7, 5, null, 9, 6, 8], "classes": {"0": "active"}, "edgeClasses": {}}, "desc": "After pop(): remove root, sift down. New root = 3. O(log n)."}, {"state": {"nodes": [2, 3, 5, 7, 9, 6, 8], "classes": {"0": "swap"}, "edgeClasses": {}}, "desc": "push(2): add at end, sift UP. O(log n) per operation."}]}</script></div>
 <h3>Python's heapq Module</h3>
 <p>Python's <code>heapq</code> is a <strong>min-heap</strong> built on a plain list. Use negation for max-heap behavior.</p>
 <pre><code class="language-python">
@@ -3121,6 +3156,8 @@ class TrieNode:
         self.is_end = False  # True if this node ends a word
 </code></pre>
 
+
+<div class="dsa-viz"><script type="application/json">{"type": "text", "title": "Trie - Prefix Tree for Words", "steps": [{"state": {"html": "<div style='font-family:var(--mono);text-align:left;font-size:0.95rem'><b>Empty Trie:</b><br><br>(root)<br> |<br>[empty]</div>"}, "desc": "A trie starts with an empty root node. Each edge represents a character."}, {"state": {"html": "<div style='font-family:var(--mono);text-align:left;font-size:0.95rem'>Insert <b>'cat'</b>:<br><br>(root)<br> c<br> a<br> t*</div>"}, "desc": "Insert 'cat': create nodes c->a->t. Mark t as end-of-word (*)."}, {"state": {"html": "<div style='font-family:var(--mono);text-align:left;font-size:0.95rem'>Insert <b>'car'</b>:<br><br>(root)<br> c<br> a<br>/ \\<br>t*  r*</div>"}, "desc": "Insert 'car': reuse c->a, then branch to r. Shared prefix = 'ca'!"}, {"state": {"html": "<div style='font-family:var(--mono);text-align:left;font-size:0.95rem'>Insert <b>'dog'</b>:<br><br>&nbsp;&nbsp;(root)<br>&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;\\<br>c&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d<br>a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;o<br>/\\&nbsp;&nbsp;&nbsp;&nbsp;g*<br>t* r*</div>"}, "desc": "Insert 'dog': new branch from root. Search any word in O(length)."}]}</script></div>
 <h3>Building a Trie</h3>
 <pre><code class="language-python">
 class Trie:
@@ -3471,6 +3508,8 @@ def backtrack(current_state, choices):
             undo_choice(current_state, choice)  # ← the "backtrack" step
 </code></pre>
 
+
+<div class="dsa-viz"><script type="application/json">{"type": "array", "title": "Backtracking - Explore & Undo", "steps": [{"state": {"arr": ["_", "_", "_"], "classes": {}, "pointers": {}}, "desc": "Goal: permutations of [1,2,3]. We fill slots one by one."}, {"state": {"arr": [1, "_", "_"], "classes": {"0": "active"}, "pointers": {}}, "desc": "Try 1 in slot 0. Explore further..."}, {"state": {"arr": [1, 2, "_"], "classes": {"0": "success", "1": "active"}, "pointers": {}}, "desc": "Try 2 in slot 1. Explore further..."}, {"state": {"arr": [1, 2, 3], "classes": {"0": "success", "1": "success", "2": "success"}, "pointers": {}}, "desc": "Place 3 in slot 2. Found permutation [1,2,3]!"}, {"state": {"arr": [1, 2, "_"], "classes": {"0": "success", "1": "success", "2": "danger"}, "pointers": {}}, "desc": "BACKTRACK: undo slot 2, try other options..."}, {"state": {"arr": [1, 3, 2], "classes": {"0": "success", "1": "swap", "2": "swap"}, "pointers": {}}, "desc": "Try 3 in slot 1, 2 in slot 2. Found [1,3,2]!"}, {"state": {"arr": ["_", "_", "_"], "classes": {"0": "danger"}, "pointers": {}}, "desc": "Backtrack to slot 0, try 2 next... Continue until all 6 permutations found."}]}</script></div>
 <h3>Example: Generate All Permutations</h3>
 <pre><code class="language-python">
 def permutations(nums):
@@ -3817,6 +3856,8 @@ print(dijkstra(graph, 'A'))
 
 <p><strong>Complexity:</strong> O((V + E) log V) with a binary heap.</p>
 
+
+<div class="dsa-viz"><script type="application/json">{"type": "text", "title": "Dijkstra's Algorithm - Shortest Path", "steps": [{"state": {"html": "<div style='font-family:var(--mono);font-size:0.95rem'><b>Weighted Graph:</b><br>A --(4)--> B<br>A --(1)--> C<br>C --(2)--> B<br>B --(3)--> D<br>C --(5)--> D</div>"}, "desc": "Goal: find shortest path from A to all other nodes."}, {"state": {"html": "<div style='font-family:var(--mono);font-size:0.95rem'>Dist: A=<b>0</b>, B=inf, C=inf, D=inf<br><br>Process A (dist 0):<br>Update B: 0+4=4<br>Update C: 0+1=<b>1</b></div>"}, "desc": "Start at A (dist=0). Update neighbors: B=4, C=1."}, {"state": {"html": "<div style='font-family:var(--mono);font-size:0.95rem'>Dist: A=0, B=4, C=<b>1</b>, D=inf<br><br>Process C (dist 1, smallest!):<br>Update B: min(4, 1+2)=<b>3</b><br>Update D: 1+5=6</div>"}, "desc": "Process C next (smallest unvisited). Found shorter path to B: 1+2=3!"}, {"state": {"html": "<div style='font-family:var(--mono);font-size:0.95rem'>Dist: A=0, B=<b>3</b>, C=1, D=6<br><br>Process B (dist 3):<br>Update D: min(6, 3+3)=<b>6</b></div>"}, "desc": "Process B. D stays at 6. Greedy: always process smallest first."}, {"state": {"html": "<div style='font-family:var(--mono);font-size:0.95rem'><b>Final shortest distances:</b><br>A=0, B=3, C=1, D=6<br><br>Shortest path A->D:<br>A -> C -> B -> D (cost 6)<br><br>Time: O((V+E) log V)</div>"}, "desc": "Done! Dijkstra finds ALL shortest paths. Uses a min-heap for efficiency."}]}</script></div>
 <h3>2. Topological Sort — Ordering Dependencies</h3>
 <p>For a <strong>Directed Acyclic Graph (DAG)</strong>, topological sort produces a linear ordering of nodes such that every directed edge u → v has u before v. Used in build systems, course prerequisites, task scheduling.</p>
 
@@ -4106,6 +4147,8 @@ print(dog1.name)      # Buddy
 print(dog2.bark())    # Lucy says Woof!
 </code></pre>
 
+
+<div class="dsa-viz"><script type="application/json">{"type": "text", "title": "OOP - Classes as Blueprints", "steps": [{"state": {"html": "<div style='text-align:left'><b>Class = Blueprint</b><br>Instance = Object built from blueprint<br><br><code>class Dog:</code> (blueprint)<br><code>my_dog = Dog('Rex')</code> (instance)</div>"}, "desc": "A class defines attributes and methods. An instance is a concrete object."}, {"state": {"html": "<div style='text-align:left'><b>Encapsulation:</b><br>Bundle data + methods together<br>Hide internal details<br><br><code>dog.name</code> (public)<br><code>dog._health</code> (protected)</div>"}, "desc": "Encapsulation: protect internal state, expose clean interfaces."}, {"state": {"html": "<div style='text-align:left'><b>Inheritance:</b><br><br>Animal (parent)<br>&nbsp;&nbsp;|-- Dog (child)<br>&nbsp;&nbsp;|-- Cat (child)<br><br>Dog inherits eat(), adds bark()</div>"}, "desc": "Inheritance: child classes inherit and extend parent behavior."}, {"state": {"html": "<div style='text-align:left'><b>Polymorphism:</b><br><br>for animal in [Dog(), Cat()]:<br>&nbsp;&nbsp;animal.speak()<br><br>Dog says 'Woof!', Cat says 'Meow!'<br>Same method, different behavior!</div>"}, "desc": "Polymorphism: same interface, different implementations. Power of OOP!"}]}</script></div>
 <h3>The Four Pillars of OOP</h3>
 <p>OOP is built on four core principles:</p>
 <ol>
